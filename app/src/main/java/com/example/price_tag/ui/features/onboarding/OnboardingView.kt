@@ -1,5 +1,6 @@
 package com.example.price_tag.ui.features.onboarding
 
+import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -51,7 +52,7 @@ import kotlinx.coroutines.launch
 @Preview(showBackground = true)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OnboardingScreen() {
+fun OnboardingView() {
     Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color.Gray) { padding ->
         val pagerState = rememberPagerState(pageCount = { 3 })
         val coroutineScope = rememberCoroutineScope()
@@ -137,7 +138,7 @@ fun OnboardingScreen() {
                                     pagerState.currentPage + 1,
                                     animationSpec = tween(
                                         durationMillis = 400,
-                                        easing = LinearOutSlowInEasing
+                                        easing = EaseIn,
                                     ),
                                 )
                             }

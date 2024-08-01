@@ -1,13 +1,11 @@
 package com.example.price_tag.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
 import com.example.price_tag.ui.features.home.HomeView
-import com.example.price_tag.ui.features.onboarding.OnboardingScreen
+import com.example.price_tag.ui.features.onboarding.OnboardingView
 
 
 @Composable
@@ -21,7 +19,7 @@ fun NavigationStack() {
         composable(
             route = Screen.OnboardingScreen.route,
         ) {
-            OnboardingScreen()
+            OnboardingView()
         }
     }
 }
