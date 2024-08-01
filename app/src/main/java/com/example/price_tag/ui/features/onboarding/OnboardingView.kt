@@ -1,7 +1,6 @@
 package com.example.price_tag.ui.features.onboarding
 
 import androidx.compose.animation.core.EaseIn
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -10,7 +9,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.absoluteOffset
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -42,17 +40,18 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.price_tag.navigation.NavigationItem
 import kotlinx.coroutines.launch
 
 
-@Preview(showBackground = true)
+//@Preview(showBackground = true)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OnboardingView() {
+fun OnboardingView(navController: NavController) {
     Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color.Gray) { padding ->
         val pagerState = rememberPagerState(pageCount = { 3 })
         val coroutineScope = rememberCoroutineScope()
@@ -155,7 +154,7 @@ fun OnboardingView() {
                     }
                     else
                         ElevatedButton(
-                            onClick = { /*TODO*/ },
+                            onClick = { navController.navigate(NavigationItem.MainView.route) },
                             colors = ButtonDefaults.elevatedButtonColors(
                                 containerColor = Color.Blue,
                                 contentColor = Color.White,
