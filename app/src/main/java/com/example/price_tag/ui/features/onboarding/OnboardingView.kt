@@ -154,7 +154,7 @@ fun OnboardingView(navController: NavController) {
                     }
                     else
                         ElevatedButton(
-                            onClick = { navController.navigate(NavigationItem.MainView.route) },
+                            onClick = { navController.navigate(NavigationItem.LoginView.route) },
                             colors = ButtonDefaults.elevatedButtonColors(
                                 containerColor = Color.Blue,
                                 contentColor = Color.White,
