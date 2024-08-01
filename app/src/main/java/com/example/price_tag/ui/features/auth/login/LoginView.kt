@@ -34,11 +34,9 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.navigation.NavigationItem
 
 @Composable
@@ -119,7 +117,13 @@ fun LoginView(navController: NavController) {
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(
-                onClick = { /*TODO*/ },
+                onClick = {
+                    navController.navigate(NavigationItem.MainView.route) {
+                        popUpTo(NavigationItem.LoginView.route){
+                            inclusive = true
+                        }
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                 modifier = Modifier.fillMaxWidth(),
             ) {
@@ -149,7 +153,8 @@ fun LoginView(navController: NavController) {
                 Spacer(modifier = Modifier.widthIn(8.dp))
 
                 ClickableText(
-                    text = AnnotatedString("Sign Up"), onClick = { navController.navigate(NavigationItem.SignUpView.route) },
+                    text = AnnotatedString("Sign Up"),
+                    onClick = { navController.navigate(NavigationItem.SignUpView.route) },
                     style = TextStyle(
                         color = Color.Blue,
                     ),
