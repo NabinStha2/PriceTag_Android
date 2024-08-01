@@ -24,8 +24,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.ui.components.BottomNavigationBar
+import com.example.price_tag.ui.features.category.CategoryView
 import com.example.price_tag.ui.features.home.HomeView
 import com.example.price_tag.ui.features.profile.ProfileView
+import com.example.price_tag.ui.features.wishlist.WishlistView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
@@ -39,7 +41,6 @@ fun MainView(
         modifier = Modifier
             .padding(WindowInsets.safeDrawing.asPaddingValues()),
         topBar = {
-
             CenterAlignedTopAppBar(
                 title = {
                     Text(
@@ -64,7 +65,16 @@ fun MainView(
             0 -> {
                 HomeView(padding)
             }
+
             1 -> {
+                CategoryView(padding)
+            }
+
+            2 -> {
+                WishlistView(padding)
+            }
+
+            3 -> {
                 ProfileView(padding)
             }
         }

@@ -6,6 +6,8 @@ import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.runtime.Composable
@@ -29,17 +31,23 @@ fun BottomNavigationBar(selectedIndex: Int, onChangeIndex: (Int) -> Unit) {
             selected = selectedIndex == 0,
             onClick = { onChangeIndex(0) }
         )
-//        BottomNavigationItem(
-//            icon = { Icon(Icons.Filled.Search, contentDescription = "Category") },
-//            label = { Text("Search") },
-//            selected = selectedIndex == 1,
-//            onClick = { selectedIndex = 1 }
-//        )
+        BottomNavigationItem(
+            icon = { Icon(Icons.Filled.Category, contentDescription = "Category") },
+            label = { Text("Category") },
+            selected = selectedIndex == 1,
+            onClick = { onChangeIndex(1) }
+        )
+        BottomNavigationItem(
+            icon = { Icon(Icons.Filled.Favorite, contentDescription = "Wishlist") },
+            label = { Text("Wishlist") },
+            selected = selectedIndex == 2,
+            onClick = { onChangeIndex(2) }
+        )
         BottomNavigationItem(
             icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
             label = { Text("Profile") },
-            selected = selectedIndex == 1,
-            onClick = { onChangeIndex(1) }
+            selected = selectedIndex == 3,
+            onClick = { onChangeIndex(3) }
         )
     }
 }
