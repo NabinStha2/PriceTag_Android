@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -138,8 +139,14 @@ fun LoginView(navController: NavController = rememberNavController()) {
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(
-                onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
+                onClick = {
+                    navController.navigate(NavigationItem.MainView.route) {
+                        popUpTo(NavigationItem.LoginView.route){
+                            inclusive = true
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
             ) {

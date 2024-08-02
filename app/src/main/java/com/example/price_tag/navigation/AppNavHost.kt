@@ -16,16 +16,16 @@ import com.example.price_tag.ui.features.onboarding.OnboardingView
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDestination : String = NavigationItem.OnboardingView.route,
+    startDestination : String = NavigationItem.MainView.route,
 ) {
     NavHost(
         modifier = modifier,
         navController = navController,
         startDestination = startDestination,
     ) {
-        composable(route = NavigationItem.SplashView.route) {
-            HomeView()
-        }
+//        composable(route = NavigationItem.SplashView.route) {
+//            HomeView()
+//        }
         composable(
             route = NavigationItem.OnboardingView.route,
         ) {
