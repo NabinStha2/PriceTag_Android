@@ -14,6 +14,4 @@ class MainViewModel : ViewModel() {
         Log.d("changeSelectedMainBottomBarIndex", index.toString())
         _selectedMainBottomBarIndex.value = index
     }
-
-
 }

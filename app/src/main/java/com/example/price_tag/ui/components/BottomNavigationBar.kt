@@ -22,33 +22,56 @@ fun BottomNavigationBar(selectedIndex: Int, onChangeIndex: (Int) -> Unit) {
 //    var selectedIndex: Int by rememberSaveable { (mutableIntStateOf(0)) }
 
     BottomNavigation(
-        modifier = Modifier.padding(0.dp),
+        modifier = Modifier
+            .padding(0.dp),
         backgroundColor = Color.White,
     ) {
-        BottomNavigationItem(
-            icon = { Icon(Icons.Filled.Home, contentDescription = "Home") },
+        BottomNavigationItem(icon = {
+            Icon(
+                Icons.Filled.Home, contentDescription = "Home"
+            )
+        },
             label = { Text("Home") },
+            unselectedContentColor = Color.Gray,
+            selectedContentColor = Color.Blue,
             selected = selectedIndex == 0,
-            onClick = { onChangeIndex(0) }
-        )
-        BottomNavigationItem(
-            icon = { Icon(Icons.Filled.Category, contentDescription = "Category") },
+            onClick = { onChangeIndex(0) })
+
+        BottomNavigationItem(icon = {
+            Icon(
+                Icons.Filled.Category,
+                contentDescription = "Category"
+            )
+        },
             label = { Text("Category") },
+            unselectedContentColor = Color.Gray,
+            selectedContentColor = Color.Blue,
             selected = selectedIndex == 1,
-            onClick = { onChangeIndex(1) }
-        )
-        BottomNavigationItem(
-            icon = { Icon(Icons.Filled.Favorite, contentDescription = "Wishlist") },
+            onClick = { onChangeIndex(1) })
+
+        BottomNavigationItem(icon = {
+            Icon(
+                Icons.Filled.Favorite,
+                contentDescription = "Wishlist"
+            )
+        },
             label = { Text("Wishlist") },
+            unselectedContentColor = Color.Gray,
+            selectedContentColor = Color.Blue,
             selected = selectedIndex == 2,
-            onClick = { onChangeIndex(2) }
-        )
-        BottomNavigationItem(
-            icon = { Icon(Icons.Filled.Person, contentDescription = "Profile") },
+            onClick = { onChangeIndex(2) })
+
+        BottomNavigationItem(icon = {
+            Icon(
+                Icons.Filled.Person, contentDescription = "Profile"
+            )
+
+        },
             label = { Text("Profile") },
+            unselectedContentColor = Color.Gray,
+            selectedContentColor = Color.Blue,
             selected = selectedIndex == 3,
-            onClick = { onChangeIndex(3) }
-        )
+            onClick = { onChangeIndex(3) })
     }
 }
 

@@ -3,8 +3,12 @@ package com.example.price_tag.ui.features.main
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,7 +43,7 @@ fun MainView(
     val selectedIndex by viewModel.selectedMainBottomBarIndex.collectAsState()
     Scaffold(
         modifier = Modifier
-            .padding(WindowInsets.safeDrawing.asPaddingValues()),
+            .padding(WindowInsets.systemBars.asPaddingValues()),
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
