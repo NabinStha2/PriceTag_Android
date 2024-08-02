@@ -1,3 +1,4 @@
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -6,7 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -29,19 +33,25 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import com.example.price_tag.R
 import com.example.price_tag.navigation.NavigationItem
+import com.example.price_tag.ui.theme.PrimaryColor
 
 @Composable
 
-fun LoginView(navController: NavController) {
+fun LoginView(navController: NavController = rememberNavController()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var obscurePassword by remember { mutableStateOf(true) }
@@ -60,18 +70,28 @@ fun LoginView(navController: NavController) {
             verticalArrangement = Arrangement.Center,
 
             ) {
+
+            Image(
+                painter = painterResource(id = R.drawable.logo),
+                contentDescription = "logo",
+                modifier = Modifier.width(200.dp),
+            )
+            Spacer(modifier = Modifier.height(24.dp))
+
             Text(
                 text = "Welcome Back",
                 style = TextStyle(
                     fontSize = 20.sp,
-                    fontWeight = FontWeight.W600,
+                    fontWeight = FontWeight.W500,
 
                     ),
             )
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(32.dp))
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Email") },
                 leadingIcon = {
@@ -79,16 +99,18 @@ fun LoginView(navController: NavController) {
                         imageVector = Icons.Default.Email,
                         contentDescription = "Email"
                     )
-                }
+                },
 
-            )
+
+                )
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Password") },
-
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Lock,
@@ -126,8 +148,16 @@ fun LoginView(navController: NavController) {
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                 modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
             ) {
-                Text(text = "Login")
+                Text(
+                    text = "LOGIN", modifier = Modifier.padding(vertical = 6.dp),
+                    style = TextStyle(
+                        fontWeight = FontWeight.W500,
+                        fontSize = 16.sp,
+
+                        ),
+                )
 
             }
             Spacer(modifier = Modifier.height(24.dp))
@@ -154,9 +184,16 @@ fun LoginView(navController: NavController) {
 
                 ClickableText(
                     text = AnnotatedString("Sign Up"),
-                    onClick = { navController.navigate(NavigationItem.SignUpView.route) },
+                    onClick = {
+                        navController.navigate(NavigationItem.SignUpView.route) {
+                            popUpTo(NavigationItem.LoginView.route) {
+                                inclusive = true
+                            }
+                        }
+                    },
                     style = TextStyle(
-                        color = Color.Blue,
+                        color = PrimaryColor,
+                        fontWeight = FontWeight.W500,
                     ),
                 )
             }
@@ -165,9 +202,8 @@ fun LoginView(navController: NavController) {
     }
 }
 
-//@Preview
-//@Composable
-//
-//fun LoginViewPreview() {
-//    LoginView()
-//}
+@Preview
+@Composable
+fun LoginViewPreview() {
+    LoginView()
+}
