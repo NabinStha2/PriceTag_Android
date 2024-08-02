@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
@@ -36,13 +37,16 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.navigation.NavigationItem
+import com.example.price_tag.ui.theme.PrimaryColor
 
 @Composable
-fun SignUpView(navController: NavController) {
+fun SignUpView(navController: NavController = rememberNavController()) {
     var userName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -75,6 +79,8 @@ fun SignUpView(navController: NavController) {
                 onValueChange = { userName = it },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "User Name") },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Person,
@@ -89,6 +95,8 @@ fun SignUpView(navController: NavController) {
                 onValueChange = { email = it },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Email") },
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Email,
@@ -103,7 +111,8 @@ fun SignUpView(navController: NavController) {
                 onValueChange = { password = it },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Password") },
-
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Lock,
@@ -136,7 +145,8 @@ fun SignUpView(navController: NavController) {
                 onValueChange = { confirmPassword = it },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Confirm Password") },
-
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Lock,
@@ -166,10 +176,15 @@ fun SignUpView(navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = { /*TODO*/ },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
+                colors = ButtonDefaults.buttonColors(containerColor = PrimaryColor),
                 modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
             ) {
-                Text(text = "Sign Up")
+                Text(text = "SIGN UP", modifier = Modifier.padding(vertical = 6.dp),style = TextStyle(
+                    fontWeight = FontWeight.W500,
+                    fontSize = 16.sp,
+
+                    ))
 
             }
 
@@ -183,9 +198,15 @@ fun SignUpView(navController: NavController) {
 
                 ClickableText(
                     text = AnnotatedString("Login Now"),
-                    onClick = { navController.navigate(NavigationItem.LoginView.route) },
+                    onClick = {
+                        navController.navigate(NavigationItem.LoginView.route) {
+                            popUpTo(NavigationItem.SignUpView.route) {
+                                inclusive = true
+                            }
+                        }
+                    },
                     style = TextStyle(
-                        color = Color.Blue,
+                        color = PrimaryColor,
                     ),
                 )
             }
@@ -195,8 +216,8 @@ fun SignUpView(navController: NavController) {
 }
 
 
-//@Preview
-//@Composable
-//fun SignUpViewPreview() {
-//    SignUpView()
-//}
+@Preview
+@Composable
+fun SignUpViewPreview() {
+    SignUpView()
+}

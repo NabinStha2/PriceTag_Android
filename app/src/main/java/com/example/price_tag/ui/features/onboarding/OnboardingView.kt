@@ -61,6 +61,7 @@ fun OnboardingView(navController: NavController) {
         val halfScreenHeightDp = (screenHeightDp / 1.5).dp
 
 
+
         Box(
             modifier = Modifier
                 .padding(padding)
@@ -154,7 +155,13 @@ fun OnboardingView(navController: NavController) {
                     }
                     else
                         ElevatedButton(
-                            onClick = { navController.navigate(NavigationItem.LoginView.route) },
+                            onClick = { navController.navigate(NavigationItem.LoginView.route){
+                                popUpTo(NavigationItem.OnboardingView.route) {
+                                    inclusive = true
+                                }
+                            }
+
+                             },
                             colors = ButtonDefaults.elevatedButtonColors(
                                 containerColor = Color.Blue,
                                 contentColor = Color.White,
