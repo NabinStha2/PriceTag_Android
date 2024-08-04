@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -204,6 +206,50 @@ fun HomeView(padding: PaddingValues = PaddingValues(0.dp)) {
         itemsIndexed(items = productList) { index, product ->
             ProductCard(index = index, productItem = product)
         }
+
+        item(span = { GridItemSpan(2) }) {
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = "Popular Products",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+                TextButton(onClick = { /*TODO*/ }) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "See all", fontSize = 14.sp, fontWeight = FontWeight.W400
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(
+                            imageVector = Icons.Default.ArrowForwardIos,
+                            contentDescription = "Arrow Forward",
+                            modifier = Modifier.size(14.dp),
+                        )
+                    }
+                }
+            }
+        }
+
+        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+            LazyRow(
+                modifier = Modifier
+                    .height(250.dp)
+                    .wrapContentWidth(),
+            ) {
+                items(productList.size) { index ->
+                    ProductCard(index = index, productItem = productList[index], width = 160.dp)
+                    Spacer(modifier = Modifier.width(10.dp))
+                }
+            }
+        }
+
     }
 }
 
