@@ -1,5 +1,7 @@
 package com.example.price_tag.ui.features.main
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -45,7 +47,7 @@ fun MainView(
             .padding(WindowInsets.systemBars.asPaddingValues())
             .fillMaxSize(),
         containerColor = Color.Gray.copy(
-            alpha = 0.1f
+            alpha = 0.08f
         ),
         topBar = {
             CenterAlignedTopAppBar(
@@ -62,7 +64,7 @@ fun MainView(
                     .wrapContentHeight(align = Alignment.CenterVertically),
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Gray.copy(
-                        alpha = 0.1f
+                        alpha = 0.08f
                     ),
                 )
             )
