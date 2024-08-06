@@ -1,7 +1,6 @@
 package com.example.price_tag.ui.features.main
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,7 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -45,7 +43,7 @@ fun MainView(
     val selectedIndex by viewModel.selectedMainBottomBarIndex.collectAsState()
     Scaffold(
         modifier = Modifier
-            .padding(WindowInsets.systemBars.asPaddingValues())
+//            .padding(WindowInsets.systemBars.asPaddingValues())
             .background(color = Color.White)
             .fillMaxSize(),
         containerColor = Color.Gray.copy(
@@ -63,9 +61,7 @@ fun MainView(
                     )
                 },
                 modifier = Modifier
-                    .height(64.dp)
-                    .background(color = Color.Red)
-                    .wrapContentHeight(align = Alignment.CenterVertically),
+                    .background(color = Color.White),
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Gray.copy(
                         alpha = 0.08f

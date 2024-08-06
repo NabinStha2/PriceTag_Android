@@ -1,7 +1,5 @@
 package com.example.price_tag.ui.components
 
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Favorite
@@ -13,20 +11,15 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 
 @Composable
 fun BottomNavigationBar(selectedIndex: Int, onChangeIndex: (Int) -> Unit) {
     // Remember the current selected index
 //    var selectedIndex: Int by rememberSaveable { (mutableIntStateOf(0)) }
 
-    NavigationBar(
-        modifier = Modifier
-            .height(84.dp),
-    ) {
+    NavigationBar(containerColor = Color.White) {
         NavigationBarItem(icon = {
             Icon(
                 Icons.Filled.Home, contentDescription = "Home"
