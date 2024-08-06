@@ -25,7 +25,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForwardIos
+import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
@@ -194,7 +194,7 @@ fun HomeView(padding: PaddingValues = PaddingValues(0.dp)) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
-                            imageVector = Icons.Default.ArrowForwardIos,
+                            imageVector = Icons.Filled.ArrowForward,
                             contentDescription = "Arrow Forward",
                             modifier = Modifier.size(14.dp),
                         )
@@ -228,7 +228,7 @@ fun HomeView(padding: PaddingValues = PaddingValues(0.dp)) {
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Icon(
-                            imageVector = Icons.Default.ArrowForwardIos,
+                            imageVector = Icons.Filled.ArrowForward,
                             contentDescription = "Arrow Forward",
                             modifier = Modifier.size(14.dp),
                         )

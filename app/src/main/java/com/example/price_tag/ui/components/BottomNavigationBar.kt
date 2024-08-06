@@ -1,15 +1,17 @@
 package com.example.price_tag.ui.components
 
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -21,55 +23,61 @@ fun BottomNavigationBar(selectedIndex: Int, onChangeIndex: (Int) -> Unit) {
     // Remember the current selected index
 //    var selectedIndex: Int by rememberSaveable { (mutableIntStateOf(0)) }
 
-    BottomNavigation(
+    NavigationBar(
         modifier = Modifier
-            .padding(0.dp),
-        backgroundColor = Color.White,
+            .height(84.dp),
     ) {
-        BottomNavigationItem(icon = {
+        NavigationBarItem(icon = {
             Icon(
                 Icons.Filled.Home, contentDescription = "Home"
             )
         },
             label = { Text("Home") },
-            unselectedContentColor = Color.Gray,
-            selectedContentColor = Color.Blue,
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = Color.Gray,
+                selectedIconColor = Color.Blue
+            ),
             selected = selectedIndex == 0,
             onClick = { onChangeIndex(0) })
 
-        BottomNavigationItem(icon = {
+        NavigationBarItem(icon = {
             Icon(
                 Icons.Filled.Category,
                 contentDescription = "Category"
             )
         },
             label = { Text("Category") },
-            unselectedContentColor = Color.Gray,
-            selectedContentColor = Color.Blue,
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = Color.Gray,
+                selectedIconColor = Color.Blue
+            ),
             selected = selectedIndex == 1,
             onClick = { onChangeIndex(1) })
 
-        BottomNavigationItem(icon = {
+        NavigationBarItem(icon = {
             Icon(
                 Icons.Filled.Favorite,
                 contentDescription = "Wishlist"
             )
         },
             label = { Text("Wishlist") },
-            unselectedContentColor = Color.Gray,
-            selectedContentColor = Color.Blue,
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = Color.Gray,
+                selectedIconColor = Color.Blue
+            ),
             selected = selectedIndex == 2,
             onClick = { onChangeIndex(2) })
 
-        BottomNavigationItem(icon = {
+        NavigationBarItem(icon = {
             Icon(
                 Icons.Filled.Person, contentDescription = "Profile"
             )
-
         },
             label = { Text("Profile") },
-            unselectedContentColor = Color.Gray,
-            selectedContentColor = Color.Blue,
+            colors = NavigationBarItemDefaults.colors(
+                unselectedIconColor = Color.Gray,
+                selectedIconColor = Color.Blue
+            ),
             selected = selectedIndex == 3,
             onClick = { onChangeIndex(3) })
     }

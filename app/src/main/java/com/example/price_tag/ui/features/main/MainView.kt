@@ -14,6 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -45,6 +46,7 @@ fun MainView(
     Scaffold(
         modifier = Modifier
             .padding(WindowInsets.systemBars.asPaddingValues())
+            .background(color = Color.White)
             .fillMaxSize(),
         containerColor = Color.Gray.copy(
             alpha = 0.08f
@@ -57,10 +59,12 @@ fun MainView(
                         fontSize = MaterialTheme.typography.titleLarge.fontSize,
                         fontWeight = FontWeight.W600,
                         textAlign = TextAlign.Center,
+                        color = Color.Black,
                     )
                 },
                 modifier = Modifier
-                    .height(56.dp)
+                    .height(64.dp)
+                    .background(color = Color.Red)
                     .wrapContentHeight(align = Alignment.CenterVertically),
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                     containerColor = Color.Gray.copy(
@@ -77,11 +81,11 @@ fun MainView(
     ) { padding ->
         when (selectedIndex) {
             0 -> {
-                HomeView(padding)
+                CategoryView(padding)
             }
 
             1 -> {
-                CategoryView(padding)
+                HomeView(padding)
             }
 
             2 -> {
