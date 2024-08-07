@@ -10,22 +10,20 @@ import com.example.price_tag.ui.features.auth.signup.SignUpView
 import com.example.price_tag.ui.features.home.HomeView
 import com.example.price_tag.ui.features.main.MainView
 import com.example.price_tag.ui.features.onboarding.OnboardingView
+import com.example.price_tag.ui.features.product.ProductView
 
 
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController,
-    startDestination : String = NavigationItem.MainView.route,
+    startDestination : String = NavigationItem.OnboardingView.route,
 ) {
     NavHost(
         modifier = modifier,
         navController = navController,
         startDestination = startDestination,
     ) {
-//        composable(route = NavigationItem.SplashView.route) {
-//            HomeView()
-//        }
         composable(
             route = NavigationItem.OnboardingView.route,
         ) {
@@ -45,6 +43,11 @@ fun AppNavHost(
             route = NavigationItem.SignUpView.route,
         ) {
             SignUpView(navController)
+        }
+        composable(
+            route = NavigationItem.ProductView.route,
+        ) {
+            ProductView(navController)
         }
     }
 }

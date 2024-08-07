@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -44,13 +43,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
+import com.example.price_tag.navigation.NavigationItem
 import com.example.price_tag.ui.features.main.MainView
 
-
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun CategoryView(padding: PaddingValues) {
+fun CategoryView(
+    navController: NavController = rememberNavController(),
+    padding: PaddingValues
+) {
     val configuration = LocalConfiguration.current
     var selectedItem by remember { mutableIntStateOf(0) }
     val listItem = listOf(
@@ -105,7 +108,9 @@ fun CategoryView(padding: PaddingValues) {
                 Box(
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
-                        .clickable { },
+                        .clickable {
+                            navController.navigate(route = NavigationItem.ProductView.route)
+                        },
                 ) {
                     Column {
 //                        AsyncImage(
