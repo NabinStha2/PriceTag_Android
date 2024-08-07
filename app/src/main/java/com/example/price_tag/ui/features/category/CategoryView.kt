@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
-import com.example.price_tag.navigation.NavigationItem
+import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.features.main.MainView
 
 @Composable

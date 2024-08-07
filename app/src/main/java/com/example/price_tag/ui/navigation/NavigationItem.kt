@@ -1,4 +1,4 @@
-package com.example.price_tag.navigation
+package com.example.price_tag.ui.navigation
 
 sealed class NavigationItem(val route: String) {
     data object SplashView : NavigationItem("splash_screen")

@@ -44,7 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.price_tag.navigation.NavigationItem
+import com.example.price_tag.ui.navigation.NavigationItem
 import kotlinx.coroutines.launch
 
 

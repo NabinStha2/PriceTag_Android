@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "price_tag"
 include(":app")
- 
+include(":utilites")

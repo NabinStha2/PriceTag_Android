@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -34,7 +33,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -43,23 +41,27 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
-import com.example.price_tag.navigation.NavigationItem
+import com.example.price_tag.ui.features.auth.login.LoginViewModel
+import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.theme.PrimaryColor
 
 @Composable
-
-fun LoginView(navController: NavController = rememberNavController()) {
+fun LoginView(
+    navController: NavController = rememberNavController(),
+) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var obscurePassword by remember { mutableStateOf(true) }
 
+    val loginViewModel: LoginViewModel = hiltViewModel()
+
 
     Surface(
-        color = Color.White,
-        modifier = Modifier.fillMaxSize()
+        color = Color.White, modifier = Modifier.fillMaxSize()
 
     ) {
         Column(
@@ -96,8 +98,7 @@ fun LoginView(navController: NavController = rememberNavController()) {
                 placeholder = { Text(text = "Email") },
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Default.Email,
-                        contentDescription = "Email"
+                        imageVector = Icons.Default.Email, contentDescription = "Email"
                     )
                 },
 
@@ -113,8 +114,7 @@ fun LoginView(navController: NavController = rememberNavController()) {
                 shape = RoundedCornerShape(12.dp),
                 leadingIcon = {
                     Icon(
-                        imageVector = Icons.Default.Lock,
-                        contentDescription = "Password"
+                        imageVector = Icons.Default.Lock, contentDescription = "Password"
                     )
                 },
                 trailingIcon = {
@@ -130,7 +130,6 @@ fun LoginView(navController: NavController = rememberNavController()) {
                                 contentDescription = "Show Password",
                             )
                         }
-
                     }
                 },
                 visualTransformation = if (obscurePassword) PasswordVisualTransformation() else VisualTransformation.None
@@ -141,7 +140,7 @@ fun LoginView(navController: NavController = rememberNavController()) {
             Button(
                 onClick = {
                     navController.navigate(NavigationItem.MainView.route) {
-                        popUpTo(NavigationItem.LoginView.route){
+                        popUpTo(NavigationItem.LoginView.route) {
                             inclusive = true
                         }
                     }
