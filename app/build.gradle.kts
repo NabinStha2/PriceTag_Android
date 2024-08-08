@@ -78,6 +78,9 @@ dependencies {
     implementation(Dependencies.moshi)
     implementation(Dependencies.moshiConverter)
 
+    implementation(Dependencies.coroutineCore)
+    implementation(Dependencies.coroutineAndroid)
+
 //    testImplementation(Dependencies.junit)
     testImplementation(Dependencies.testJunit)
     androidTestImplementation(Dependencies.espressoCore)

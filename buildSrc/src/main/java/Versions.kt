@@ -27,4 +27,7 @@ object Versions {
 
     const val lifecycleViewModelCompose = "1.0.0-alpha07"
     const val lifecycleLivedata = "2.3.1"
+
+    const val coroutineCore = "2.0.0"
+    const val coroutineAndroid = "1.3.9"
 }

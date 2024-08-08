@@ -35,6 +35,9 @@ object Dependencies {
     val lifecycleViewModelCompose by lazy { "androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.lifecycleViewModelCompose}" }
     val lifecycleLivedata by lazy { "androidx.lifecycle:lifecycle-livedata:${Versions.lifecycleLivedata}" }
 
+    val coroutineAndroid by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutineAndroid}" }
+    val coroutineCore by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutineCore}" }
+
 }
 
 
