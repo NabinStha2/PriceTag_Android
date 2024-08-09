@@ -1,3 +1,4 @@
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -45,25 +47,49 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
+import com.example.price_tag.data.model.auth.LoginRequest
+import com.example.price_tag.ui.components.Loader
 import com.example.price_tag.ui.features.auth.login.LoginViewModel
+import com.example.price_tag.ui.features.main.MainView
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.theme.PrimaryColor
+import com.example.utilites.ResourceState
 
 @Composable
 fun LoginView(
     navController: NavController = rememberNavController(),
+    loginViewModel: LoginViewModel = hiltViewModel(),
 ) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var obscurePassword by remember { mutableStateOf(true) }
 
-    val loginViewModel: LoginViewModel = hiltViewModel()
+    val loginResponse by loginViewModel.loginData.collectAsState()
 
 
     Surface(
         color = Color.White, modifier = Modifier.fillMaxSize()
 
     ) {
+        when (loginResponse) {
+            is ResourceState.Loading -> {
+                Log.d("Login View", "Loading")
+                Loader()
+            }
+
+            is ResourceState.Success -> {
+                val response = (loginResponse as ResourceState.Success).data
+
+                Log.d("Login View", response.toString())
+            }
+
+            is ResourceState.Error -> {
+                Log.d("Login View", (loginResponse as ResourceState.Error).error.toString())
+            }
+
+            else -> {}
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -139,11 +165,16 @@ fun LoginView(
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-                    navController.navigate(NavigationItem.MainView.route) {
-                        popUpTo(NavigationItem.LoginView.route) {
-                            inclusive = true
-                        }
-                    }
+//                    navController.navigate(NavigationItem.MainView.route) {
+//                        popUpTo(NavigationItem.LoginView.route) {
+//                            inclusive = true
+//                        }
+//                    }
+                    loginViewModel.login(
+                        loginRequest = LoginRequest(
+                            email = email, password = password
+                        )
+                    )
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                 modifier = Modifier.fillMaxWidth(),
@@ -204,5 +235,5 @@ fun LoginView(
 @Preview
 @Composable
 fun LoginViewPreview() {
-    LoginView()
+    MainView()
 }

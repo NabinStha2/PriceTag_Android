@@ -2,6 +2,9 @@ package com.example.price_tag.di
 
 import com.example.price_tag.data.AppConstants
 import com.example.price_tag.data.api.ApiService
+import com.example.price_tag.data.datasource.auth.AuthDataSource
+import com.example.price_tag.data.datasource.auth.AuthDataSourceImpl
+import com.example.price_tag.ui.repository.auth.AuthRepository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -50,6 +53,20 @@ class AppModule {
     @Singleton
     fun providesApiService(retrofit: Retrofit): ApiService {
         return retrofit.create(ApiService::class.java)
+    }
+
+
+    // Auth Hilt
+    @Provides
+    @Singleton
+    fun providesAuthDataSource(apiService: ApiService): AuthDataSource {
+        return AuthDataSourceImpl(apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun providesAuthRepository(authDataSource: AuthDataSource): AuthRepository {
+        return AuthRepository(authDataSource)
     }
 
 }

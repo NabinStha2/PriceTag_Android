@@ -1,4 +1,4 @@
-package com.example.price_tag.data.entity
+package com.example.price_tag.data.model.auth
 
 data class LoginResponse(
     val accessToken: String,

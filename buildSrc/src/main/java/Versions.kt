@@ -15,8 +15,8 @@ object Versions {
     const val junitVersion = "1.2.1"
     const val espressoCore = "3.6.1"
 
-    const val hiltAndroid = "2.44"
-    const val hiltAndroidCompiler = "2.44"
+    const val hiltAndroid = "2.48"
+    const val hiltAndroidCompiler = "2.48"
     const val hiltNavigationCompose = "1.2.0"
 
     const val retrofit = "2.11.0"
@@ -28,6 +28,6 @@ object Versions {
     const val lifecycleViewModelCompose = "1.0.0-alpha07"
     const val lifecycleLivedata = "2.3.1"
 
-    const val coroutineCore = "2.0.0"
+    const val coroutineCore = "1.9.0-RC"
     const val coroutineAndroid = "1.3.9"
 }
