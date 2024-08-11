@@ -23,6 +23,8 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -67,27 +69,44 @@ fun LoginView(
     val loginResponse by loginViewModel.loginData.collectAsState()
 
 
+    var TAG = "LoginView"
+
     Surface(
         color = Color.White, modifier = Modifier.fillMaxSize()
 
     ) {
         when (loginResponse) {
             is ResourceState.Loading -> {
-                Log.d("Login View", "Loading")
+                Log.i(TAG, "Inside Loading State")
                 Loader()
             }
 
             is ResourceState.Success -> {
                 val response = (loginResponse as ResourceState.Success).data
-
-                Log.d("Login View", response.toString())
+                navController.navigate(NavigationItem.MainView.route) {
+                    popUpTo(NavigationItem.LoginView.route) {
+                        inclusive = true
+                    }
+                }
+                Log.i(TAG, response.toString())
+                Snackbar(
+                    containerColor = PrimaryColor,
+                    shape = RoundedCornerShape(12.dp),
+                ) {
+                    Text(text = "Login successful")
+                }
             }
 
             is ResourceState.Error -> {
-                Log.d("Login View", (loginResponse as ResourceState.Error).error.toString())
+                Log.e(
+                    TAG,
+                    "Inside Error State : ${(loginResponse as ResourceState.Error).error.toString()}"
+                )
             }
 
-            else -> {}
+            else -> {
+                Log.d(TAG,"Else State")
+            }
         }
 
         Column(
@@ -165,11 +184,6 @@ fun LoginView(
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-//                    navController.navigate(NavigationItem.MainView.route) {
-//                        popUpTo(NavigationItem.LoginView.route) {
-//                            inclusive = true
-//                        }
-//                    }
                     loginViewModel.login(
                         loginRequest = LoginRequest(
                             email = email, password = password
