@@ -3,6 +3,7 @@ package com.example.price_tag.ui.repository.auth
 import com.example.price_tag.data.datasource.auth.AuthDataSource
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.LoginResponse
+import com.example.price_tag.data.model.auth.SignUpRequest
 import com.example.utilites.ResourceState
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -22,6 +23,22 @@ class AuthRepository @Inject constructor(
                 )
             )
             else emit(ResourceState.Error("Error while logging in"))
+        }.catch { err ->
+            emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))
+        }
+
+    }
+
+    suspend fun register(signUpRequest: SignUpRequest): Flow<ResourceState<LoginResponse>> {
+        return flow {
+            emit(ResourceState.Loading())
+            val response = authDataSource.register(signUpRequest = signUpRequest)
+            if (response.isSuccessful && response.body() != null) emit(
+                ResourceState.Success(
+                    response.body()!!
+                )
+            )
+            else emit(ResourceState.Error("Error while registering user"))
         }.catch { err ->
             emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))
         }

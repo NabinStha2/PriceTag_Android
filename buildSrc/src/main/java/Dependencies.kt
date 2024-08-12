@@ -8,7 +8,8 @@ object Dependencies {
     val composeBom by lazy { "androidx.compose:compose-bom:${Versions.composeBom}" }
     val ui by lazy { "androidx.compose.ui:ui" }
     val uiGraphics by lazy { "androidx.compose.ui:ui-graphics" }
-    val uiToolingPreview by lazy { "androidx.compose.ui:ui-tooling-preview" }
+    val uiToolingPreview by lazy { "androidx.compose.ui:ui-tooling-preview:${Versions.ui}" }
+    val uiTooling by lazy { "androidx.compose.ui:ui-tooling:${Versions.ui}" }
     val material3 by lazy { "androidx.compose.material3:material3" }
     val constraintLayoutCompose by lazy { "androidx.constraintlayout:constraintlayout-compose:${Versions.constraintLayoutCompose}" }
     val coilCompose by lazy { "io.coil-kt:coil-compose:${Versions.coilCompose}" }

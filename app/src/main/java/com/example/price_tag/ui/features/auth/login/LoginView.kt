@@ -1,3 +1,5 @@
+package com.example.price_tag.ui.features.auth.login
+
 import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -8,10 +10,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.ClickableText
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -23,9 +28,8 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarData
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -71,10 +75,12 @@ fun LoginView(
 
     var TAG = "LoginView"
 
-    Surface(
-        color = Color.White, modifier = Modifier.fillMaxSize()
-
-    ) {
+    Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .safeContentPadding(),
+        containerColor = Color.White,
+        ) {innerPadding ->
         when (loginResponse) {
             is ResourceState.Loading -> {
                 Log.i(TAG, "Inside Loading State")
@@ -105,14 +111,16 @@ fun LoginView(
             }
 
             else -> {
-                Log.d(TAG,"Else State")
+                Log.d(TAG, "Else State")
             }
         }
 
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp),
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
 
@@ -249,5 +257,5 @@ fun LoginView(
 @Preview
 @Composable
 fun LoginViewPreview() {
-    MainView()
+    LoginView()
 }

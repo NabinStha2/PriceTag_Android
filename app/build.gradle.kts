@@ -64,6 +64,7 @@ dependencies {
     implementation(Dependencies.navigationCompose)
     implementation(Dependencies.uiGraphics)
     implementation(Dependencies.uiToolingPreview)
+    implementation(Dependencies.uiTooling)
     implementation(Dependencies.materialIconExtended)
     implementation(Dependencies.accompanistFlowlayout)
 
