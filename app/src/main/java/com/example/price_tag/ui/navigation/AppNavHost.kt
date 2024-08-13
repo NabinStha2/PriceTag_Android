@@ -1,14 +1,13 @@
 package com.example.price_tag.ui.navigation
 
-import LoginView
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.price_tag.ui.features.auth.login.LoginView
+import com.example.price_tag.ui.features.auth.otp.OtpView
 import com.example.price_tag.ui.features.auth.signup.SignUpView
-import com.example.price_tag.ui.features.home.HomeView
 import com.example.price_tag.ui.features.main.MainView
 import com.example.price_tag.ui.features.onboarding.OnboardingView
 import com.example.price_tag.ui.features.product.ProductView
@@ -48,6 +47,12 @@ fun AppNavHost(
             route = NavigationItem.SignUpView.route,
         ) {
             SignUpView(navController)
+        }
+
+        composable(
+            route = NavigationItem.OtpView.route,
+        ) {
+            OtpView(navController)
         }
 
         composable(

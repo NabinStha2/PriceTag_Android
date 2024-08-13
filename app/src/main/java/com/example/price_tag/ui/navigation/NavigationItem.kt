@@ -7,4 +7,5 @@ sealed class NavigationItem(val route: String) {
     data object LoginView : NavigationItem("login_screen")
     data object SignUpView : NavigationItem("sign_up_screen")
     data object ProductView : NavigationItem("product_screen")
+    data object OtpView : NavigationItem("otp_screen")
 }
