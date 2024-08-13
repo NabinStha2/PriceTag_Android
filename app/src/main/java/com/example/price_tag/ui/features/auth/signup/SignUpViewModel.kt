@@ -1,5 +1,6 @@
 package com.example.price_tag.ui.features.auth.signup
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.data.model.auth.LoginResponse
@@ -19,6 +20,22 @@ class SignUpViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) :
     ViewModel() {
+
+    var userName = mutableStateOf("who cares")
+    var email = mutableStateOf("nabincresta246@gmail.com")
+    var phoneNumber = mutableStateOf("9826484691")
+    var password = mutableStateOf("hello123")
+    var confirmPassword = mutableStateOf("hello123")
+
+//    val userName: State<String> = _userName
+//    val email: State<String> = _email
+//    val phoneNumber: State<String> = _phoneNumber
+//    val password: State<String> = _password
+//    val confirmPassword: State<String> = _confirmPassword
+
+//    fun setEmail(newEmail: String) {
+//        _email.value = newEmail
+//    }
 
 
     private val _signupData: MutableStateFlow<ResourceState<LoginResponse>> =

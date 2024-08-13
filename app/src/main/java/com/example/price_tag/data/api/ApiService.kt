@@ -2,6 +2,7 @@ package com.example.price_tag.data.api
 
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.LoginResponse
+import com.example.price_tag.data.model.auth.OtpRequest
 import com.example.price_tag.data.model.auth.SignUpRequest
 import retrofit2.Response
 import retrofit2.http.Body
@@ -14,6 +15,9 @@ interface ApiService {
 
     @POST("auth/register")
     suspend fun register(@Body signUpRequest: SignUpRequest): Response<LoginResponse>
+
+    @POST("auth/verify-otp")
+    suspend fun verifyOtp(@Body otpRequest: OtpRequest): Response<LoginResponse>
 
 
 }

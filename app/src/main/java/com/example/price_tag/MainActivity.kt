@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -33,6 +35,15 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
+data class CustomSnackbarVisuals(
+    override val message: String,
+    override val duration: SnackbarDuration = SnackbarDuration.Short,
+    val containerColor: Color = Color.White,
+    val contentColor: Color = Color.Red,
+    override val actionLabel: String? = null,
+    override val withDismissAction: Boolean = false
+) : SnackbarVisuals
 
 
 @Preview(showBackground = true)

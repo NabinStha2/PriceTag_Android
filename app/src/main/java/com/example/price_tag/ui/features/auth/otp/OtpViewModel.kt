@@ -2,8 +2,8 @@ package com.example.price_tag.ui.features.auth.otp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.LoginResponse
+import com.example.price_tag.data.model.auth.OtpRequest
 import com.example.price_tag.ui.repository.auth.AuthRepository
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,13 +22,13 @@ class OtpViewModel @Inject constructor(
 
     private val _loginData: MutableStateFlow<ResourceState<LoginResponse>> =
         MutableStateFlow(ResourceState.Initial())
-    val loginData: StateFlow <ResourceState<LoginResponse>> = _loginData
+    val loginData: StateFlow<ResourceState<LoginResponse>> = _loginData
 
-    fun login(loginRequest: LoginRequest) {
+    fun verifyOtp(otpRequest: OtpRequest) {
         viewModelScope.launch(Dispatchers.IO) {
-            authRepository.login(loginRequest)
-                .collectLatest { loginReponse ->
-                    _loginData.value = loginReponse
+            authRepository.verifyOtp(otpRequest = otpRequest)
+                .collectLatest { otpResponse ->
+                    _loginData.value = otpResponse
                 }
         }
     }
