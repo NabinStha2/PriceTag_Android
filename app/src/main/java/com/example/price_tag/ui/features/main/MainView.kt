@@ -33,6 +33,7 @@ fun MainView(
     viewModel: MainViewModel = viewModel<MainViewModel>()
 ) {
     val selectedIndex by viewModel.selectedMainBottomBarIndex.collectAsState()
+
     Scaffold(
         modifier = Modifier
 //            .padding(WindowInsets.systemBars.asPaddingValues())
@@ -42,10 +43,11 @@ fun MainView(
             alpha = 0.08f
         ),
         topBar = {
+            if(selectedIndex == 0)
             CenterAlignedTopAppBar(
                 title = {
                     Text(
-                        text = "Price Tag",
+                        text =   "Price Tag" ,
                         fontSize = MaterialTheme.typography.titleLarge.fontSize,
                         fontWeight = FontWeight.W600,
                         textAlign = TextAlign.Center,

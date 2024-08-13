@@ -17,7 +17,7 @@ import com.example.price_tag.ui.features.product.ProductView
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
-    startDestination: String = NavigationItem.LoginView.route,
+    startDestination: String = NavigationItem.MainView.route,
 ) {
     val navController = rememberNavController()
 
