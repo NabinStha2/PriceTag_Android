@@ -101,6 +101,7 @@ fun LoginView(
             })
         }) { scaffoldPadding ->
         Log.e(TAG, "Inside of Scaffold")
+
         when (loginResponse) {
             is ResourceState.Loading -> {
                 Log.i(TAG, "Inside Loading State")
@@ -132,6 +133,11 @@ fun LoginView(
                     popUpTo(NavigationItem.LoginView.route) {
                         inclusive = true
                     }
+                    // Avoid multiple copies of the same destination when
+                    // reselecting the same item
+                    launchSingleTop = true
+                    // Restore state when reselecting a previously selected item
+                    restoreState = true
                 }
 //                    }
 //                }
