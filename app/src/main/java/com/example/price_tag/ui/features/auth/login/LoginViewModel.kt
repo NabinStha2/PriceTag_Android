@@ -1,5 +1,6 @@
 package com.example.price_tag.ui.features.auth.login
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.data.model.auth.LoginRequest
@@ -19,18 +20,27 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
+    var email = mutableStateOf("admin@gmail.com")
+    var password = mutableStateOf("hello123")
+    var obscurePassword = mutableStateOf(true)
+    var emailError = mutableStateOf<String?>(null)
 
     private val _loginData: MutableStateFlow<ResourceState<LoginResponse>> =
         MutableStateFlow(ResourceState.Initial())
-    val loginData: StateFlow <ResourceState<LoginResponse>> = _loginData
+    val loginData: StateFlow<ResourceState<LoginResponse>> = _loginData
+
 
     fun login(loginRequest: LoginRequest) {
         viewModelScope.launch(Dispatchers.IO) {
-            authRepository.login(loginRequest)
-                .collectLatest { loginReponse ->
-                    _loginData.value = loginReponse
-                }
+            authRepository.login(loginRequest).collectLatest { loginReponse ->
+                _loginData.value = loginReponse
+            }
         }
+    }
+
+    // Method to reset login response state
+    fun resetLoginResponse() {
+        _loginData.value = ResourceState.Initial()
     }
 
     companion object {

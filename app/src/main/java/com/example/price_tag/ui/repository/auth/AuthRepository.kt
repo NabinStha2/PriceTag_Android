@@ -2,30 +2,46 @@ package com.example.price_tag.ui.repository.auth
 
 import android.util.Log
 import com.example.price_tag.data.datasource.auth.AuthDataSource
+import com.example.price_tag.data.model.auth.CommonErrorResponse
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.model.auth.OtpRequest
 import com.example.price_tag.data.model.auth.SignUpRequest
 import com.example.utilites.ResourceState
+import com.squareup.moshi.JsonAdapter
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.adapter
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
+@OptIn(ExperimentalStdlibApi::class)
 class AuthRepository @Inject constructor(
     private val authDataSource: AuthDataSource
 ) {
+    private val moshi: Moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+
+    private val jsonErrorAdapter: JsonAdapter<CommonErrorResponse> =
+        moshi.adapter<CommonErrorResponse>()
+
     suspend fun login(loginRequest: LoginRequest): Flow<ResourceState<LoginResponse>> {
         return flow {
             emit(ResourceState.Loading())
             val response = authDataSource.login(loginRequest = loginRequest)
-            Log.i("AuthRepository login", "response => ${response.body()}")
+//            Log.i("AuthRepository login", "response => ${response.errorBody()?.string()}")
             if (response.isSuccessful && response.body() != null) emit(
                 ResourceState.Success(
                     response.body()!!
                 )
             )
-            else emit(ResourceState.Error("Error while logging in"))
+            else {
+                val commonErrorResponse: CommonErrorResponse? =
+                    response.errorBody()?.string()?.let { jsonErrorAdapter.fromJson(it) }
+//                Log.e("AuthRepository login", commonErrorResponse?.message ?: "Error while logging in")
+                emit(ResourceState.Error(commonErrorResponse?.message ?: "Error while logging in"))
+            }
         }.catch { err ->
             emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))
         }
@@ -41,7 +57,11 @@ class AuthRepository @Inject constructor(
                     response.body()!!
                 )
             )
-            else emit(ResourceState.Error(response.body()?.message ?: "Error while registering"))
+            else {
+                val commonErrorResponse: CommonErrorResponse? =
+                    response.errorBody()?.string()?.let { jsonErrorAdapter.fromJson(it) }
+                emit(ResourceState.Error(commonErrorResponse?.message ?: "Error while registering"))
+            }
         }.catch { err ->
             emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))
         }
@@ -57,7 +77,11 @@ class AuthRepository @Inject constructor(
                     response.body()!!
                 )
             )
-            else emit(ResourceState.Error(response.body()?.message ?: "Error while registering"))
+            else {
+                val commonErrorResponse: CommonErrorResponse? =
+                    response.errorBody()?.string()?.let { jsonErrorAdapter.fromJson(it) }
+                emit(ResourceState.Error(commonErrorResponse?.message ?: "Error while registering"))
+            }
         }.catch { err ->
             emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))
         }

@@ -1,6 +1,7 @@
 package com.example.price_tag.ui.features.auth.login
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -24,28 +25,24 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -63,56 +60,47 @@ import com.example.price_tag.CustomSnackbarVisuals
 import com.example.price_tag.R
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.ui.components.Loader
+import com.example.price_tag.ui.components.SharedPreferencesViewModel
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.theme.PrimaryColor
 import com.example.price_tag.utils.Validations
 import com.example.utilites.ResourceState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @Composable
 fun LoginView(
     navController: NavController = rememberNavController(),
     loginViewModel: LoginViewModel = hiltViewModel(),
+    sharedPreferencesUtil: SharedPreferencesViewModel = hiltViewModel(),
 ) {
-    var email by remember { mutableStateOf("admin@gmail.com") }
-    var password by remember { mutableStateOf("hello123") }
-    var obscurePassword by remember { mutableStateOf(true) }
-
-    var emailError by remember { mutableStateOf<String?>(null) }
-
+    val TAG = "LoginView"
     val loginResponse by loginViewModel.loginData.collectAsState()
-
-    val coroutineScope = rememberCoroutineScope()
-
+//    val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
-    var TAG = "LoginView"
+
+    Log.e(TAG, "Outside of Scaffold")
 
 
-    Scaffold(
-        modifier = Modifier
-            .fillMaxSize()
-            .safeContentPadding(),
+    Scaffold(modifier = Modifier
+        .fillMaxSize()
+        .safeContentPadding(),
         containerColor = Color.White,
         snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState,
-                snackbar = { snackbarData ->
-                    val customVisuals = snackbarData.visuals as? CustomSnackbarVisuals
-                    if (customVisuals != null) {
-                        Snackbar(
-                            snackbarData = snackbarData,
-                            contentColor = customVisuals.contentColor,
-                            containerColor = customVisuals.containerColor,
-                        )
-                    } else {
-                        Snackbar(snackbarData = snackbarData)
-                    }
+            SnackbarHost(hostState = snackbarHostState, snackbar = { snackbarData ->
+                val customVisuals = snackbarData.visuals as? CustomSnackbarVisuals
+                if (customVisuals != null) {
+                    Snackbar(
+                        snackbarData = snackbarData,
+                        contentColor = customVisuals.contentColor,
+                        containerColor = customVisuals.containerColor,
+                    )
+                } else {
+                    Snackbar(snackbarData = snackbarData)
                 }
-            )
-        }
-    ) { innerPadding ->
+            })
+        }) { scaffoldPadding ->
+        Log.e(TAG, "Inside of Scaffold")
         when (loginResponse) {
             is ResourceState.Loading -> {
                 Log.i(TAG, "Inside Loading State")
@@ -121,46 +109,66 @@ fun LoginView(
 
             is ResourceState.Success -> {
                 val response = (loginResponse as ResourceState.Success).data
-
-                LaunchedEffect(Unit) {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            CustomSnackbarVisuals(
-                                containerColor = PrimaryColor,
-                                message = "Login successfully",
-                                contentColor = Color.White,
-                                duration = SnackbarDuration.Indefinite,
-                            ),
-                        )
-                    }
-                    delay(600)
-                    coroutineScope.launch {
-                        navController.navigate(NavigationItem.MainView.route) {
-                            popUpTo(NavigationItem.LoginView.route) {
-                                inclusive = true
-                            }
-                        }
+                Log.e(TAG, "Inside of Success")
+//                LaunchedEffect(Unit) {
+//                    coroutineScope.launch {
+                Toast.makeText(
+                    context,
+                    response.message,
+                    Toast.LENGTH_SHORT,
+                ).show()
+//                        snackbarHostState.showSnackbar(
+//                            CustomSnackbarVisuals(
+//                                containerColor = PrimaryColor,
+//                                message = "Login successfully",
+//                                contentColor = Color.White,
+//                                duration = SnackbarDuration.Indefinite,
+//                            ),
+//                        )
+//                    }
+//                    delay(600)
+//                    coroutineScope.launch {
+                navController.navigate(NavigationItem.MainView.route) {
+                    popUpTo(NavigationItem.LoginView.route) {
+                        inclusive = true
                     }
                 }
+//                    }
+//                }
+                if (response.data?.accessToken != null && response.data.refreshToken != null) {
+                    sharedPreferencesUtil.save(
+                        sharedPreferencesUtil.bearerToken,
+                        response.data.accessToken
+                    )
+                    sharedPreferencesUtil.save(
+                        sharedPreferencesUtil.refreshToken,
+                        response.data.refreshToken
+                    )
+                }
+                loginViewModel.resetLoginResponse()
             }
 
             is ResourceState.Error -> {
                 Log.e(
-                    TAG,
-                    "Inside Error State : ${(loginResponse as ResourceState.Error).error.toString()}"
+                    TAG, "Inside Error State : ${(loginResponse as ResourceState.Error).error}"
                 )
 
-                LaunchedEffect(Unit) {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            CustomSnackbarVisuals(
-                                containerColor = Color.Red,
-                                message = (loginResponse as ResourceState.Error).error.toString(),
-                                contentColor = Color.White,
-                            ),
-                        )
-                    }
-                }
+//                LaunchedEffect(Unit) {
+//                    coroutineScope.launch {
+                Toast.makeText(
+                    context,
+                    (loginResponse as ResourceState.Error).error.toString(),
+                    Toast.LENGTH_SHORT,
+                ).show()
+//                        snackbarHostState.showSnackbar(
+//                            CustomSnackbarVisuals(
+//                                containerColor = Color.Red,
+//                                message = (loginResponse as ResourceState.Error).error.toString(),
+//                                contentColor = Color.White,
+//                            ),
+//                        )
+//                    }
+//                }
             }
 
             else -> {
@@ -172,7 +180,7 @@ fun LoginView(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(scaffoldPadding)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -197,10 +205,10 @@ fun LoginView(
             )
             Spacer(modifier = Modifier.height(32.dp))
             OutlinedTextField(
-                value = email,
+                value = loginViewModel.email.value,
                 onValueChange = {
-                    email = it
-                    emailError = Validations().validateEmail(it)
+                    loginViewModel.email.value = it
+                    loginViewModel.emailError.value = Validations().validateEmail(it)
                 },
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -212,7 +220,7 @@ fun LoginView(
                     )
                 },
             )
-            emailError?.let {
+            loginViewModel.emailError.value?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.error,
@@ -225,8 +233,8 @@ fun LoginView(
             }
             Spacer(modifier = Modifier.height(16.dp))
             OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
+                value = loginViewModel.password.value,
+                onValueChange = { loginViewModel.password.value = it },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Password") },
                 singleLine = true,
@@ -237,8 +245,10 @@ fun LoginView(
                     )
                 },
                 trailingIcon = {
-                    IconButton(onClick = { obscurePassword = !obscurePassword }) {
-                        if (obscurePassword) {
+                    IconButton(onClick = {
+                        loginViewModel.obscurePassword.value = !loginViewModel.obscurePassword.value
+                    }) {
+                        if (loginViewModel.obscurePassword.value) {
                             Icon(
                                 imageVector = Icons.Default.Visibility,
                                 contentDescription = "Hide Password",
@@ -251,7 +261,7 @@ fun LoginView(
                         }
                     }
                 },
-                visualTransformation = if (obscurePassword) PasswordVisualTransformation() else VisualTransformation.None
+                visualTransformation = if (loginViewModel.obscurePassword.value) PasswordVisualTransformation() else VisualTransformation.None
 
 
             )
@@ -260,7 +270,8 @@ fun LoginView(
                 onClick = {
                     loginViewModel.login(
                         loginRequest = LoginRequest(
-                            email = email, password = password
+                            email = loginViewModel.email.value,
+                            password = loginViewModel.password.value
                         )
                     )
                 },
@@ -284,11 +295,11 @@ fun LoginView(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Divider(modifier = Modifier.weight(1f))
+                HorizontalDivider(modifier = Modifier.weight(1f))
                 Spacer(modifier = Modifier.widthIn(8.dp))
                 Text(text = "OR")
                 Spacer(modifier = Modifier.widthIn(8.dp))
-                Divider(modifier = Modifier.weight(1f))
+                HorizontalDivider(modifier = Modifier.weight(1f))
 
 
             }

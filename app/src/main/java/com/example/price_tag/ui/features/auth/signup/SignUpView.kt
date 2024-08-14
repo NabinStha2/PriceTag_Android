@@ -1,6 +1,7 @@
 package com.example.price_tag.ui.features.auth.signup
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,7 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Person
@@ -25,6 +27,8 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,16 +39,13 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -66,33 +67,19 @@ import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.theme.PrimaryColor
 import com.example.price_tag.utils.Validations
 import com.example.utilites.ResourceState
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpView(
     navController: NavController = rememberNavController(),
     signUpViewModel: SignUpViewModel = hiltViewModel(),
     sharedViewModel: SharedViewModel = hiltViewModel(),
 ) {
-    var obscurePassword by remember { mutableStateOf(true) }
-    var obscureConfirmPassword by remember { mutableStateOf(true) }
-
-    var fullNameError by remember { mutableStateOf<String?>(null) }
-    var emailError by remember { mutableStateOf<String?>(null) }
-    var passwordError by remember { mutableStateOf<String?>(null) }
-    var confirmPasswordError by remember { mutableStateOf<String?>(null) }
-    var phoneNumberError by remember { mutableStateOf<String?>(null) }
-
-    val coroutineScope = rememberCoroutineScope()
-
+//    val coroutineScope = rememberCoroutineScope()
     val snackbarHostState: SnackbarHostState = sharedViewModel.snackbarHostState
-
     val signUpResponse by signUpViewModel.signUpData.collectAsState()
-
-    var TAG = "SignUpView"
-
-
+    val TAG = "SignUpView"
+    val context = LocalContext.current
 
 
     Scaffold(
@@ -115,6 +102,20 @@ fun SignUpView(
                     }
                 }
             )
+        },
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBackIosNew,
+                            contentDescription = "Back",
+                            tint = Color.Black
+                        )
+                    }
+                },
+            )
         }
     ) { scaffoldPadding ->
         when (signUpResponse) {
@@ -125,21 +126,18 @@ fun SignUpView(
 
             is ResourceState.Success -> {
                 val response = (signUpResponse as ResourceState.Success).data
-                LaunchedEffect(Unit) {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            CustomSnackbarVisuals(
-                                containerColor = PrimaryColor,
-                                message = response.message,
-                                contentColor = Color.White,
-                            ),
-                        )
-                    }
-                    delay(600)
-                    coroutineScope.launch {
-                        navController.navigate(NavigationItem.OtpView.route)
-                    }
-                }
+                Log.i(
+                    TAG,
+                    "Inside Success State : ${response.message}"
+                )
+
+                Toast.makeText(
+                    context,
+                    response.message,
+                    Toast.LENGTH_SHORT,
+                ).show()
+                navController.navigate(NavigationItem.OtpView.route)
+                signUpViewModel.resetSignUpResponse()
             }
 
             is ResourceState.Error -> {
@@ -147,17 +145,11 @@ fun SignUpView(
                     TAG,
                     "Inside Error State : ${(signUpResponse as ResourceState.Error).error.toString()}"
                 )
-                LaunchedEffect(Unit) {
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar(
-                            CustomSnackbarVisuals(
-                                containerColor = Color.Red,
-                                message = (signUpResponse as ResourceState.Error).error.toString(),
-                                contentColor = Color.White,
-                            ),
-                        )
-                    }
-                }
+                Toast.makeText(
+                    context,
+                    (signUpResponse as ResourceState.Error).error.toString(),
+                    Toast.LENGTH_SHORT,
+                ).show()
             }
 
             else -> {
@@ -188,7 +180,7 @@ fun SignUpView(
                 value = signUpViewModel.userName.value,
                 onValueChange = {
                     signUpViewModel.userName.value = it
-                    fullNameError = Validations().validateFullName(it)
+                    signUpViewModel.fullNameError.value = Validations().validateFullName(it)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "User Name") },
@@ -206,7 +198,7 @@ fun SignUpView(
                 }
 
             )
-            fullNameError?.let {
+            signUpViewModel.fullNameError.value?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.error,
@@ -221,7 +213,7 @@ fun SignUpView(
                 value = signUpViewModel.email.value,
                 onValueChange = {
                     signUpViewModel.email.value = it
-                    emailError = Validations().validateEmail(it)
+                    signUpViewModel.emailError.value = Validations().validateEmail(it)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Email") },
@@ -238,7 +230,7 @@ fun SignUpView(
                     )
                 }
             )
-            emailError?.let {
+            signUpViewModel.emailError.value?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.error,
@@ -253,7 +245,7 @@ fun SignUpView(
                 value = signUpViewModel.phoneNumber.value,
                 onValueChange = {
                     signUpViewModel.phoneNumber.value = it
-                    phoneNumberError = Validations().validatePhoneNumber(it)
+                    signUpViewModel.phoneNumberError.value = Validations().validatePhoneNumber(it)
                 },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Phone Number") },
@@ -271,7 +263,7 @@ fun SignUpView(
                 }
 
             )
-            phoneNumberError?.let {
+            signUpViewModel.phoneNumberError.value?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.error,
@@ -286,11 +278,12 @@ fun SignUpView(
                 value = signUpViewModel.password.value,
                 onValueChange = {
                     signUpViewModel.password.value = it
-                    passwordError = Validations().validatePasswords(it)
-                    confirmPasswordError = Validations().validateConfirmPasswords(
-                        password = it,
-                        confirmPassword = signUpViewModel.confirmPassword.value
-                    )
+                    signUpViewModel.passwordError.value = Validations().validatePasswords(it)
+                    signUpViewModel.confirmPasswordError.value =
+                        Validations().validateConfirmPasswords(
+                            password = it,
+                            confirmPassword = signUpViewModel.confirmPassword.value
+                        )
                 },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Password") },
@@ -307,8 +300,11 @@ fun SignUpView(
                     )
                 },
                 trailingIcon = {
-                    IconButton(onClick = { obscurePassword = !obscurePassword }) {
-                        if (obscurePassword) {
+                    IconButton(onClick = {
+                        signUpViewModel.obscurePassword.value =
+                            !signUpViewModel.obscurePassword.value
+                    }) {
+                        if (signUpViewModel.obscurePassword.value) {
                             Icon(
                                 imageVector = Icons.Default.Visibility,
                                 contentDescription = "Hide Password",
@@ -322,9 +318,9 @@ fun SignUpView(
 
                     }
                 },
-                visualTransformation = if (obscurePassword) PasswordVisualTransformation() else VisualTransformation.None
+                visualTransformation = if (signUpViewModel.obscurePassword.value) PasswordVisualTransformation() else VisualTransformation.None
             )
-            passwordError?.let {
+            signUpViewModel.passwordError.value?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.error,
@@ -339,11 +335,12 @@ fun SignUpView(
                 value = signUpViewModel.confirmPassword.value,
                 onValueChange = {
                     signUpViewModel.confirmPassword.value = it
-                    passwordError = Validations().validatePasswords(it)
-                    confirmPasswordError = Validations().validateConfirmPasswords(
-                        password = it,
-                        confirmPassword = signUpViewModel.confirmPassword.value
-                    )
+                    signUpViewModel.passwordError.value = Validations().validatePasswords(it)
+                    signUpViewModel.confirmPasswordError.value =
+                        Validations().validateConfirmPasswords(
+                            password = it,
+                            confirmPassword = signUpViewModel.confirmPassword.value
+                        )
                 },
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Confirm Password") },
@@ -360,8 +357,11 @@ fun SignUpView(
                     )
                 },
                 trailingIcon = {
-                    IconButton(onClick = { obscureConfirmPassword = !obscureConfirmPassword }) {
-                        if (obscureConfirmPassword) {
+                    IconButton(onClick = {
+                        signUpViewModel.obscureConfirmPassword.value =
+                            !signUpViewModel.obscureConfirmPassword.value
+                    }) {
+                        if (signUpViewModel.obscureConfirmPassword.value) {
                             Icon(
                                 imageVector = Icons.Default.Visibility,
                                 contentDescription = "Hide Password",
@@ -375,9 +375,9 @@ fun SignUpView(
 
                     }
                 },
-                visualTransformation = if (obscureConfirmPassword) PasswordVisualTransformation() else VisualTransformation.None
+                visualTransformation = if (signUpViewModel.obscureConfirmPassword.value) PasswordVisualTransformation() else VisualTransformation.None
             )
-            confirmPasswordError?.let {
+            signUpViewModel.confirmPasswordError.value?.let {
                 Text(
                     text = it,
                     color = MaterialTheme.colorScheme.error,

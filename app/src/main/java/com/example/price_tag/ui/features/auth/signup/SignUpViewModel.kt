@@ -26,6 +26,13 @@ class SignUpViewModel @Inject constructor(
     var phoneNumber = mutableStateOf("9826484691")
     var password = mutableStateOf("hello123")
     var confirmPassword = mutableStateOf("hello123")
+    var obscurePassword = mutableStateOf(true)
+    var obscureConfirmPassword = mutableStateOf(true)
+    var fullNameError = mutableStateOf<String?>(null)
+    var emailError = mutableStateOf<String?>(null)
+    var passwordError = mutableStateOf<String?>(null)
+    var confirmPasswordError = mutableStateOf<String?>(null)
+    var phoneNumberError = mutableStateOf<String?>(null)
 
 //    val userName: State<String> = _userName
 //    val email: State<String> = _email
@@ -49,6 +56,10 @@ class SignUpViewModel @Inject constructor(
                     _signupData.value = signupResponse
                 }
         }
+    }
+
+    fun resetSignUpResponse() {
+        _signupData.value = ResourceState.Initial()
     }
 
     companion object {

@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
 import com.example.price_tag.ui.features.home.widgets.CarouselSlider
@@ -66,7 +67,7 @@ data class ProductItem(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalLayoutApi::class)
 @Composable
 fun HomeView(
-    navController: NavController = rememberNavController(),
+    navController: NavHostController = rememberNavController(),
     padding: PaddingValues = PaddingValues(0.dp)
 ) {
     val images = listOf(

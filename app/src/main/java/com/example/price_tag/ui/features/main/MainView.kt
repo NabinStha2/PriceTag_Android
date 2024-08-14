@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.ui.components.BottomNavigationBar
 import com.example.price_tag.ui.features.category.CategoryView
@@ -29,7 +29,7 @@ import com.example.price_tag.ui.features.wishlist.WishlistView
 @Preview
 @Composable
 fun MainView(
-    navController: NavController = rememberNavController(),
+    navController: NavHostController = rememberNavController(),
     viewModel: MainViewModel = viewModel<MainViewModel>()
 ) {
     val selectedIndex by viewModel.selectedMainBottomBarIndex.collectAsState()
@@ -43,25 +43,25 @@ fun MainView(
             alpha = 0.08f
         ),
         topBar = {
-            if(selectedIndex == 0)
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        text =   "Price Tag" ,
-                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                        fontWeight = FontWeight.W600,
-                        textAlign = TextAlign.Center,
-                        color = Color.Black,
+            if (selectedIndex == 0)
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            text = "Price Tag",
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                            fontWeight = FontWeight.W600,
+                            textAlign = TextAlign.Center,
+                            color = Color.Black,
+                        )
+                    },
+                    modifier = Modifier
+                        .background(color = Color.White),
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = Color.Gray.copy(
+                            alpha = 0.08f
+                        ),
                     )
-                },
-                modifier = Modifier
-                    .background(color = Color.White),
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = Color.Gray.copy(
-                        alpha = 0.08f
-                    ),
                 )
-            )
         },
         bottomBar = {
             BottomNavigationBar(selectedIndex) {
@@ -83,7 +83,7 @@ fun MainView(
             }
 
             3 -> {
-                ProfileView(padding)
+                ProfileView(padding, navController = navController)
             }
         }
 

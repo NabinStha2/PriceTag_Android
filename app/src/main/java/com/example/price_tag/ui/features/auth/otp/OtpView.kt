@@ -17,8 +17,14 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
@@ -35,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -47,6 +54,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.CustomSnackbarVisuals
+import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.model.auth.OtpRequest
 import com.example.price_tag.ui.components.Loader
 import com.example.price_tag.ui.components.SharedViewModel
@@ -57,6 +65,7 @@ import com.example.utilites.ResourceState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OtpView(
     navController: NavController = rememberNavController(),
@@ -66,14 +75,11 @@ fun OtpView(
     var TAG = "OtpView"
 
     val signUpViewModel: SignUpViewModel = hiltViewModel()
-
     val coroutineScope = rememberCoroutineScope()
-
     var otpCode by remember { mutableStateOf("") }
-
-    val otpResponse by otpViewModel.loginData.collectAsState()
-
+    val verifyOtpData: ResourceState<LoginResponse> by otpViewModel.verifyOtpData.collectAsState()
     val snackbarHostState: SnackbarHostState = sharedViewModel.snackbarHostState
+    val context = LocalContext.current
 
     Scaffold(
         modifier = Modifier
@@ -96,17 +102,31 @@ fun OtpView(
                     }
                 }
             )
+        },
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(
+                            imageVector = Icons.Filled.ArrowBackIosNew,
+                            contentDescription = "Back",
+                            tint = Color.Black
+                        )
+                    }
+                },
+            )
         }
-    ) { innerPadding ->
+    ) { scaffoldPadding ->
 
-        when (otpResponse) {
+        when (verifyOtpData) {
             is ResourceState.Loading -> {
                 Log.i(TAG, "Inside Loading State")
                 Loader(message = "Registering, Please wait...")
             }
 
             is ResourceState.Success -> {
-                val response = (otpResponse as ResourceState.Success).data
+                val response = (verifyOtpData as ResourceState.Success).data
                 LaunchedEffect(Unit) {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
@@ -117,9 +137,14 @@ fun OtpView(
                             ),
                         )
                     }
-                    delay(600)
+                    delay(500)
                     coroutineScope.launch {
-                        navController.navigate(NavigationItem.OtpView.route)
+                        navController.navigate(NavigationItem.MainView.route) {
+                            popUpTo(NavigationItem.LoginView.route) {
+                                inclusive = true
+                            }
+                        }
+                        otpViewModel.resetVerifyOtpResponse()
                     }
                 }
             }
@@ -127,14 +152,14 @@ fun OtpView(
             is ResourceState.Error -> {
                 Log.e(
                     TAG,
-                    "Inside Error State : ${(otpResponse as ResourceState.Error).error}"
+                    "Inside Error State : ${(verifyOtpData as ResourceState.Error).error}"
                 )
                 LaunchedEffect(Unit) {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
                             CustomSnackbarVisuals(
                                 containerColor = Color.Red,
-                                message = (otpResponse as ResourceState.Error).error.toString(),
+                                message = (verifyOtpData as ResourceState.Error).error.toString(),
                                 contentColor = Color.White,
                             ),
                         )
@@ -151,7 +176,7 @@ fun OtpView(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(innerPadding)
+                .padding(scaffoldPadding)
                 .padding(horizontal = 16.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,

@@ -43,15 +43,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
-import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.features.main.MainView
+import com.example.price_tag.ui.navigation.NavigationItem
 
 @Composable
 fun CategoryView(
-    navController: NavController = rememberNavController(),
+    navController: NavHostController = rememberNavController(),
     padding: PaddingValues
 ) {
     val configuration = LocalConfiguration.current

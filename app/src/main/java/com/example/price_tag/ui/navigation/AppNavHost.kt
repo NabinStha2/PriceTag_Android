@@ -6,6 +6,7 @@ import androidx.compose.animation.slideOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -20,9 +21,9 @@ import com.example.price_tag.ui.features.product.ProductView
 @Composable
 fun AppNavHost(
     modifier: Modifier = Modifier,
-    startDestination: String = NavigationItem.LoginView.route,
+    startDestination: String,
 ) {
-    val navController = rememberNavController()
+    val navController: NavHostController = rememberNavController()
 
     NavHost(
         modifier = modifier,
@@ -36,11 +37,11 @@ fun AppNavHost(
         }
 
         composable(route = NavigationItem.MainView.route, enterTransition = {
-            slideIn(tween(durationMillis = 300)) {
+            slideIn(tween(durationMillis = 200)) {
                 IntOffset(x = it.width, y = 0) // Start off-screen to the right
             }
         }, exitTransition = {
-            slideOut(tween(durationMillis = 300)) {
+            slideOut(tween(durationMillis = 200)) {
                 IntOffset(x = -it.width, y = 0) // Exit off-screen to the left
             }
         }) {
@@ -48,11 +49,11 @@ fun AppNavHost(
         }
 
         composable(route = NavigationItem.LoginView.route, enterTransition = {
-            slideIn(tween(durationMillis = 300)) {
+            slideIn(tween(durationMillis = 200)) {
                 IntOffset(x = it.width, y = 0) // Start off-screen to the right
             }
         }, exitTransition = {
-            slideOut(tween(durationMillis = 300)) {
+            slideOut(tween(durationMillis = 200)) {
                 IntOffset(x = -it.width, y = 0) // Exit off-screen to the left
             }
         }) {
@@ -60,11 +61,11 @@ fun AppNavHost(
         }
 
         composable(route = NavigationItem.SignUpView.route, enterTransition = {
-            slideIn(tween(durationMillis = 300)) {
+            slideIn(tween(durationMillis = 200)) {
                 IntOffset(x = it.width, y = 0) // Start off-screen to the right
             }
         }, exitTransition = {
-            slideOut(tween(durationMillis = 300)) {
+            slideOut(tween(durationMillis = 200)) {
                 IntOffset(x = -it.width, y = 0) // Exit off-screen to the left
             }
         }) {
@@ -72,11 +73,11 @@ fun AppNavHost(
         }
 
         composable(route = NavigationItem.OtpView.route, enterTransition = {
-            slideIn(tween(durationMillis = 300)) {
+            slideIn(tween(durationMillis = 200)) {
                 IntOffset(x = it.width, y = 0) // Start off-screen to the right
             }
         }, exitTransition = {
-            slideOut(tween(durationMillis = 300)) {
+            slideOut(tween(durationMillis = 200)) {
                 IntOffset(x = -it.width, y = 0) // Exit off-screen to the left
             }
         }) {
@@ -84,11 +85,11 @@ fun AppNavHost(
         }
 
         composable(route = NavigationItem.ProductView.route, enterTransition = {
-            slideIn(tween(durationMillis = 300)) {
+            slideIn(tween(durationMillis = 200)) {
                 IntOffset(x = it.width, y = 0) // Start off-screen to the right
             }
         }, exitTransition = {
-            slideOut(tween(durationMillis = 300)) {
+            slideOut(tween(durationMillis = 200)) {
                 IntOffset(x = -it.width, y = 0) // Exit off-screen to the left
             }
         }) {

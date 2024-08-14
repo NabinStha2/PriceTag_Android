@@ -20,21 +20,25 @@ class OtpViewModel @Inject constructor(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _loginData: MutableStateFlow<ResourceState<LoginResponse>> =
+    private val _verifyOtpData: MutableStateFlow<ResourceState<LoginResponse>> =
         MutableStateFlow(ResourceState.Initial())
-    val loginData: StateFlow<ResourceState<LoginResponse>> = _loginData
+    val verifyOtpData: StateFlow<ResourceState<LoginResponse>> = _verifyOtpData
 
     fun verifyOtp(otpRequest: OtpRequest) {
         viewModelScope.launch(Dispatchers.IO) {
             authRepository.verifyOtp(otpRequest = otpRequest)
                 .collectLatest { otpResponse ->
-                    _loginData.value = otpResponse
+                    _verifyOtpData.value = otpResponse
                 }
         }
     }
 
+    fun resetVerifyOtpResponse() {
+        _verifyOtpData.value = ResourceState.Initial()
+    }
+
     companion object {
-        const val TAG = "LoginViewModel"
+        const val TAG = "OtpViewModel"
     }
 
 }

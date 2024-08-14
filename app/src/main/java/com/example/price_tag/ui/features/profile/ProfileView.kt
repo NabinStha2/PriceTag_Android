@@ -1,6 +1,5 @@
 package com.example.price_tag.ui.features.profile
 
-import android.graphics.drawable.Icon
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -18,7 +17,6 @@ import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DoorFront
 import androidx.compose.material.icons.filled.IndeterminateCheckBox
 import androidx.compose.material.icons.filled.Newspaper
-import androidx.compose.material.icons.filled.NoteAlt
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material3.AlertDialog
@@ -42,16 +40,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.example.price_tag.ui.components.SharedPreferencesViewModel
+import com.example.price_tag.ui.navigation.NavigationItem
 
 @Composable
-fun ProfileView(padding: PaddingValues) {
+fun ProfileView(
+    padding: PaddingValues,
+    navController: NavHostController = rememberNavController(),
+    sharedPreferencesViewModel: SharedPreferencesViewModel = hiltViewModel()
+) {
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     fun handleLogout() {
-        //logout logic
+        sharedPreferencesViewModel.clearSharedPreference()
+        navController.navigate(NavigationItem.LoginView.route) {
+            popUpTo(NavigationItem.MainView.route) {
+                inclusive = true
+            }
+        }
     }
 
     Column(
@@ -239,7 +251,7 @@ fun ProfileView(padding: PaddingValues) {
             }
 
 
-            )
+        )
 
         if (showLogoutDialog) {
             AlertDialog(
@@ -271,5 +283,5 @@ fun ProfileView(padding: PaddingValues) {
 @Preview(showBackground = true)
 @Composable
 fun ProfileViewPreview() {
-    ProfileView(padding = PaddingValues())
+    ProfileView(padding = PaddingValues(), navController = rememberNavController())
 }

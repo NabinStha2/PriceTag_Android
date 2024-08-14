@@ -1,5 +1,6 @@
 package com.example.price_tag.ui.features.onboarding
 
+import android.util.Log
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -31,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,8 +44,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.price_tag.ui.components.SharedPreferencesViewModel
 import com.example.price_tag.ui.navigation.NavigationItem
 import kotlinx.coroutines.launch
 
@@ -51,8 +55,17 @@ import kotlinx.coroutines.launch
 //@Preview(showBackground = true)
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun OnboardingView(navController: NavController) {
-    Scaffold(modifier = Modifier.fillMaxSize(), containerColor = Color.Gray) { padding ->
+fun OnboardingView(
+    navController: NavController,
+    sharedPreferencesUtil: SharedPreferencesViewModel = hiltViewModel(),
+) {
+    val TAG = "OnboardingView"
+
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color.Gray
+    ) { padding ->
         val pagerState = rememberPagerState(pageCount = { 3 })
         val coroutineScope = rememberCoroutineScope()
         val configuration = LocalConfiguration.current
@@ -87,7 +100,6 @@ fun OnboardingView(navController: NavController) {
                 ) {
                     Spacer(modifier = Modifier.height(20.dp))
                     Row {
-
                         Box(
                             modifier = Modifier
                                 .height(10.dp)
@@ -152,27 +164,27 @@ fun OnboardingView(navController: NavController) {
                             tint = Color.White
                         )
                     }
-                    else
-                        ElevatedButton(
-                            onClick = {
-                                navController.navigate(NavigationItem.LoginView.route) {
-                                    popUpTo(NavigationItem.OnboardingView.route) {
-                                        inclusive = true
-                                    }
+                    else ElevatedButton(
+                        onClick = {
+                            sharedPreferencesUtil.save(sharedPreferencesUtil.firstTimeInApp, false)
+                            navController.navigate(NavigationItem.LoginView.route) {
+                                popUpTo(NavigationItem.OnboardingView.route) {
+                                    inclusive = true
                                 }
-                            },
-                            colors = ButtonDefaults.elevatedButtonColors(
-                                containerColor = Color.Blue,
-                                contentColor = Color.White,
-                            ),
-                        ) {
-                            Text(
-                                text = "Let's Get Started",
-                                color = Color.White,
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Normal,
-                            )
-                        }
+                            }
+                        },
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = Color.Blue,
+                            contentColor = Color.White,
+                        ),
+                    ) {
+                        Text(
+                            text = "Let's Get Started",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Normal,
+                        )
+                    }
                 }
             }
         }

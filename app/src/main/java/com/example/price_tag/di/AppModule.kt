@@ -1,5 +1,8 @@
 package com.example.price_tag.di
 
+import android.app.Application
+import android.content.Context
+import android.content.SharedPreferences
 import com.example.price_tag.data.AppConstants
 import com.example.price_tag.data.api.ApiService
 import com.example.price_tag.data.datasource.auth.AuthDataSource
@@ -40,7 +43,6 @@ class AppModule {
         }
 
         val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-
         return Retrofit.Builder()
             .baseUrl(AppConstants.APP_BASE_URL)
             .client(httpClient.build())
@@ -56,7 +58,6 @@ class AppModule {
     }
 
 
-    // Auth Hilt
     @Provides
     @Singleton
     fun providesAuthDataSource(apiService: ApiService): AuthDataSource {
@@ -67,6 +68,12 @@ class AppModule {
     @Singleton
     fun providesAuthRepository(authDataSource: AuthDataSource): AuthRepository {
         return AuthRepository(authDataSource)
+    }
+
+    @Provides
+    @Singleton
+    fun providesSharedPreferences(context: Application): SharedPreferences {
+        return context.getSharedPreferences(AppConstants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
     }
 
 }
