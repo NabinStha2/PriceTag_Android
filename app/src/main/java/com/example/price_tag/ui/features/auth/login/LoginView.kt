@@ -60,7 +60,6 @@ import com.example.price_tag.CustomSnackbarVisuals
 import com.example.price_tag.R
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.ui.components.Loader
-import com.example.price_tag.ui.components.SharedPreferencesViewModel
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.theme.PrimaryColor
 import com.example.price_tag.utils.Validations
@@ -70,10 +69,10 @@ import com.example.utilites.ResourceState
 fun LoginView(
     navController: NavController = rememberNavController(),
     loginViewModel: LoginViewModel = hiltViewModel(),
-    sharedPreferencesUtil: SharedPreferencesViewModel = hiltViewModel(),
 ) {
     val TAG = "LoginView"
     val loginResponse by loginViewModel.loginData.collectAsState()
+    val spUtils = loginViewModel.spUtils
 //    val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
@@ -142,12 +141,12 @@ fun LoginView(
 //                    }
 //                }
                 if (response.data?.accessToken != null && response.data.refreshToken != null) {
-                    sharedPreferencesUtil.save(
-                        sharedPreferencesUtil.bearerToken,
+                    spUtils.save(
+                        spUtils.bearerToken,
                         response.data.accessToken
                     )
-                    sharedPreferencesUtil.save(
-                        sharedPreferencesUtil.refreshToken,
+                    spUtils.save(
+                        spUtils.refreshToken,
                         response.data.refreshToken
                     )
                 }

@@ -5,7 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.LoginResponse
-import com.example.price_tag.ui.repository.auth.AuthRepository
+import com.example.price_tag.data.repository.auth.AuthRepository
+import com.example.price_tag.utils.SharedPreferencesUtils
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -18,8 +19,11 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val sharedPreferencesUtils: SharedPreferencesUtils
 ) : ViewModel() {
+    val spUtils: SharedPreferencesUtils = sharedPreferencesUtils
+
     var email = mutableStateOf("admin@gmail.com")
     var password = mutableStateOf("hello123")
     var obscurePassword = mutableStateOf(true)

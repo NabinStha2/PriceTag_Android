@@ -1,5 +1,6 @@
 package com.example.price_tag.ui.features.category
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -27,6 +28,8 @@ import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -43,6 +46,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
@@ -52,8 +56,10 @@ import com.example.price_tag.ui.navigation.NavigationItem
 @Composable
 fun CategoryView(
     navController: NavHostController = rememberNavController(),
-    padding: PaddingValues
+    padding: PaddingValues,
+    categoryViewModel: CategoryViewModel = hiltViewModel(),
 ) {
+    val TAG = "CategoryView"
     val configuration = LocalConfiguration.current
     var selectedItem by remember { mutableIntStateOf(0) }
     val listItem = listOf(
@@ -66,8 +72,7 @@ fun CategoryView(
         Icons.Filled.Search,
         Icons.Filled.Settings,
     )
-
-
+    val getAllCategoriesData by categoryViewModel.getAllCategoriesData.collectAsState()
 
     Row {
         NavigationRail(

@@ -1,0 +1,35 @@
+package com.example.price_tag.network
+
+import com.example.price_tag.utils.SharedPreferencesUtils
+import okhttp3.Interceptor
+import okhttp3.Response
+import javax.inject.Inject
+
+class AuthInterceptor @Inject constructor(
+    private val sharedPreferencesUtils: SharedPreferencesUtils
+) : Interceptor {
+    override fun intercept(chain: Interceptor.Chain): Response {
+        val originalRequest = chain.request()
+        val token = sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken)
+
+        // List of endpoints that require authentication
+        val endpointsThatDoesNotNeedAuth =
+            listOf("/auth/login", "/auth/register", "/auth/verify-otp")
+
+        // Check if the request URL path matches one of the protected endpoints
+        val shouldNotAddAuth = endpointsThatDoesNotNeedAuth.any { endpoint ->
+            originalRequest.url.encodedPath.contains(endpoint)
+        }
+
+        val newRequest = originalRequest.newBuilder().apply {
+            addHeader("Content-Type", "application/json")
+            addHeader("accept", "application/json")
+            if (!shouldNotAddAuth) {
+                if (token != null) {
+                    addHeader("Authorization", "Bearer $token")
+                }
+            }
+        }.build()
+        return chain.proceed(newRequest)
+    }
+}

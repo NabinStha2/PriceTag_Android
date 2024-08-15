@@ -14,12 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.price_tag.ui.components.SharedPreferencesViewModel
 import com.example.price_tag.ui.navigation.AppNavHost
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.theme.Price_tagTheme
+import com.example.price_tag.utils.SharedPreferencesUtils
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -27,33 +27,34 @@ class MainActivity : ComponentActivity() {
 
     val TAG = "MainActivity"
 
+    @Inject
+    lateinit var sharedPreferencesUtils: SharedPreferencesUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val sharedPreferencesUtil: SharedPreferencesViewModel = hiltViewModel()
             var navigationRoute: String = NavigationItem.OnboardingView.route
 
             Log.i(
                 TAG, "${
-                    sharedPreferencesUtil.getValueBoolean(
-                        sharedPreferencesUtil.firstTimeInApp,
+                    sharedPreferencesUtils.getValueBoolean(
+                        sharedPreferencesUtils.firstTimeInApp,
                         true
                     )
                 } => ${
-                    sharedPreferencesUtil.getValueString(
-                        sharedPreferencesUtil.bearerToken
+                    sharedPreferencesUtils.getValueString(
+                        sharedPreferencesUtils.bearerToken
                     )
                 }"
             )
-            if (!sharedPreferencesUtil.getValueBoolean(
-                    sharedPreferencesUtil.firstTimeInApp,
+            if (!sharedPreferencesUtils.getValueBoolean(
+                    sharedPreferencesUtils.firstTimeInApp,
                     true
                 )
             ) {
                 navigationRoute =
-                    if (sharedPreferencesUtil.getValueString(sharedPreferencesUtil.bearerToken) != null) {
+                    if (sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken) != null) {
                         NavigationItem.MainView.route
                     } else {
                         NavigationItem.LoginView.route

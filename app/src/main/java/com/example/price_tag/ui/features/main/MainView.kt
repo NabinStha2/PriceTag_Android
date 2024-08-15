@@ -9,6 +9,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -16,11 +17,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.ui.components.BottomNavigationBar
 import com.example.price_tag.ui.features.category.CategoryView
+import com.example.price_tag.ui.features.category.CategoryViewModel
 import com.example.price_tag.ui.features.home.HomeView
 import com.example.price_tag.ui.features.profile.ProfileView
 import com.example.price_tag.ui.features.wishlist.WishlistView
@@ -30,9 +33,15 @@ import com.example.price_tag.ui.features.wishlist.WishlistView
 @Composable
 fun MainView(
     navController: NavHostController = rememberNavController(),
-    viewModel: MainViewModel = viewModel<MainViewModel>()
+    viewModel: MainViewModel = viewModel<MainViewModel>(),
+    categoryViewModel: CategoryViewModel = hiltViewModel(),
 ) {
+    val TAG = "MainView"
     val selectedIndex by viewModel.selectedMainBottomBarIndex.collectAsState()
+
+    LaunchedEffect(key1 = true) {
+        categoryViewModel.getAllCategories()
+    }
 
     Scaffold(
         modifier = Modifier

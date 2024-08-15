@@ -1,6 +1,5 @@
 package com.example.price_tag.ui.features.onboarding
 
-import android.util.Log
 import androidx.compose.animation.core.EaseIn
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -32,7 +31,6 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +45,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.price_tag.ui.components.SharedPreferencesViewModel
 import com.example.price_tag.ui.navigation.NavigationItem
 import kotlinx.coroutines.launch
 
@@ -57,10 +54,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun OnboardingView(
     navController: NavController,
-    sharedPreferencesUtil: SharedPreferencesViewModel = hiltViewModel(),
+    onboardingViewModel: OnboardingViewModel = hiltViewModel(),
 ) {
     val TAG = "OnboardingView"
-
+    val spUtils = onboardingViewModel.spUtils
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -166,7 +163,7 @@ fun OnboardingView(
                     }
                     else ElevatedButton(
                         onClick = {
-                            sharedPreferencesUtil.save(sharedPreferencesUtil.firstTimeInApp, false)
+                            spUtils.save(spUtils.firstTimeInApp, false)
                             navController.navigate(NavigationItem.LoginView.route) {
                                 popUpTo(NavigationItem.OnboardingView.route) {
                                     inclusive = true

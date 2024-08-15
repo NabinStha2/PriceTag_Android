@@ -1,15 +1,11 @@
-package com.example.price_tag.ui.components
+package com.example.price_tag.utils
 
 
 import android.content.SharedPreferences
-import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-@HiltViewModel
-class SharedPreferencesViewModel @Inject constructor(private val sharedPref: SharedPreferences) :
-    ViewModel() {
-    private val TAG = "SharedPreferencesUtil"
+class SharedPreferencesUtils @Inject constructor(private val sharedPref: SharedPreferences) {
+    private val TAG = "SharedPreferencesUtils"
     private val _firstTimeInApp = "firstTimeInApp"
     private val _bearerToken = "bearerToken"
     private val _refreshToken = "refreshToken"

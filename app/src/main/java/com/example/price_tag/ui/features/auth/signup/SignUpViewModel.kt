@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.model.auth.SignUpRequest
-import com.example.price_tag.ui.repository.auth.AuthRepository
+import com.example.price_tag.data.repository.auth.AuthRepository
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

@@ -46,19 +46,19 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.example.price_tag.ui.components.SharedPreferencesViewModel
 import com.example.price_tag.ui.navigation.NavigationItem
 
 @Composable
 fun ProfileView(
     padding: PaddingValues,
     navController: NavHostController = rememberNavController(),
-    sharedPreferencesViewModel: SharedPreferencesViewModel = hiltViewModel()
+    profileViewModel: ProfileViewModel = hiltViewModel(),
 ) {
+    val spUtils = profileViewModel.spUtils
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     fun handleLogout() {
-        sharedPreferencesViewModel.clearSharedPreference()
+        spUtils.clearSharedPreference()
         navController.navigate(NavigationItem.LoginView.route) {
             popUpTo(NavigationItem.MainView.route) {
                 inclusive = true
@@ -283,5 +283,4 @@ fun ProfileView(
 @Preview(showBackground = true)
 @Composable
 fun ProfileViewPreview() {
-    ProfileView(padding = PaddingValues(), navController = rememberNavController())
 }

@@ -1,8 +1,8 @@
-package com.example.price_tag.ui.repository.auth
+package com.example.price_tag.data.repository.auth
 
 import android.util.Log
 import com.example.price_tag.data.datasource.auth.AuthDataSource
-import com.example.price_tag.data.model.auth.CommonErrorResponse
+import com.example.price_tag.data.model.CommonErrorResponse
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.model.auth.OtpRequest

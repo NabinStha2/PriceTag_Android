@@ -7,7 +7,13 @@ import com.example.price_tag.data.AppConstants
 import com.example.price_tag.data.api.ApiService
 import com.example.price_tag.data.datasource.auth.AuthDataSource
 import com.example.price_tag.data.datasource.auth.AuthDataSourceImpl
-import com.example.price_tag.ui.repository.auth.AuthRepository
+import com.example.price_tag.data.datasource.category.CategoryDataSource
+import com.example.price_tag.data.datasource.category.CategoryDataSourceImpl
+import com.example.price_tag.data.repository.auth.AuthRepository
+import com.example.price_tag.data.repository.category.CategoryRepository
+import com.example.price_tag.network.AuthInterceptor
+import com.example.price_tag.network.RetryInterceptor
+import com.example.price_tag.utils.SharedPreferencesUtils
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module
@@ -25,29 +31,56 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 class AppModule {
+    @Provides
+    @Singleton
+    fun providesSharedPreferences(context: Application): SharedPreferences {
+        return context.getSharedPreferences(AppConstants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
+    }
 
     @Provides
     @Singleton
-    fun providesRetrofit(): Retrofit {
+    fun providesSharedPreferencesUtils(sharedPreferences: SharedPreferences): SharedPreferencesUtils {
+        return SharedPreferencesUtils(sharedPreferences)
+    }
 
-        val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
+    @Provides
+    @Singleton
+    fun providesAuthInterceptor(sharedPreferencesUtils: SharedPreferencesUtils): AuthInterceptor {
+        return AuthInterceptor(sharedPreferencesUtils)
+    }
+
+    @Provides
+    @Singleton
+    fun providesRetryInterceptor(): RetryInterceptor {
+        return RetryInterceptor(maxRetry = 3)
+    }
+
+
+    @Provides
+    @Singleton
+    fun providesOkHttpClient(
+        authInterceptor: AuthInterceptor,
+        retryInterceptor: RetryInterceptor
+    ): OkHttpClient {
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
-
-        val httpClient = OkHttpClient().newBuilder().apply {
-            addInterceptor(httpLoggingInterceptor)
-        }
-
-        httpClient.apply {
-            readTimeout(60, TimeUnit.SECONDS)
-        }
-
-        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
-        return Retrofit.Builder()
-            .baseUrl(AppConstants.APP_BASE_URL)
-            .client(httpClient.build())
-            .addConverterFactory(MoshiConverterFactory.create(moshi))
+        return OkHttpClient.Builder()
+            .addInterceptor(authInterceptor)
+            .addInterceptor(loggingInterceptor)
+            .addInterceptor(retryInterceptor)
+            .connectTimeout(60, TimeUnit.SECONDS)
+            .readTimeout(60, TimeUnit.SECONDS)
             .build()
+    }
+
+
+    @Provides
+    @Singleton
+    fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit {
+        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+        return Retrofit.Builder().baseUrl(AppConstants.APP_BASE_URL).client(okHttpClient)
+            .addConverterFactory(MoshiConverterFactory.create(moshi)).build()
     }
 
 
@@ -70,10 +103,18 @@ class AppModule {
         return AuthRepository(authDataSource)
     }
 
+
     @Provides
     @Singleton
-    fun providesSharedPreferences(context: Application): SharedPreferences {
-        return context.getSharedPreferences(AppConstants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
+    fun providesCategoryDataSource(apiService: ApiService): CategoryDataSource {
+        return CategoryDataSourceImpl(apiService)
     }
+
+    @Provides
+    @Singleton
+    fun providesCategoryRepository(categoryDataSource: CategoryDataSource): CategoryRepository {
+        return CategoryRepository(categoryDataSource)
+    }
+
 
 }

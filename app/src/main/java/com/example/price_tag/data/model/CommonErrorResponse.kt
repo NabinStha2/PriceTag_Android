@@ -1,4 +1,4 @@
-package com.example.price_tag.data.model.auth
+package com.example.price_tag.data.model
 
 data class CommonErrorResponse(
     val message: String,
