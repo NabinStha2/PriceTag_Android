@@ -22,7 +22,7 @@ interface ApiService {
     @POST("auth/verify-otp")
     suspend fun verifyOtp(@Body otpRequest: OtpRequest): Response<LoginResponse>
 
-    @GET(value = "category/")
+    @GET(value = "category")
     suspend fun getAllCategories(): Response<CategoryResponse>
 
 

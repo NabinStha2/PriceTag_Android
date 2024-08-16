@@ -1,6 +1,5 @@
 package com.example.price_tag.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
@@ -13,14 +12,14 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryColor,
-    secondary = secondaryColor4,
-    tertiary = TertiaryColor
+    secondary = SecondaryColor,
+    tertiary = SecondaryColor
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryColor,
-    secondary = secondaryColor4,
-    tertiary = TertiaryColor
+    secondary = SecondaryColor,
+    tertiary = SecondaryColor
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),

@@ -10,9 +10,9 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -22,8 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Icon
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
@@ -50,8 +49,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
+import com.example.price_tag.data.model.category.CategoryResponse
 import com.example.price_tag.ui.features.main.MainView
 import com.example.price_tag.ui.navigation.NavigationItem
+import com.example.utilites.ResourceState
 
 @Composable
 fun CategoryView(
@@ -70,54 +71,85 @@ fun CategoryView(
     val icons = listOf(
         Icons.Filled.Home,
         Icons.Filled.Search,
-        Icons.Filled.Settings,
     )
     val getAllCategoriesData by categoryViewModel.getAllCategoriesData.collectAsState()
 
-    Row {
-        NavigationRail(
-            modifier = Modifier
-                .padding(padding)
-                .width(configuration.screenWidthDp.dp * 0.23f)
-                .fillMaxHeight()
-                .weight(1f)
-                .verticalScroll(rememberScrollState()),
-            containerColor = Color.White,
-            contentColor = Color.Black,
-        ) {
-            listItem.forEachIndexed { index, item ->
-                NavigationRailItem(modifier = Modifier.height(60.dp),
-                    icon = {
-                        Icon(
-                            icons[index], contentDescription = item, modifier = Modifier.size(24.dp)
-                        )
-                    },
-                    label = { Text(item) },
-                    selected = selectedItem == index,
-                    onClick = { selectedItem = index })
-                Spacer(modifier = Modifier.height(8.dp))
+    when (getAllCategoriesData) {
+        is ResourceState.Loading -> {
+            Log.d(TAG, "CategoryView: Loading")
+
+            CircularProgressIndicator()
+        }
+
+        is ResourceState.Error -> {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize(),
+            ) {
+                Text(
+                    text = "Error: ${(getAllCategoriesData as ResourceState.Error<CategoryResponse>).error}",
+                    color = Color.Red,
+                    textAlign = TextAlign.Center,
+                    fontSize = 18.sp,
+                )
             }
         }
 
-        Spacer(modifier = Modifier.width(10.dp))
+        is ResourceState.Success -> {
+            LaunchedEffect(Unit) {
+                Log.e(TAG, "Success")
+            }
+            val categoryResponseData: CategoryResponse =
+                (getAllCategoriesData as ResourceState.Success<CategoryResponse>).data
 
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .padding(padding)
-                .weight(3f),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(count = 20) { index ->
-                Box(
+            Row {
+                NavigationRail(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .clickable {
-                            navController.navigate(route = NavigationItem.ProductView.route)
-                        },
+                        .padding(padding)
+                        .width(configuration.screenWidthDp.dp * 0.23f)
+                        .fillMaxHeight()
+                        .weight(1f)
+                        .verticalScroll(rememberScrollState()),
+                    containerColor = Color.White,
+                    contentColor = Color.Black,
                 ) {
-                    Column {
+                    categoryResponseData.data?.results?.forEachIndexed { index, item ->
+                        NavigationRailItem(modifier = Modifier.height(60.dp),
+                            icon = {
+//                                Icon(
+//                                    icons[index],
+//                                    contentDescription = item.categoryName,
+//                                    modifier = Modifier.size(24.dp)
+//                                )
+                                Text(item.categoryName ?: "")
+                            },
+//                            label = { Text(item.categoryName ?: "") },
+                            selected = selectedItem == index,
+                            onClick = { selectedItem = index })
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(2),
+                    modifier = Modifier
+                        .padding(padding)
+                        .weight(3f),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    items(count = 20) { index ->
+                        Box(
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .clickable {
+                                    navController.navigate(route = NavigationItem.ProductView.route)
+                                },
+                        ) {
+                            Column {
 //                        AsyncImage(
 //                            model = "https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg",
 //                            contentDescription = "SubCategory Image",
@@ -125,29 +157,34 @@ fun CategoryView(
 //                                .height(120.dp)
 //                                .clip(RoundedCornerShape(12.dp))
 //                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.carousel1),
-                            contentDescription = "Product Image",
-                            contentScale = ContentScale.Crop,
-                            modifier = Modifier
-                                .height(120.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "SubCategory $index",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.W500,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .align(alignment = Alignment.CenterHorizontally)
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+                                Image(
+                                    painter = painterResource(id = R.drawable.carousel1),
+                                    contentDescription = "Product Image",
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier
+                                        .height(120.dp)
+                                        .clip(RoundedCornerShape(12.dp))
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                                Text(
+                                    text = "SubCategory $index",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.W500,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .align(alignment = Alignment.CenterHorizontally)
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
+                        }
                     }
                 }
+
             }
+
         }
 
+        else -> {}
     }
 
 

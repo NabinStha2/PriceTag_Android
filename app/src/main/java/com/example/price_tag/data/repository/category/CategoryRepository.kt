@@ -44,7 +44,27 @@ class CategoryRepository @Inject constructor(
         }.catch { err ->
             emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))
         }
-
+    }    suspend fun getAllSubCategories(): Flow<ResourceState<CategoryResponse>> {
+        return flow {
+            emit(ResourceState.Loading())
+            val response = categoryDataSource.getAllCategories()
+            if (response.isSuccessful && response.body() != null) emit(
+                ResourceState.Success(
+                    response.body()!!
+                )
+            )
+            else {
+                val commonErrorResponse: CommonErrorResponse? =
+                    response.errorBody()?.string()?.let { jsonErrorAdapter.fromJson(it) }
+                Log.e(
+                    "CategoryRepository GetAllCategories",
+                    commonErrorResponse?.message ?: "Error while logging in"
+                )
+                emit(ResourceState.Error(commonErrorResponse?.message ?: "Error while logging in"))
+            }
+        }.catch { err ->
+            emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))
+        }
     }
 
 }
