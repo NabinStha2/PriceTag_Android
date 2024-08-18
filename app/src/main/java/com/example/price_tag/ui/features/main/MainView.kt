@@ -52,25 +52,24 @@ fun MainView(
             alpha = 0.08f
         ),
         topBar = {
-            if (selectedIndex == 0)
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            text = "Price Tag",
-                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
-                            fontWeight = FontWeight.W600,
-                            textAlign = TextAlign.Center,
-                            color = Color.Black,
-                        )
-                    },
-                    modifier = Modifier
-                        .background(color = Color.White),
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = Color.Gray.copy(
-                            alpha = 0.08f
-                        ),
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        text = if (selectedIndex == 0) "Price Tag" else if (selectedIndex == 1) "Category" else if (selectedIndex == 2) "Wishlist" else "Profile",
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
+                        fontWeight = FontWeight.W600,
+                        textAlign = TextAlign.Center,
+                        color = Color.Black,
                     )
+                },
+                modifier = Modifier
+                    .background(color = Color.White),
+                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                    containerColor = Color.Gray.copy(
+                        alpha = 0.08f
+                    ),
                 )
+            )
         },
         bottomBar = {
             BottomNavigationBar(selectedIndex) {

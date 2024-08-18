@@ -23,7 +23,7 @@ class RetryInterceptor(private val maxRetry: Int = 3) : Interceptor {
                 }
 
                 // Close the response before retrying (but not the final one)
-                response.close()
+//                response.close()
             } catch (e: IOException) {
                 exception = e
                 println("Attempt ${attempt + 1} failed with IOException: ${e.message}")

@@ -19,9 +19,6 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
@@ -50,6 +47,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
 import com.example.price_tag.data.model.category.CategoryResponse
+import com.example.price_tag.data.model.category.SubCategoryResponse
+import com.example.price_tag.data.model.category.SubCategoryResult
 import com.example.price_tag.ui.features.main.MainView
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.utilites.ResourceState
@@ -63,32 +62,29 @@ fun CategoryView(
     val TAG = "CategoryView"
     val configuration = LocalConfiguration.current
     var selectedItem by remember { mutableIntStateOf(0) }
-    val listItem = listOf(
-        "New Arrival",
-        "Clothing",
-        "Accessories",
-    )
-    val icons = listOf(
-        Icons.Filled.Home,
-        Icons.Filled.Search,
-    )
+
     val getAllCategoriesData by categoryViewModel.getAllCategoriesData.collectAsState()
+    val getAllSubCategoriesData by categoryViewModel.getAllSubCategoriesData.collectAsState()
+
 
     when (getAllCategoriesData) {
         is ResourceState.Loading -> {
             Log.d(TAG, "CategoryView: Loading")
-
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
 
         is ResourceState.Error -> {
             Box(
+                modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .fillMaxSize(),
             ) {
                 Text(
-                    text = "Error: ${(getAllCategoriesData as ResourceState.Error<CategoryResponse>).error}",
+                    text = "Error: ${(getAllCategoriesData as? ResourceState.Error<CategoryResponse>)?.error ?: "Something went wrong"}",
                     color = Color.Red,
                     textAlign = TextAlign.Center,
                     fontSize = 18.sp,
@@ -100,23 +96,23 @@ fun CategoryView(
             LaunchedEffect(Unit) {
                 Log.e(TAG, "Success")
             }
-            val categoryResponseData: CategoryResponse =
-                (getAllCategoriesData as ResourceState.Success<CategoryResponse>).data
+            val categoryResponseData: CategoryResponse? =
+                (getAllCategoriesData as? ResourceState.Success<CategoryResponse>)?.data
 
-            Row {
-                NavigationRail(
-                    modifier = Modifier
-                        .padding(padding)
-                        .width(configuration.screenWidthDp.dp * 0.23f)
-                        .fillMaxHeight()
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState()),
-                    containerColor = Color.White,
-                    contentColor = Color.Black,
-                ) {
-                    categoryResponseData.data?.results?.forEachIndexed { index, item ->
-                        NavigationRailItem(modifier = Modifier.height(60.dp),
-                            icon = {
+            categoryResponseData?.let {
+                Row {
+                    NavigationRail(
+                        modifier = Modifier
+                            .padding(padding)
+                            .width(configuration.screenWidthDp.dp * 0.23f)
+                            .fillMaxHeight()
+                            .weight(1f)
+                            .verticalScroll(rememberScrollState()),
+                        containerColor = Color.White,
+                        contentColor = Color.Black,
+                    ) {
+                        categoryResponseData.data?.results?.forEachIndexed { index, item ->
+                            NavigationRailItem(modifier = Modifier.height(60.dp), icon = {
 //                                Icon(
 //                                    icons[index],
 //                                    contentDescription = item.categoryName,
@@ -125,31 +121,76 @@ fun CategoryView(
                                 Text(item.categoryName ?: "")
                             },
 //                            label = { Text(item.categoryName ?: "") },
-                            selected = selectedItem == index,
-                            onClick = { selectedItem = index })
-                        Spacer(modifier = Modifier.height(8.dp))
+                                selected = selectedItem == index, onClick = {
+                                    selectedItem = index
+                                    categoryViewModel.getAllSubCategories(
+                                        categoryId = item.id ?: 0
+                                    )
+                                }
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
-                }
 
-                Spacer(modifier = Modifier.width(10.dp))
+                    Spacer(modifier = Modifier.width(10.dp))
 
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .padding(padding)
-                        .weight(3f),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(count = 20) { index ->
-                        Box(
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .clickable {
-                                    navController.navigate(route = NavigationItem.ProductView.route)
-                                },
-                        ) {
-                            Column {
+                    when (getAllSubCategoriesData) {
+                        is ResourceState.Loading -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .weight(3f),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+
+                        is ResourceState.Error -> {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .weight(3f)
+                                    .align(alignment = Alignment.CenterVertically),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Text(
+                                    text = "Error: ${(getAllSubCategoriesData as? ResourceState.Error<SubCategoryResponse>)?.error ?: "Something went wrong"}",
+                                    color = Color.Red,
+                                    textAlign = TextAlign.Center,
+                                    fontSize = 18.sp,
+                                )
+                            }
+                        }
+
+                        is ResourceState.Success -> {
+                            val subCategoryResponse: SubCategoryResponse? =
+                                (getAllSubCategoriesData as? ResourceState.Success<SubCategoryResponse>)?.data
+
+                            LazyVerticalGrid(
+                                columns = GridCells.Fixed(2),
+                                modifier = Modifier
+                                    .padding(padding)
+                                    .weight(3f),
+                                verticalArrangement = Arrangement.spacedBy(12.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                items(
+                                    count = subCategoryResponse?.data?.results?.size
+                                        ?: 0
+                                ) { index ->
+                                    val subCategoryResult: SubCategoryResult? =
+                                        subCategoryResponse?.data?.results?.get(
+                                            index
+                                        )
+                                    Box(
+                                        modifier = Modifier
+                                            .padding(horizontal = 8.dp)
+                                            .clickable {
+                                                navController.navigate(route = NavigationItem.ProductView.route)
+                                            },
+                                    ) {
+                                        Column {
 //                        AsyncImage(
 //                            model = "https://buffer.com/library/content/images/size/w1200/2023/10/free-images.jpg",
 //                            contentDescription = "SubCategory Image",
@@ -157,29 +198,33 @@ fun CategoryView(
 //                                .height(120.dp)
 //                                .clip(RoundedCornerShape(12.dp))
 //                        )
-                                Image(
-                                    painter = painterResource(id = R.drawable.carousel1),
-                                    contentDescription = "Product Image",
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier
-                                        .height(120.dp)
-                                        .clip(RoundedCornerShape(12.dp))
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                                Text(
-                                    text = "SubCategory $index",
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.W500,
-                                    textAlign = TextAlign.Center,
-                                    modifier = Modifier
-                                        .align(alignment = Alignment.CenterHorizontally)
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
+                                            Image(
+                                                painter = painterResource(id = R.drawable.carousel1),
+                                                contentDescription = "Product Image",
+                                                contentScale = ContentScale.Crop,
+                                                modifier = Modifier
+                                                    .height(120.dp)
+                                                    .clip(RoundedCornerShape(12.dp))
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                            Text(
+                                                text = subCategoryResult?.subCategoryName ?: "",
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.W500,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+                                            )
+                                            Spacer(modifier = Modifier.height(8.dp))
+                                        }
+                                    }
+                                }
                             }
                         }
-                    }
-                }
 
+                        else -> {}
+                    }
+
+                }
             }
 
         }

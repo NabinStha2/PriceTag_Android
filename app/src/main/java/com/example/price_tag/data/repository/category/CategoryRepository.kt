@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.price_tag.data.datasource.category.CategoryDataSource
 import com.example.price_tag.data.model.CommonErrorResponse
 import com.example.price_tag.data.model.category.CategoryResponse
+import com.example.price_tag.data.model.category.SubCategoryResponse
 import com.example.utilites.ResourceState
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -27,16 +28,19 @@ class CategoryRepository @Inject constructor(
         return flow {
             emit(ResourceState.Loading())
             val response = categoryDataSource.getAllCategories()
-            if (response.isSuccessful && response.body() != null) emit(
-                ResourceState.Success(
-                    response.body()!!
+
+            if (response.isSuccessful && response.body() != null) {
+                emit(
+                    ResourceState.Success(
+                        response.body()!!
+                    )
                 )
-            )
-            else {
+
+            } else {
                 val commonErrorResponse: CommonErrorResponse? =
                     response.errorBody()?.string()?.let { jsonErrorAdapter.fromJson(it) }
                 Log.e(
-                    "CategoryRepository GetAllCategories",
+                    "getAllCategories",
                     commonErrorResponse?.message ?: "Error while logging in"
                 )
                 emit(ResourceState.Error(commonErrorResponse?.message ?: "Error while logging in"))
@@ -44,10 +48,12 @@ class CategoryRepository @Inject constructor(
         }.catch { err ->
             emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))
         }
-    }    suspend fun getAllSubCategories(): Flow<ResourceState<CategoryResponse>> {
+    }
+
+    suspend fun getAllSubCategories(categoryId: Long): Flow<ResourceState<SubCategoryResponse>> {
         return flow {
             emit(ResourceState.Loading())
-            val response = categoryDataSource.getAllCategories()
+            val response = categoryDataSource.getAllSubCategories(categoryId = categoryId)
             if (response.isSuccessful && response.body() != null) emit(
                 ResourceState.Success(
                     response.body()!!
@@ -57,7 +63,7 @@ class CategoryRepository @Inject constructor(
                 val commonErrorResponse: CommonErrorResponse? =
                     response.errorBody()?.string()?.let { jsonErrorAdapter.fromJson(it) }
                 Log.e(
-                    "CategoryRepository GetAllCategories",
+                    "getAllSubCategories",
                     commonErrorResponse?.message ?: "Error while logging in"
                 )
                 emit(ResourceState.Error(commonErrorResponse?.message ?: "Error while logging in"))

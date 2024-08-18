@@ -226,10 +226,10 @@ fun ProductView(
     Scaffold(
         modifier = Modifier
             .padding(horizontal = 16.dp)
-    ) { padding ->
+    ) { scaffoldPadding ->
         Column(
             modifier = Modifier
-                .padding(padding)
+                .padding(scaffoldPadding)
                 .fillMaxSize()
         ) {
             Row {
@@ -305,8 +305,6 @@ fun ProductView(
                     )
                 }
             }
-
-
         }
     }
 
