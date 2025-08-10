@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.ui.navigation.AppNavHost
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.theme.Price_tagTheme
@@ -65,6 +67,9 @@ class MainActivity : ComponentActivity() {
                 TAG, "navigationRoute${navigationRoute}"
             )
 
+            val navController: NavHostController = rememberNavController()
+
+
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
@@ -72,6 +77,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 AppNavHost(
                     startDestination = navigationRoute,
+                    navController = navController,
                 )
             }
         }
@@ -88,12 +94,12 @@ data class CustomSnackbarVisuals(
 ) : SnackbarVisuals
 
 
-@Preview(showBackground = true)
-@Composable
-fun PriceTagPreview() {
-    Price_tagTheme {
-        AppNavHost(
-            startDestination = NavigationItem.OnboardingView.route
-        )
-    }
-}
+//@Preview(showBackground = true)
+//@Composable
+//fun PriceTagPreview() {
+//    Price_tagTheme {
+//        AppNavHost(
+//            startDestination = NavigationItem.OnboardingView.route
+//        )
+//    }
+//}

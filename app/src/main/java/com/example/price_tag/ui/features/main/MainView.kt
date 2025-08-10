@@ -16,12 +16,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.ui.components.BottomNavigationBar
+import com.example.price_tag.ui.components.SharedViewModel
 import com.example.price_tag.ui.features.category.CategoryView
 import com.example.price_tag.ui.features.category.CategoryViewModel
 import com.example.price_tag.ui.features.home.HomeView
@@ -29,12 +27,12 @@ import com.example.price_tag.ui.features.profile.ProfileView
 import com.example.price_tag.ui.features.wishlist.WishlistView
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Preview
 @Composable
 fun MainView(
-    navController: NavHostController = rememberNavController(),
-    viewModel: MainViewModel = viewModel<MainViewModel>(),
-    categoryViewModel: CategoryViewModel = hiltViewModel(),
+    navController: NavHostController,
+    viewModel: MainViewModel,
+    categoryViewModel: CategoryViewModel,
+    sharedViewModel: SharedViewModel,
 ) {
     val TAG = "MainView"
     val selectedIndex by viewModel.selectedMainBottomBarIndex.collectAsState()
@@ -83,7 +81,12 @@ fun MainView(
             }
 
             1 -> {
-                CategoryView(navController = navController, padding = padding)
+                CategoryView(
+                    navController = navController,
+                    padding = padding,
+                    categoryViewModel = categoryViewModel,
+                    sharedViewModel = sharedViewModel
+                )
             }
 
             2 -> {

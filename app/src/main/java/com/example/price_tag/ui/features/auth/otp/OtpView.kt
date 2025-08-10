@@ -69,8 +69,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun OtpView(
     navController: NavController = rememberNavController(),
-    otpViewModel: OtpViewModel = hiltViewModel(),
-    sharedViewModel: SharedViewModel = hiltViewModel(),
+    otpViewModel: OtpViewModel,
+    sharedViewModel: SharedViewModel,
 ) {
     var TAG = "OtpView"
 

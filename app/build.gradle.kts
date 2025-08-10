@@ -55,6 +55,7 @@ dependencies {
 
     implementation(Dependencies.coreKtx)
     implementation(Dependencies.lifecycleRuntimeKtx)
+    implementation(Dependencies.lifecycleRuntimeComposeKtx)
     implementation(Dependencies.ui)
     implementation(Dependencies.material3)
     implementation(Dependencies.activityCompose)

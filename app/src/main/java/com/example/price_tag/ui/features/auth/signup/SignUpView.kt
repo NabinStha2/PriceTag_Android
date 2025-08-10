@@ -57,6 +57,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.CustomSnackbarVisuals
@@ -71,13 +72,14 @@ import com.example.utilites.ResourceState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpView(
-    navController: NavController = rememberNavController(),
-    signUpViewModel: SignUpViewModel = hiltViewModel(),
-    sharedViewModel: SharedViewModel = hiltViewModel(),
+    navController: NavController,
+    signUpViewModel: SignUpViewModel,
+    sharedViewModel: SharedViewModel,
+
 ) {
 //    val coroutineScope = rememberCoroutineScope()
     val snackbarHostState: SnackbarHostState = sharedViewModel.snackbarHostState
-    val signUpResponse by signUpViewModel.signUpData.collectAsState()
+    val signUpResponse by signUpViewModel.signUpData.collectAsStateWithLifecycle()
     val TAG = "SignUpView"
     val context = LocalContext.current
 
@@ -442,8 +444,8 @@ fun SignUpView(
 }
 
 
-@Preview
-@Composable
-fun SignUpViewPreview() {
-    SignUpView()
-}
+//@Preview
+//@Composable
+//fun SignUpViewPreview() {
+//    SignUpView()
+//}

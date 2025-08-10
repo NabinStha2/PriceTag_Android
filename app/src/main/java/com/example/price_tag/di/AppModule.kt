@@ -9,8 +9,11 @@ import com.example.price_tag.data.datasource.auth.AuthDataSource
 import com.example.price_tag.data.datasource.auth.AuthDataSourceImpl
 import com.example.price_tag.data.datasource.category.CategoryDataSource
 import com.example.price_tag.data.datasource.category.CategoryDataSourceImpl
+import com.example.price_tag.data.datasource.product.ProductDataSource
+import com.example.price_tag.data.datasource.product.ProductDataSourceImpl
 import com.example.price_tag.data.repository.auth.AuthRepository
 import com.example.price_tag.data.repository.category.CategoryRepository
+import com.example.price_tag.data.repository.product.ProductRepository
 import com.example.price_tag.network.AuthInterceptor
 import com.example.price_tag.network.RetryInterceptor
 import com.example.price_tag.utils.SharedPreferencesUtils
@@ -55,6 +58,12 @@ class AppModule {
         return RetryInterceptor(maxRetry = 3)
     }
 
+    @Provides
+    @Singleton
+    fun providesMoshi(): Moshi {
+        return Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    }
+
 
     @Provides
     @Singleton
@@ -67,7 +76,7 @@ class AppModule {
         }
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
-            .addInterceptor(retryInterceptor)
+//            .addInterceptor(retryInterceptor)
             .addInterceptor(loggingInterceptor)
             .connectTimeout(60, TimeUnit.SECONDS)
             .readTimeout(60, TimeUnit.SECONDS)
@@ -77,8 +86,7 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun providesRetrofit(okHttpClient: OkHttpClient): Retrofit {
-        val moshi = Moshi.Builder().add(KotlinJsonAdapterFactory()).build()
+    fun providesRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit.Builder().baseUrl(AppConstants.APP_BASE_URL).client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi)).build()
     }
@@ -112,8 +120,23 @@ class AppModule {
 
     @Provides
     @Singleton
-    fun providesCategoryRepository(categoryDataSource: CategoryDataSource): CategoryRepository {
-        return CategoryRepository(categoryDataSource)
+    fun providesCategoryRepository(
+        categoryDataSource: CategoryDataSource,
+        sharedPreferencesUtils: SharedPreferencesUtils
+    ): CategoryRepository {
+        return CategoryRepository(categoryDataSource, sharedPreferencesUtils)
+    }
+
+    @Provides
+    @Singleton
+    fun providesProductDataSource(apiService: ApiService): ProductDataSource {
+        return ProductDataSourceImpl(apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun providesProductRepository(productDataSource: ProductDataSource): ProductRepository {
+        return ProductRepository(productDataSource)
     }
 
 

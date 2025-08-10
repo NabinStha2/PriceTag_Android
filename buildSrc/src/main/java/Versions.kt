@@ -1,6 +1,7 @@
 object Versions {
     const val coreKtx = "1.13.1"
     const val lifecycleRuntimeKtx = "2.8.4"
+    const val lifecycleRuntimeComposeKtx = "2.8.7"
     const val activityCompose = "1.9.1"
     const val composeBom = "2024.06.00"
     const val ui = "1.6.8"

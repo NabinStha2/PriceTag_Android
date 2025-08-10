@@ -209,9 +209,9 @@ fun HomeView(
             }
         }
 
-        itemsIndexed(items = productList) { index, product ->
-            ProductCard(index = index, productItem = product)
-        }
+//        itemsIndexed(items = productList) { index, product ->
+//            ProductCard(index = index, productItem = product)
+//        }
 
         item(span = { GridItemSpan(2) }) {
             Row(
@@ -250,7 +250,7 @@ fun HomeView(
                     .wrapContentWidth(),
             ) {
                 items(productList.size) { index ->
-                    ProductCard(index = index, productItem = productList[index], width = 160.dp)
+//                    ProductCard(index = index, productItem = productList[index], width = 160.dp)
                     Spacer(modifier = Modifier.width(10.dp))
                 }
             }
@@ -260,13 +260,13 @@ fun HomeView(
 }
 
 
-@Preview
-@Composable
-fun HomeViewPreview(padding: PaddingValues = PaddingValues(16.dp)) {
-    Column(
-        modifier = Modifier
-            .padding(padding)
-            .fillMaxSize()
-            .background(color = Color.White)
-    ) { MainView() }
-}
+//@Preview
+//@Composable
+//fun HomeViewPreview(padding: PaddingValues = PaddingValues(16.dp)) {
+//    Column(
+//        modifier = Modifier
+//            .padding(padding)
+//            .fillMaxSize()
+//            .background(color = Color.White)
+//    ) { MainView() }
+//}

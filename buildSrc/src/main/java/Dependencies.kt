@@ -4,6 +4,7 @@ object Dependencies {
 
     val coreKtx by lazy { "androidx.core:core-ktx:${Versions.coreKtx}" }
     val lifecycleRuntimeKtx by lazy { "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycleRuntimeKtx}" }
+    val lifecycleRuntimeComposeKtx by lazy { "androidx.lifecycle:lifecycle-runtime-compose:${Versions.lifecycleRuntimeComposeKtx}" }
     val activityCompose by lazy { "androidx.activity:activity-compose:${Versions.activityCompose}" }
     val composeBom by lazy { "androidx.compose:compose-bom:${Versions.composeBom}" }
     val ui by lazy { "androidx.compose.ui:ui" }
@@ -38,7 +39,6 @@ object Dependencies {
 
     val coroutineAndroid by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-android:${Versions.coroutineAndroid}" }
     val coroutineCore by lazy { "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutineCore}" }
-
 }
 
 

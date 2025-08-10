@@ -1,5 +1,6 @@
 package com.example.price_tag.network
 
+import android.util.Log
 import com.example.price_tag.utils.SharedPreferencesUtils
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -11,6 +12,8 @@ class AuthInterceptor @Inject constructor(
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
         val token = sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken)
+
+        Log.i("Authorization", "Bearer $token")
 
         // List of endpoints that require authentication
         val endpointsThatDoesNotNeedAuth =

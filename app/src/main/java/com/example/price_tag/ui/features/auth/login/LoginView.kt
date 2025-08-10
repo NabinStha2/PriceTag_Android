@@ -53,7 +53,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.CustomSnackbarVisuals
@@ -68,7 +67,7 @@ import com.example.utilites.ResourceState
 @Composable
 fun LoginView(
     navController: NavController = rememberNavController(),
-    loginViewModel: LoginViewModel = hiltViewModel(),
+    loginViewModel: LoginViewModel,
 ) {
     val TAG = "LoginView"
     val loginResponse by loginViewModel.loginData.collectAsState()
@@ -114,7 +113,7 @@ fun LoginView(
 //                    coroutineScope.launch {
                 Toast.makeText(
                     context,
-                    response.message,
+                    "Login Successfully",
                     Toast.LENGTH_SHORT,
                 ).show()
 //                        snackbarHostState.showSnackbar(
@@ -141,6 +140,7 @@ fun LoginView(
 //                    }
 //                }
                 if (response.data?.accessToken != null && response.data.refreshToken != null) {
+                    Log.i("Login response data", response.data.toString())
                     spUtils.save(
                         spUtils.bearerToken,
                         response.data.accessToken
@@ -337,8 +337,8 @@ fun LoginView(
     }
 }
 
-@Preview
-@Composable
-fun LoginViewPreview() {
-    LoginView()
-}
+//@Preview
+//@Composable
+//fun LoginViewPreview() {
+//    LoginView()
+//}

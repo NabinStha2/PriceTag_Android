@@ -12,14 +12,14 @@ import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
     primary = PrimaryColor,
-    secondary = SecondaryColor,
-    tertiary = SecondaryColor
+    secondary = AccentColor,
+    tertiary = AccentColor
 )
 
 private val LightColorScheme = lightColorScheme(
     primary = PrimaryColor,
-    secondary = SecondaryColor,
-    tertiary = SecondaryColor
+    secondary = AccentColor,
+    tertiary = AccentColor
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -51,7 +51,7 @@ fun Price_tagTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = PoppinsTypography,
         content = content
     )
 }

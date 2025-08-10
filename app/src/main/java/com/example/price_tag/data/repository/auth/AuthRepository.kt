@@ -3,6 +3,7 @@ package com.example.price_tag.data.repository.auth
 import android.util.Log
 import com.example.price_tag.data.datasource.auth.AuthDataSource
 import com.example.price_tag.data.model.CommonErrorResponse
+import com.example.price_tag.data.model.auth.LoginData
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.model.auth.OtpRequest
@@ -30,19 +31,25 @@ class AuthRepository @Inject constructor(
         return flow {
             emit(ResourceState.Loading())
             val response = authDataSource.login(loginRequest = loginRequest)
-//            Log.i("AuthRepository login", "response => ${response.errorBody()?.string()}")
-            if (response.isSuccessful && response.body() != null) emit(
-                ResourceState.Success(
-                    response.body()!!
+            Log.i("AuthRepository login", "response => ${response.body()}")
+            if (response.isSuccessful && response.body() != null) {
+                emit(
+                    ResourceState.Success(
+                        response.body()!!
+                    )
                 )
-            )
+            }
             else {
+                val errorBody = response.errorBody()?.string() // Read it once and store it
                 val commonErrorResponse: CommonErrorResponse? =
-                    response.errorBody()?.string()?.let { jsonErrorAdapter.fromJson(it) }
-//                Log.e("AuthRepository login", commonErrorResponse?.message ?: "Error while logging in")
+                    errorBody?.let {
+                        jsonErrorAdapter.fromJson(it)
+                    }
+                Log.e("AuthRepository login", commonErrorResponse?.message ?: "Error while logging in")
                 emit(ResourceState.Error(commonErrorResponse?.message ?: "Error while logging in"))
             }
         }.catch { err ->
+            Log.e("AuthRepository login", err.toString() )
             emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))
         }
 

@@ -3,6 +3,7 @@ package com.example.price_tag.ui.features.auth.login
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.price_tag.data.model.auth.LoginData
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.repository.auth.AuthRepository

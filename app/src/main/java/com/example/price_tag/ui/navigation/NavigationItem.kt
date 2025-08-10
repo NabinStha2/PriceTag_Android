@@ -6,6 +6,8 @@ sealed class NavigationItem(val route: String) {
     data object MainView : NavigationItem("main_screen")
     data object LoginView : NavigationItem("login_screen")
     data object SignUpView : NavigationItem("sign_up_screen")
-    data object ProductView : NavigationItem("product_screen")
+    data object ProductView : NavigationItem("product_screen?subCategoryId={subCategoryId}"){
+        fun createRoute(subCategoryId: Long?) = "product_screen?subCategoryId=$subCategoryId"
+    }
     data object OtpView : NavigationItem("otp_screen")
 }
