@@ -9,6 +9,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.rememberPagerState
@@ -55,11 +57,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
 import com.example.price_tag.ui.components.CartIconWithBadge
+import com.example.price_tag.ui.components.SharedViewModel
 import com.example.price_tag.ui.components.StarRating
 import com.example.price_tag.ui.features.home.CarouselItem
 import com.example.price_tag.ui.features.home.widgets.CarouselSlider
+import com.example.price_tag.ui.features.product.ProductViewModel
 import com.example.price_tag.ui.theme.NeutralColor100
 import com.example.price_tag.ui.theme.NeutralColor200
 import com.example.price_tag.ui.theme.NeutralColor800
@@ -70,15 +76,13 @@ import com.example.price_tag.ui.theme.PrimaryColor600
 import com.example.price_tag.ui.theme.WarningColor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-@Preview
 @Composable
 fun ProductDetailsView(
-//    navController: NavController = rememberNavController(),
-//    paddingValues: PaddingValues,
-//    productViewModel: ProductViewModel,
-//    sharedViewModel: SharedViewModel,
-//    productId: Long?,
-//    productName: String?,
+    navController: NavController,
+    paddingValues: PaddingValues,
+    productDetailsViewModel: ProductDetailsViewModel,
+    sharedViewModel: SharedViewModel,
+    productId: Long?,
 ) {
     val images = listOf(
         CarouselItem(R.drawable.carousel1),
@@ -96,19 +100,18 @@ fun ProductDetailsView(
     val tabs = listOf("Description", "Reviews")
 
     Scaffold(
-        modifier = Modifier.padding(horizontal = 16.dp),
+        modifier = Modifier.padding(horizontal = 16.dp).systemBarsPadding(),
         topBar = {
             CenterAlignedTopAppBar(
                 navigationIcon = {
                     IconButton(
-                        onClick = { /*TODO*/ },
+                        onClick = { navController.popBackStack()},
                         modifier = Modifier
                             .border(
                                 shape = CircleShape.copy(CornerSize(percent = 100)),
                                 border = BorderStroke(width = 1.dp, color = NeutralColor200)
                             )
                             .size(35.dp)
-
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,

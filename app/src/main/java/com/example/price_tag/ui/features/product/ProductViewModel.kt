@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.data.model.product.ProductResponse
 import com.example.price_tag.data.model.product.ProductResult
+import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import com.example.price_tag.data.repository.product.ProductRepository
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,6 +37,7 @@ class ProductViewModel @Inject constructor(private val productRepository: Produc
         MutableStateFlow<ResourceState<ProductResponse>>(ResourceState.Initial())
     val getAllSubCategorySearchProductsData: MutableStateFlow<ResourceState<ProductResponse>> =
         _getAllSubCategorySearchProductsData
+
 
 
     fun getAllSubCategoryProducts(
@@ -128,4 +130,5 @@ class ProductViewModel @Inject constructor(private val productRepository: Produc
 
         }
     }
+
 }

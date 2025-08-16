@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -27,6 +26,8 @@ import com.example.price_tag.ui.features.main.MainViewModel
 import com.example.price_tag.ui.features.onboarding.OnboardingView
 import com.example.price_tag.ui.features.product.ProductView
 import com.example.price_tag.ui.features.product.ProductViewModel
+import com.example.price_tag.ui.features.productDetails.ProductDetailsView
+import com.example.price_tag.ui.features.productDetails.ProductDetailsViewModel
 
 
 @Composable
@@ -141,7 +142,31 @@ fun AppNavHost(
                 sharedViewModel = sharedViewModel,
                 productViewModel = productViewModel
             )
+        }
 
+        composable(route = NavigationItem.ProductDetailsView.route,
+            arguments = listOf(navArgument("productId") {
+                type = NavType.LongType
+                defaultValue = 0
+            }),
+            enterTransition = {
+                slideIn(tween(durationMillis = 200)) {
+                    IntOffset(x = it.width, y = 0) // Start off-screen to the right
+                }
+            }, exitTransition = {
+                slideOut(tween(durationMillis = 200)) {
+                    IntOffset(x = -it.width, y = 0) // Exit off-screen to the left
+                }
+            }) { backStackEntry ->
+            val productDetailsViewModel: ProductDetailsViewModel = hiltViewModel()
+            val productId = backStackEntry.arguments?.getLong("productId")
+            ProductDetailsView(
+                navController = navController,
+                productId = productId,
+                sharedViewModel = sharedViewModel,
+                productDetailsViewModel = productDetailsViewModel,
+                paddingValues = PaddingValues(),
+                )
         }
     }
 }

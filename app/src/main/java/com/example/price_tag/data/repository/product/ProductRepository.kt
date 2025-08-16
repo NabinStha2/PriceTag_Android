@@ -4,6 +4,7 @@ import android.util.Log
 import com.example.price_tag.data.datasource.product.ProductDataSource
 import com.example.price_tag.data.model.CommonErrorResponse
 import com.example.price_tag.data.model.product.ProductResponse
+import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import com.example.utilites.ResourceState
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -105,6 +106,41 @@ class ProductRepository @Inject constructor(private val productDataSource: Produ
         }.catch { err ->
             Log.e(
                 "ProductRepository getAllSubCategorySearchProducts",
+                err.toString()
+            )
+            emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))
+        }
+    }
+
+    suspend fun getSingleProductDetails(productId: Long): Flow<ResourceState<ProductDetailsResponse>> {
+        return flow<ResourceState<ProductDetailsResponse>> {
+            emit(ResourceState.Loading())
+            val response = productDataSource.getSingleProductDetails(productId)
+            Log.i(
+                "ProductRepository getSingleProductDetails",
+                "response => ${response.body()}"
+            )
+            if (response.isSuccessful && response.body() != null) emit(
+                ResourceState.Success(
+                    response.body()!!
+                )
+            )
+            else {
+                val commonErrorResponse: CommonErrorResponse? =
+                    response.errorBody()?.string()?.let { jsonErrorAdapter.fromJson(it) }
+                Log.e(
+                    "ProductRepository getSingleProductDetails",
+                    commonErrorResponse?.message ?: "Error fetching product details"
+                )
+                emit(
+                    ResourceState.Error(
+                        commonErrorResponse?.message ?: "Error fetching product details"
+                    )
+                )
+            }
+        }.catch { err ->
+            Log.e(
+                "ProductRepository getSingleProductDetails",
                 err.toString()
             )
             emit(ResourceState.Error(err.localizedMessage ?: "Something went wrong"))

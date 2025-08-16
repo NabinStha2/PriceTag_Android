@@ -1,6 +1,7 @@
 package com.example.price_tag.data.datasource.product
 
 import com.example.price_tag.data.model.product.ProductResponse
+import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import retrofit2.Response
 
 interface ProductDataSource {
@@ -21,5 +22,7 @@ interface ProductDataSource {
         order: String?,
         name: String?
     ): Response<ProductResponse>
+
+    suspend fun getSingleProductDetails(productId: Long): Response<ProductDetailsResponse>
 
 }

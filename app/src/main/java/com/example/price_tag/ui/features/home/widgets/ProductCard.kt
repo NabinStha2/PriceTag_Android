@@ -27,7 +27,6 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.ImageLoader
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -39,13 +38,14 @@ fun ProductCard(
     index: Int? = 0,
     productResult: ProductResult?,
     width: Dp = 160.dp,
-    categoryName: String? = ""
+    categoryName: String? = "",
+    onClick: () -> Unit
 ) {
     Card(
         modifier = Modifier
             .width(width = width)
             .clip(shape = RoundedCornerShape(12.dp)),
-        onClick = {},
+        onClick = onClick,
         colors = CardDefaults.cardColors(
             Color.White
 

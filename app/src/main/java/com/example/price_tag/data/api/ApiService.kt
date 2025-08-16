@@ -7,6 +7,7 @@ import com.example.price_tag.data.model.auth.SignUpRequest
 import com.example.price_tag.data.model.category.CategoryResponse
 import com.example.price_tag.data.model.category.SubCategoryResponse
 import com.example.price_tag.data.model.product.ProductResponse
+import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -52,5 +53,10 @@ interface ApiService {
         @Query("order") order: String? = "asc",
         @Query("name") name: String? = "",
     ): Response<ProductResponse>
+
+    @GET(value = "product/{product_id}")
+    suspend fun getSingleProductDetails(
+        @Path("product_id") productId: Long
+    ) : Response<ProductDetailsResponse>
 
 }

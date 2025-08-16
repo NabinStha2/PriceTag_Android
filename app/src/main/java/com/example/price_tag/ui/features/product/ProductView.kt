@@ -58,6 +58,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.data.model.product.ProductResponse
 import com.example.price_tag.ui.components.SharedViewModel
 import com.example.price_tag.ui.features.home.widgets.ProductCard
+import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.utilites.ResourceState
 
 
@@ -103,12 +104,12 @@ fun ProductView(
                         )
                     }
                 } else {
-                        productViewModel.getAllSubCategorySearchProductsData(
-                            subCategoryId = subCategoryId!!,
-                            page = productViewModel.currentPage.intValue,
-                            limit = 5,
-                            name = productSearchValue
-                        )
+                    productViewModel.getAllSubCategorySearchProductsData(
+                        subCategoryId = subCategoryId!!,
+                        page = productViewModel.currentPage.intValue,
+                        limit = 5,
+                        name = productSearchValue
+                    )
                 }
             }
         }
@@ -263,6 +264,13 @@ fun ProductView(
                                     index = index,
                                     productResult = product,
                                     categoryName = categoryName,
+                                    onClick = {
+                                        navController.navigate(
+                                            NavigationItem.ProductDetailsView.createRoute(
+                                                product.id
+                                            )
+                                        )
+                                    }
                                 )
                             }
 

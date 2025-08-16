@@ -9,6 +9,6 @@ interface CategoryDataSource {
     suspend fun getAllCategories(accessToken:String): Response<CategoryResponse>
     suspend fun getSubCategoriesWithSelectedCategory(categoryId : Long): Response<SubCategoryResponse>
 
-    suspend fun getAllSubCategories(categoryId: Long): Response<SubCategoryResponse>
+//    suspend fun getAllSubCategories(categoryId: Long): Response<SubCategoryResponse>
 
 }
