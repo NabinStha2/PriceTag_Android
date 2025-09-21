@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -30,7 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,10 +42,8 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
@@ -54,7 +53,6 @@ import com.example.price_tag.data.model.category.CategoryResult
 import com.example.price_tag.data.model.category.SubCategoryResponse
 import com.example.price_tag.data.model.category.SubCategoryResult
 import com.example.price_tag.ui.components.SharedViewModel
-import com.example.price_tag.ui.features.main.MainView
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.utilites.ResourceState
 
@@ -67,11 +65,12 @@ fun CategoryView(
 ) {
     val TAG = "CategoryView"
     val configuration = LocalConfiguration.current
-    var selectedItem by remember { mutableIntStateOf(0) }
-    var selectedCategoryId by remember { mutableStateOf<Long?>(null) } // Store the selected category ID
+    var selectedItem by rememberSaveable { mutableIntStateOf(0) }
+    var selectedCategoryId by rememberSaveable { mutableStateOf<Long?>(null) } // Store the selected category ID
     val spUtils = categoryViewModel.spUtils
     val getAllCategoriesData by categoryViewModel.getAllCategoriesData.collectAsStateWithLifecycle()
     val getSubCategoriesData by categoryViewModel.getSubCategoriesData.collectAsStateWithLifecycle()
+
 
     when (getAllCategoriesData) {
         is ResourceState.Loading -> {
@@ -100,17 +99,25 @@ fun CategoryView(
             val categoryResponseData: CategoryResponse =
                 (getAllCategoriesData as ResourceState.Success<CategoryResponse>).data
 
-
             // Load subcategories for the first category by default
             LaunchedEffect(categoryResponseData) {
-                val firstCategoryId = categoryResponseData.data?.results?.firstOrNull()?.id
-                if (firstCategoryId != null) {
-                    selectedCategoryId = firstCategoryId
-                    categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId = firstCategoryId)
+                if (selectedCategoryId != null) {
+                    categoryViewModel.getSubCategoriesWithSelectedCategory(
+                        categoryId = selectedCategoryId ?: 0
+                    )
+
+                } else {
+                    val firstCategoryId = categoryResponseData.data?.results?.firstOrNull()?.id
+                    if (firstCategoryId != null) {
+                        selectedCategoryId = firstCategoryId
+                        categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId = firstCategoryId)
+                    }
+
                 }
             }
             LaunchedEffect(selectedItem) {
-                val categoryName = categoryResponseData.data?.results?.getOrNull(selectedItem)?.categoryName.orEmpty()
+                val categoryName =
+                    categoryResponseData.data?.results?.getOrNull(selectedItem)?.categoryName.orEmpty()
                 sharedViewModel.setCategoryName(categoryName)
             }
 
@@ -125,6 +132,7 @@ fun CategoryView(
                     selectedItem = selectedItem,
                     onCategorySelected = { index, categoryId ->
                         selectedItem = index
+                        selectedCategoryId = categoryId
                         categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId)
                     },
                     padding = padding
@@ -228,8 +236,11 @@ fun SubCategoryGrid(
 
         is ResourceState.Success -> {
             val subCategoryResponseData = getSubCategoriesData.data
-
+            val gridState = rememberSaveable(saver = LazyGridState.Saver) {
+                LazyGridState()
+            }
             LazyVerticalGrid(
+                state = gridState,
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
                     .padding(padding),
@@ -254,7 +265,13 @@ fun SubCategoryItem(subCategory: SubCategoryResult?, navController: NavHostContr
         modifier = Modifier
             .padding(horizontal = 8.dp)
             .clickable {
-                navController.navigate(NavigationItem.ProductView.createRoute(subCategoryId = subCategory?.id))
+                navController.navigate(NavigationItem.ProductView.createRoute(subCategoryId = subCategory?.id)) {
+                    launchSingleTop = true
+                    restoreState = true
+                    popUpTo(NavigationItem.MainView.route) {
+                        saveState = true
+                    }
+                }
             },
     ) {
         Column {
