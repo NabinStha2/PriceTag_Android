@@ -32,6 +32,7 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -41,6 +42,7 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -54,18 +56,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
+import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import com.example.price_tag.ui.components.CartIconWithBadge
 import com.example.price_tag.ui.components.SharedViewModel
 import com.example.price_tag.ui.components.StarRating
 import com.example.price_tag.ui.features.home.CarouselItem
 import com.example.price_tag.ui.features.home.widgets.CarouselSlider
-import com.example.price_tag.ui.features.product.ProductViewModel
 import com.example.price_tag.ui.theme.NeutralColor100
 import com.example.price_tag.ui.theme.NeutralColor200
 import com.example.price_tag.ui.theme.NeutralColor800
@@ -74,6 +76,7 @@ import com.example.price_tag.ui.theme.PrimaryColor
 import com.example.price_tag.ui.theme.PrimaryColor50
 import com.example.price_tag.ui.theme.PrimaryColor600
 import com.example.price_tag.ui.theme.WarningColor
+import com.example.utilites.ResourceState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
@@ -99,13 +102,24 @@ fun ProductDetailsView(
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
     val tabs = listOf("Description", "Reviews")
 
+    val getSingleProductDetailsData =
+        productDetailsViewModel.getSingleProductDetailsData.collectAsStateWithLifecycle()
+
+    LaunchedEffect(true) {
+        if (productId != null) {
+            productDetailsViewModel.getSingleProductDetails(productId = productId)
+        }
+    }
+
     Scaffold(
-        modifier = Modifier.padding(horizontal = 16.dp).systemBarsPadding(),
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .systemBarsPadding(),
         topBar = {
             CenterAlignedTopAppBar(
                 navigationIcon = {
                     IconButton(
-                        onClick = { navController.popBackStack()},
+                        onClick = { navController.popBackStack() },
                         modifier = Modifier
                             .border(
                                 shape = CircleShape.copy(CornerSize(percent = 100)),
@@ -174,176 +188,234 @@ fun ProductDetailsView(
         }
 
     ) { innerPadding ->
-        LazyColumn(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            item {
-                CarouselSlider(
-                    images = images,
-                    pageCount = images.size,
-                    pagerState = pagerState,
-                    coroutine = coroutineScope,
-                )
-            }
 
-            item {
-                Row {
-                    StarRating(rating = 4)
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Text(text = "20 Reviews", fontSize = 12.sp)
+        when (getSingleProductDetailsData.value) {
+            is ResourceState.Loading -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .padding(paddingValues)
+                    )
                 }
             }
 
-            item {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(text = "Product Name", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-                    Spacer(modifier = Modifier.width(10.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.End
+            is ResourceState.Success -> {
+                val productDetails =
+                    (getSingleProductDetailsData.value as ResourceState.Success<ProductDetailsResponse>).data
+                        .data?.results
+
+                if (productDetails != null) {
+                    LazyColumn(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .fillMaxSize(),
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        IconButton(
-                            onClick = { /*TODO*/ },
-                            modifier = Modifier
-                                .clip(shape = CircleShape)
-                                .size(36.dp)
-                                .background(color = PrimaryColor50)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.FavoriteBorder,
-                                contentDescription = "Favorite",
-                                tint = PrimaryColor600
+                        item {
+                            CarouselSlider(
+                                images = images,
+                                pageCount = images.size,
+                                pagerState = pagerState,
+                                coroutine = coroutineScope,
                             )
                         }
 
-                        Spacer(modifier = Modifier.width(10.dp))
-
-                        IconButton(
-                            onClick = { /*TODO*/ }, modifier = Modifier
-                                .clip(shape = CircleShape)
-                                .size(36.dp)
-                                .background(color = PrimaryColor50)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Outlined.Share,
-                                contentDescription = "Share",
-                                tint = PrimaryColor600
-                            )
+                        item {
+                            Row {
+                                StarRating(rating = 4)
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Text(text = "20 Reviews", fontSize = 12.sp)
+                            }
                         }
 
-                    }
-                }
-            }
-
-            item {
-                Text(text = "Short Description", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-            }
-
-            item {
-                HorizontalDivider(color = NeutralColor200)
-            }
-
-            item {
-                Text(text = "Select Size", fontSize = 18.sp)
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row {
-                    productSelectSize.forEachIndexed { _, item ->
-                        Box(
-                            modifier = Modifier
-                                .clip(shape = RoundedCornerShape(percent = 15))
-                                .clickable {
-                                    productSize = item
-                                }
-                                .background(color = if (productSize == item) PrimaryColor else Color.Transparent)
-                                .border(
-                                    shape = RoundedCornerShape(percent = 15),
-                                    width = 1.dp,
-                                    color = NeutralColor100
-                                )
-                                .size(30.dp),
-                            contentAlignment = Alignment.Center,
-
+                        item {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Text(
+                                    text = productDetails.name ?: "",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                                Spacer(modifier = Modifier.width(10.dp))
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.End
+                                ) {
+                                    IconButton(
+                                        onClick = { /*TODO*/ },
+                                        modifier = Modifier
+                                            .clip(shape = CircleShape)
+                                            .size(36.dp)
+                                            .background(color = PrimaryColor50)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.FavoriteBorder,
+                                            contentDescription = "Favorite",
+                                            tint = PrimaryColor600
+                                        )
+                                    }
+
+                                    Spacer(modifier = Modifier.width(10.dp))
+
+                                    IconButton(
+                                        onClick = { /*TODO*/ }, modifier = Modifier
+                                            .clip(shape = CircleShape)
+                                            .size(36.dp)
+                                            .background(color = PrimaryColor50)
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Share,
+                                            contentDescription = "Share",
+                                            tint = PrimaryColor600
+                                        )
+                                    }
+
+                                }
+                            }
+                        }
+
+                        item {
                             Text(
-                                text = item,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = if (productSize == item) Color.White else NeutralColor800
+                                text = productDetails.description ?: "Short Description",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.SemiBold
                             )
                         }
-                        Spacer(modifier = Modifier.width(10.dp))
-                    }
-                }
 
-            }
+                        item {
+                            HorizontalDivider(color = NeutralColor200)
+                        }
 
-            item { Spacer(modifier = Modifier.height(10.dp)) }
 
-            item {
-                Text(text = "Select Color", fontSize = 18.sp)
 
-                Spacer(modifier = Modifier.height(10.dp))
+                        item {
+                            Text(text = "Select Color", fontSize = 18.sp)
 
-                Row {
-                    for (i in 1..5) {
-                        Box(
-                            modifier = Modifier
-                                .size(30.dp)
-                                .clip(CircleShape)
-                                .background(WarningColor)
-                        )
-                        Spacer(modifier = Modifier.width(10.dp))
-                    }
-                }
+                            Spacer(modifier = Modifier.height(10.dp))
 
-            }
+                            Row {
+                                productDetails.variants?.forEachIndexed { _, productVariant ->
+                                    Box(
+                                        modifier = Modifier
+                                            .size(30.dp)
+                                            .clip(CircleShape)
+                                            .background(WarningColor)
+                                    )
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                }
+                            }
 
-            item { Spacer(modifier = Modifier.height(10.dp)) }
+                        }
 
-            stickyHeader {
-                // Tab Row at the top
-                TabRow(
-                    selectedTabIndex = selectedTabIndex,
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    indicator = {},
-                    divider = {},
-                ) {
-                    tabs.forEachIndexed { index, title ->
-                        Tab(
-                            selected = selectedTabIndex == index,
-                            onClick = { selectedTabIndex = index },
-                            text = { Text(title) },
-                            selectedContentColor = Color.White,
-                            unselectedContentColor = NeutralColor800,
-                            modifier = Modifier
+                        item {
+                            Text(text = "Select Size", fontSize = 18.sp)
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            Row {
+                                productDetails.variants?.forEachIndexed { _, productVariant ->
+                                    productVariant.size?.forEachIndexed { _, s ->
+                                        Box(
+                                            modifier = Modifier
+                                                .clip(shape = RoundedCornerShape(percent = 15))
+                                                .clickable {
+                                                    productSize = s
+                                                }
+                                                .background(color = if (productSize == s) PrimaryColor else Color.Transparent)
+                                                .border(
+                                                    shape = RoundedCornerShape(percent = 15),
+                                                    width = 1.dp,
+                                                    color = NeutralColor100
+                                                )
+                                                .size(30.dp),
+                                            contentAlignment = Alignment.Center,
+
+                                            ) {
+                                            Text(
+                                                text = s,
+                                                fontSize = 14.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                                color = if (productSize == s) Color.White else NeutralColor800
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.width(10.dp))
+                                }
+
+                            }
+
+                        }
+
+                        item { Spacer(modifier = Modifier.height(10.dp)) }
+
+                        item { Spacer(modifier = Modifier.height(10.dp)) }
+
+                        stickyHeader {
+                            // Tab Row at the top
+                            TabRow(
+                                selectedTabIndex = selectedTabIndex,
+                                modifier = Modifier
+                                    .fillMaxWidth(),
+                                indicator = {},
+                                divider = {},
+                            ) {
+                                tabs.forEachIndexed { index, title ->
+                                    Tab(
+                                        selected = selectedTabIndex == index,
+                                        onClick = { selectedTabIndex = index },
+                                        text = { Text(title) },
+                                        selectedContentColor = Color.White,
+                                        unselectedContentColor = NeutralColor800,
+                                        modifier = Modifier
 //                                .size(40.dp)
-                                .clip(shape = RoundedCornerShape(8.dp))
-                                .background(color = if (selectedTabIndex == index) PrimaryColor else Color.Transparent)
+                                            .clip(shape = RoundedCornerShape(8.dp))
+                                            .background(color = if (selectedTabIndex == index) PrimaryColor else Color.Transparent)
+                                    )
+                                }
+                            }
+                        }
+
+                        item {
+                            when (selectedTabIndex) {
+                                0 -> DescriptionContent()
+                                1 -> ReviewContent()
+                            }
+                        }
+
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No Products Found",
+                            color = Color.Black,
+                            textAlign = TextAlign.Center,
+                            fontSize = 18.sp,
                         )
                     }
                 }
             }
 
-            item {
-                when (selectedTabIndex) {
-                    0 -> DescriptionContent()
-                    1 -> ReviewContent()
+            is ResourceState.Error -> {
+                val error =
+                    (getSingleProductDetailsData.value as ResourceState.Error<ProductDetailsResponse>).error
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(innerPadding)
+                ) {
+                    Text(text = error.toString())
                 }
             }
 
+            else -> {}
         }
-
     }
 
 }
@@ -362,7 +434,11 @@ fun ReviewContent() {
         Box(modifier = Modifier.padding(bottom = 8.dp)) {
             Column(
                 modifier = Modifier
-                    .border(width = 1.dp, color = NeutralColor200, shape = RoundedCornerShape(8.dp))
+                    .border(
+                        width = 1.dp,
+                        color = NeutralColor200,
+                        shape = RoundedCornerShape(8.dp)
+                    )
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {

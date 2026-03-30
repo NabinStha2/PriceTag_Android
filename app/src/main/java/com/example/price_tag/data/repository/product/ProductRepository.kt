@@ -113,7 +113,7 @@ class ProductRepository @Inject constructor(private val productDataSource: Produ
     }
 
     suspend fun getSingleProductDetails(productId: Long): Flow<ResourceState<ProductDetailsResponse>> {
-        return flow<ResourceState<ProductDetailsResponse>> {
+        return flow {
             emit(ResourceState.Loading())
             val response = productDataSource.getSingleProductDetails(productId)
             Log.i(

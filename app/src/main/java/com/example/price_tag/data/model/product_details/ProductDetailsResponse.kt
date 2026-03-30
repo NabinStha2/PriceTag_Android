@@ -10,7 +10,7 @@ data class ProductDetailsResponse(
 )
 
 data class ProductDetailsData(
-    val results: List<ProductDetailsResult>? = null,
+    val results: ProductDetailsResult? = null,
 )
 
 data class ProductDetailsResult(
