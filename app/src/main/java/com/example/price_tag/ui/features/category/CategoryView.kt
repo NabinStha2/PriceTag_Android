@@ -48,8 +48,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
+import com.example.price_tag.data.model.category.CategoryData
 import com.example.price_tag.data.model.category.CategoryResponse
-import com.example.price_tag.data.model.category.CategoryResult
 import com.example.price_tag.data.model.category.SubCategoryResponse
 import com.example.price_tag.data.model.category.SubCategoryResult
 import com.example.price_tag.ui.components.SharedViewModel
@@ -107,7 +107,7 @@ fun CategoryView(
                     )
 
                 } else {
-                    val firstCategoryId = categoryResponseData.data?.results?.firstOrNull()?.id
+                    val firstCategoryId = categoryResponseData.data?.firstOrNull()?.id
                     if (firstCategoryId != null) {
                         selectedCategoryId = firstCategoryId
                         categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId = firstCategoryId)
@@ -117,7 +117,7 @@ fun CategoryView(
             }
             LaunchedEffect(selectedItem) {
                 val categoryName =
-                    categoryResponseData.data?.results?.getOrNull(selectedItem)?.categoryName.orEmpty()
+                    categoryResponseData.data?.getOrNull(selectedItem)?.name.orEmpty()
                 sharedViewModel.setCategoryName(categoryName)
             }
 
@@ -128,7 +128,7 @@ fun CategoryView(
             Row {
                 /** 🔹 Category Navigation Rail (Only Updates Selected State) **/
                 CategoryNavigationRail(
-                    categories = categoryResponseData.data?.results.orEmpty(),
+                    categories = categoryResponseData.data.orEmpty(),
                     selectedItem = selectedItem,
                     onCategorySelected = { index, categoryId ->
                         selectedItem = index
@@ -156,7 +156,7 @@ fun CategoryView(
 /** 🔹 Category Navigation Rail (Only Updates State) **/
 @Composable
 fun CategoryNavigationRail(
-    categories: List<CategoryResult>,
+    categories: List<CategoryData>,
     selectedItem: Int,
     onCategorySelected: (Int, Long) -> Unit,
     padding: PaddingValues,
@@ -183,7 +183,7 @@ fun CategoryNavigationRail(
                     onClick = { onCategorySelected(index, item.id ?: 0) },
                     icon = {
                         Text(
-                            text = item.categoryName ?: "",
+                            text = item.name ?: "",
                             modifier = Modifier
                                 .padding(horizontal = 8.dp)
                                 .fillMaxWidth(),
@@ -226,7 +226,7 @@ fun SubCategoryGrid(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 Text(
-                    text = "Error: ${(getSubCategoriesData as ResourceState.Error<SubCategoryResponse>).error}",
+                    text = "Error: ${getSubCategoriesData.error}",
                     color = Color.Red,
                     textAlign = TextAlign.Center,
                     fontSize = 18.sp,
