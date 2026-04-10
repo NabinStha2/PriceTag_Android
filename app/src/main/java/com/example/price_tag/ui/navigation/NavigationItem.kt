@@ -10,8 +10,7 @@ sealed class NavigationItem(val route: String) {
         fun createRoute(subCategoryId: Long?) = "product_screen?subCategoryId=$subCategoryId"
     }
 
-    data object ProductDetailsView :
-        NavigationItem("product_details_screen?productId={productId}") {
+    data object ProductDetailsView : NavigationItem("product_details_screen?productId={productId}") {
         fun createRoute(productId: Long?) = "product_details_screen?productId=$productId"
     }
 
