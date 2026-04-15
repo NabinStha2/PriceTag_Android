@@ -52,7 +52,7 @@ import com.example.price_tag.data.model.category.CategoryData
 import com.example.price_tag.data.model.category.CategoryResponse
 import com.example.price_tag.data.model.category.SubCategoryResponse
 import com.example.price_tag.data.model.category.SubCategoryResult
-import com.example.price_tag.ui.components.SharedViewModel
+import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.utilites.ResourceState
 
@@ -61,7 +61,7 @@ fun CategoryView(
     navController: NavHostController = rememberNavController(),
     padding: PaddingValues,
     categoryViewModel: CategoryViewModel,
-    sharedViewModel: SharedViewModel,
+    selectedCategoryViewModel: SelectedCategoryViewModel,
 ) {
     val TAG = "CategoryView"
     val configuration = LocalConfiguration.current
@@ -118,12 +118,12 @@ fun CategoryView(
             LaunchedEffect(selectedItem) {
                 val categoryName =
                     categoryResponseData.data?.getOrNull(selectedItem)?.name.orEmpty()
-                sharedViewModel.setCategoryName(categoryName)
+                selectedCategoryViewModel.setCategoryName(categoryName)
             }
 
             Log.i(
                 TAG,
-                "🔹 Selected Category: ${sharedViewModel.selectedCategoryName.collectAsStateWithLifecycle().value}"
+                "🔹 Selected Category: ${selectedCategoryViewModel.selectedCategoryName.collectAsStateWithLifecycle().value}"
             )
             Row {
                 /** 🔹 Category Navigation Rail (Only Updates Selected State) **/
@@ -265,10 +265,10 @@ fun SubCategoryItem(subCategory: SubCategoryResult?, navController: NavHostContr
         modifier = Modifier
             .padding(horizontal = 8.dp)
             .clickable {
-                navController.navigate(NavigationItem.ProductView.createRoute(subCategoryId = subCategory?.id)) {
+                navController.navigate(NavigationItem.ProductView(subCategoryId = subCategory?.id)) {
                     launchSingleTop = true
                     restoreState = true
-                    popUpTo(NavigationItem.MainView.route) {
+                    popUpTo(NavigationItem.MainView) {
                         saveState = true
                     }
                 }

@@ -7,18 +7,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.data.model.product.ProductResponse
 import com.example.price_tag.data.model.product.ProductResult
-import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import com.example.price_tag.data.repository.product.ProductRepository
+import com.example.price_tag.ui.navigation.NavigationCoordinator
+import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductViewModel @Inject constructor(private val productRepository: ProductRepository) :
+class ProductViewModel @Inject constructor(
+    private val productRepository: ProductRepository,
+    private val navigationCoordinator: NavigationCoordinator
+) :
     ViewModel() {
 
     val productsList = mutableStateListOf<ProductResult>()
@@ -30,15 +36,18 @@ class ProductViewModel @Inject constructor(private val productRepository: Produc
 
     private val _getAllSubCategoryProductsData =
         MutableStateFlow<ResourceState<ProductResponse>>(ResourceState.Initial())
-    val getAllSubCategoryProductsData: MutableStateFlow<ResourceState<ProductResponse>> =
-        _getAllSubCategoryProductsData
+    val getAllSubCategoryProductsData: StateFlow<ResourceState<ProductResponse>> =
+        _getAllSubCategoryProductsData.asStateFlow()
 
     private val _getAllSubCategorySearchProductsData =
         MutableStateFlow<ResourceState<ProductResponse>>(ResourceState.Initial())
-    val getAllSubCategorySearchProductsData: MutableStateFlow<ResourceState<ProductResponse>> =
-        _getAllSubCategorySearchProductsData
+    val getAllSubCategorySearchProductsData: StateFlow<ResourceState<ProductResponse>> =
+        _getAllSubCategorySearchProductsData.asStateFlow()
 
 
+    fun onProductClick(productId: Long) {
+        navigationCoordinator.navigateTo(NavigationItem.ProductDetailsView(productId))
+    }
 
     fun getAllSubCategoryProducts(
         subCategoryId: Long,

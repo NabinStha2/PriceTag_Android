@@ -3,10 +3,12 @@ package com.example.price_tag.ui.features.auth.login
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.price_tag.data.model.auth.LoginData
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.repository.auth.AuthRepository
+import com.example.price_tag.ui.navigation.NavEvent
+import com.example.price_tag.ui.navigation.NavigationCoordinator
+import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.utils.SharedPreferencesUtils
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val sharedPreferencesUtils: SharedPreferencesUtils
+    private val sharedPreferencesUtils: SharedPreferencesUtils,
+    private val navigationCoordinator: NavigationCoordinator
 ) : ViewModel() {
     val spUtils: SharedPreferencesUtils = sharedPreferencesUtils
 
@@ -39,8 +42,28 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             authRepository.login(loginRequest).collectLatest { loginReponse ->
                 _loginData.value = loginReponse
+                if (loginReponse is ResourceState.Success) {
+                    val response = loginReponse.data
+                    if (response.data?.accessToken != null && response.data.refreshToken != null) {
+                        spUtils.save(spUtils.bearerToken, response.data.accessToken)
+                        spUtils.save(spUtils.refreshToken, response.data.refreshToken)
+                    }
+                    
+                    // PRO ARCHITECTURE: ViewModel decides where to go
+                    navigationCoordinator.navigate(
+                        NavEvent.Navigate(NavigationItem.MainView) {
+                            popUpTo(NavigationItem.LoginView) { inclusive = true }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
+                    )
+                }
             }
         }
+    }
+
+    fun onSignUpClick() {
+        navigationCoordinator.navigateTo(NavigationItem.SignUpView)
     }
 
     // Method to reset login response state

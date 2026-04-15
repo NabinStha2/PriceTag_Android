@@ -59,6 +59,15 @@ object Dependencies {
     val junit by lazy { "junit:junit:${Versions.junit}" }
     val testJunit by lazy { "androidx.test.ext:junit:${Versions.junitVersion}" }
     val espressoCore by lazy { "androidx.test.espresso:espresso-core:${Versions.espressoCore}" }
+
+    // Navigation3
+    val nav3Core by lazy { "androidx.navigation:navigation-runtime-ktx:${Versions.nav3Core}" }
+    val nav3Compose by lazy { "androidx.navigation:navigation-compose:${Versions.nav3Core}" }
+    val lifecycleViewmodelNav3 by lazy { "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycleViewmodelNav3}" }
+    val kotlinSerialization by lazy { "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlinSerialization}" }
+    val kotlinxSerializationCore by lazy { "org.jetbrains.kotlinx:kotlinx-serialization-core:${Versions.kotlinxSerializationCore}" }
+    val material3AdaptiveNav3 by lazy { "com.google.android.material:compose-adaptive:${Versions.material3AdaptiveNav3}" }
+
 }
 
 object Modules {

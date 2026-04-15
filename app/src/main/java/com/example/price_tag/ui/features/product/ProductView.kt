@@ -56,7 +56,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.data.model.product.ProductResponse
-import com.example.price_tag.ui.components.SharedViewModel
+import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.home.widgets.ProductCard
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.utilites.ResourceState
@@ -69,11 +69,11 @@ fun ProductView(
     subCategoryId: Long?,
     paddingValues: PaddingValues,
     productViewModel: ProductViewModel,
-    sharedViewModel: SharedViewModel,
+    selectedCategoryViewModel: SelectedCategoryViewModel,
 ) {
     val focusManager = LocalFocusManager.current
 
-    val categoryName by sharedViewModel.selectedCategoryName.collectAsStateWithLifecycle()
+    val categoryName by selectedCategoryViewModel.selectedCategoryName.collectAsStateWithLifecycle()
     var productSearchValue by rememberSaveable {
         mutableStateOf("")
     }
@@ -266,9 +266,7 @@ fun ProductView(
                                     categoryName = categoryName,
                                     onClick = {
                                         navController.navigate(
-                                            NavigationItem.ProductDetailsView.createRoute(
-                                                product.id
-                                            )
+                                            NavigationItem.ProductDetailsView(productId = product.id)
                                         )
                                     }
                                 )

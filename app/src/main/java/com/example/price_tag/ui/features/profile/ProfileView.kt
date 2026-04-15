@@ -59,8 +59,8 @@ fun ProfileView(
 
     fun handleLogout() {
         spUtils.clearSharedPreference()
-        navController.navigate(NavigationItem.LoginView.route) {
-            popUpTo(NavigationItem.MainView.route) {
+        navController.navigate(NavigationItem.LoginView) {
+            popUpTo(NavigationItem.MainView) {
                 inclusive = true
             }
         }

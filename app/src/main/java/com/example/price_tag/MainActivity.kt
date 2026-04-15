@@ -15,9 +15,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.price_tag.ui.components.SharedViewModel
+import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.navigation.AppNavHost
+import com.example.price_tag.ui.navigation.NavigationCoordinator
 import com.example.price_tag.ui.navigation.NavigationItem
+import com.example.price_tag.ui.navigation.graphs.AuthGraph
+import com.example.price_tag.ui.navigation.graphs.MainGraph
 import com.example.price_tag.utils.SharedPreferencesUtils
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -30,12 +33,15 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var sharedPreferencesUtils: SharedPreferencesUtils
+    
+    @Inject
+    lateinit var navigationCoordinator: NavigationCoordinator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var navigationRoute: String = NavigationItem.OnboardingView.route
+            var navigationRoute: Any = NavigationItem.OnboardingView
 
             Log.i(TAG,
                   "${
@@ -44,21 +50,22 @@ class MainActivity : ComponentActivity() {
                   } => ${
                       sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken)
                   }")
+
             if (!sharedPreferencesUtils.getValueBoolean(sharedPreferencesUtils.firstTimeInApp,
                                                         true)) {
                 navigationRoute =
                     if (sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken) != null) {
-                        NavigationItem.MainView.route
+                        MainGraph
                     } else {
-                        NavigationItem.LoginView.route
+                        AuthGraph
                     }
             }
 
             Log.i(TAG,
-                  "navigationRoute${navigationRoute}")
+                  "navigationRoute ${navigationRoute}")
 
             val navController: NavHostController = rememberNavController()
-            val sharedViewModel: SharedViewModel = hiltViewModel()
+            val selectedCategoryViewModel: SelectedCategoryViewModel = hiltViewModel()
 
 
             Surface(modifier = Modifier
@@ -67,7 +74,8 @@ class MainActivity : ComponentActivity() {
                 AppNavHost(
                     startDestination = navigationRoute,
                     navController = navController,
-                    sharedViewModel = sharedViewModel,
+                    selectedCategoryViewModel = selectedCategoryViewModel,
+                    navigationCoordinator = navigationCoordinator
                 )
             }
         }
@@ -80,14 +88,3 @@ data class CustomSnackbarVisuals(override val message: String,
                                  val contentColor: Color = Color.Red,
                                  override val actionLabel: String? = null,
                                  override val withDismissAction: Boolean = false) : SnackbarVisuals
-
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PriceTagPreview() {
-//    Price_tagTheme {
-//        AppNavHost(
-//            startDestination = NavigationItem.OnboardingView.route
-//        )
-//    }
-//}

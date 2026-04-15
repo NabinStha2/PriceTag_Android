@@ -63,7 +63,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.CustomSnackbarVisuals
 import com.example.price_tag.data.model.auth.SignUpRequest
 import com.example.price_tag.ui.components.Loader
-import com.example.price_tag.ui.components.SharedViewModel
+import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.theme.PrimaryColor
 import com.example.price_tag.utils.Validations
@@ -74,11 +74,11 @@ import com.example.utilites.ResourceState
 fun SignUpView(
     navController: NavController,
     signUpViewModel: SignUpViewModel,
-    sharedViewModel: SharedViewModel,
+    selectedCategoryViewModel: SelectedCategoryViewModel,
 
 ) {
 //    val coroutineScope = rememberCoroutineScope()
-    val snackbarHostState: SnackbarHostState = sharedViewModel.snackbarHostState
+    val snackbarHostState: SnackbarHostState = selectedCategoryViewModel.snackbarHostState
     val signUpResponse by signUpViewModel.signUpData.collectAsStateWithLifecycle()
     val TAG = "SignUpView"
     val context = LocalContext.current
@@ -138,7 +138,7 @@ fun SignUpView(
                     response.message,
                     Toast.LENGTH_SHORT,
                 ).show()
-                navController.navigate(NavigationItem.OtpView.route)
+                navController.navigate(NavigationItem.OtpView)
                 signUpViewModel.resetSignUpResponse()
             }
 
@@ -427,8 +427,8 @@ fun SignUpView(
                 ClickableText(
                     text = AnnotatedString("Login Now"),
                     onClick = {
-                        navController.navigate(NavigationItem.LoginView.route) {
-                            popUpTo(NavigationItem.LoginView.route) {
+                        navController.navigate(NavigationItem.LoginView) {
+                            popUpTo(NavigationItem.LoginView) {
                                 inclusive = true
                             }
                         }
@@ -442,10 +442,3 @@ fun SignUpView(
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//fun SignUpViewPreview() {
-//    SignUpView()
-//}

@@ -64,7 +64,7 @@ import androidx.navigation.NavController
 import com.example.price_tag.R
 import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import com.example.price_tag.ui.components.CartIconWithBadge
-import com.example.price_tag.ui.components.SharedViewModel
+import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.components.StarRating
 import com.example.price_tag.ui.features.home.CarouselItem
 import com.example.price_tag.ui.features.home.widgets.CarouselSlider
@@ -84,7 +84,7 @@ fun ProductDetailsView(
     navController: NavController,
     paddingValues: PaddingValues,
     productDetailsViewModel: ProductDetailsViewModel,
-    sharedViewModel: SharedViewModel,
+    selectedCategoryViewModel: SelectedCategoryViewModel,
     productId: Long?,
 ) {
     val images = listOf(

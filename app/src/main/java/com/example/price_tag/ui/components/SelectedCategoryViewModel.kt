@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class SharedViewModel  @Inject constructor() : ViewModel() {
+class SelectedCategoryViewModel  @Inject constructor() : ViewModel() {
     val snackbarHostState = SnackbarHostState()
     private val _selectedCategoryName = MutableStateFlow<String?>(null)
     val selectedCategoryName: StateFlow<String?> = _selectedCategoryName

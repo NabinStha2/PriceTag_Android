@@ -50,7 +50,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -72,7 +71,6 @@ fun LoginView(
     val TAG = "LoginView"
     val loginResponse by loginViewModel.loginData.collectAsState()
     val spUtils = loginViewModel.spUtils
-//    val coroutineScope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
@@ -109,26 +107,13 @@ fun LoginView(
             is ResourceState.Success -> {
                 val response = (loginResponse as ResourceState.Success).data
                 Log.e(TAG, "Inside of Success")
-//                LaunchedEffect(Unit) {
-//                    coroutineScope.launch {
                 Toast.makeText(
                     context,
                     "Login Successfully",
                     Toast.LENGTH_SHORT,
                 ).show()
-//                        snackbarHostState.showSnackbar(
-//                            CustomSnackbarVisuals(
-//                                containerColor = PrimaryColor,
-//                                message = "Login successfully",
-//                                contentColor = Color.White,
-//                                duration = SnackbarDuration.Indefinite,
-//                            ),
-//                        )
-//                    }
-//                    delay(600)
-//                    coroutineScope.launch {
-                navController.navigate(NavigationItem.MainView.route) {
-                    popUpTo(NavigationItem.LoginView.route) {
+                navController.navigate(NavigationItem.MainView) {
+                    popUpTo(NavigationItem.LoginView) {
                         inclusive = true
                     }
                     // Avoid multiple copies of the same destination when
@@ -137,8 +122,6 @@ fun LoginView(
                     // Restore state when reselecting a previously selected item
                     restoreState = true
                 }
-//                    }
-//                }
                 if (response.data?.accessToken != null && response.data.refreshToken != null) {
                     Log.i("Login response data", response.data.toString())
                     spUtils.save(
@@ -158,22 +141,11 @@ fun LoginView(
                     TAG, "Inside Error State : ${(loginResponse as ResourceState.Error).error}"
                 )
 
-//                LaunchedEffect(Unit) {
-//                    coroutineScope.launch {
                 Toast.makeText(
                     context,
                     (loginResponse as ResourceState.Error).error.toString(),
                     Toast.LENGTH_SHORT,
                 ).show()
-//                        snackbarHostState.showSnackbar(
-//                            CustomSnackbarVisuals(
-//                                containerColor = Color.Red,
-//                                message = (loginResponse as ResourceState.Error).error.toString(),
-//                                contentColor = Color.White,
-//                            ),
-//                        )
-//                    }
-//                }
             }
 
             else -> {
@@ -319,12 +291,7 @@ fun LoginView(
                 ClickableText(
                     text = AnnotatedString("Sign Up"),
                     onClick = {
-                        navController.navigate(NavigationItem.SignUpView.route)
-//                        {
-//                            popUpTo(NavigationItem.LoginView.route) {
-//                                inclusive = true
-//                            }
-//                        }
+                        navController.navigate(NavigationItem.SignUpView)
                     },
                     style = TextStyle(
                         color = PrimaryColor,
@@ -336,9 +303,3 @@ fun LoginView(
         }
     }
 }
-
-//@Preview
-//@Composable
-//fun LoginViewPreview() {
-//    LoginView()
-//}

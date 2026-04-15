@@ -4,12 +4,10 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,7 +17,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
@@ -42,17 +39,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
 import com.example.price_tag.ui.features.home.widgets.CarouselSlider
-import com.example.price_tag.ui.features.home.widgets.ProductCard
-import com.example.price_tag.ui.features.main.MainView
-
 
 data class CarouselItem(val imageResId: Int)
 
@@ -68,7 +61,8 @@ data class ProductItem(
 @Composable
 fun HomeView(
     navController: NavHostController = rememberNavController(),
-    padding: PaddingValues = PaddingValues(0.dp)
+    padding: PaddingValues = PaddingValues(0.dp),
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
     val images = listOf(
         CarouselItem(R.drawable.carousel1),
@@ -110,7 +104,7 @@ fun HomeView(
         verticalArrangement = Arrangement.spacedBy(12.dp),
         horizontalArrangement = Arrangement.spacedBy(12.dp),
     ) {
-        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Row {
                 OutlinedTextField(
                     value = "",
@@ -124,15 +118,13 @@ fun HomeView(
                     ),
                     keyboardActions = KeyboardActions(
                         onSearch = {
-                            // Handle search action here
-                            // e.g., perform a search, close the keyboard, etc.
                         }
                     ),
                     shape = RoundedCornerShape(12.dp),
                     placeholder = { Text(text = "Search") },
                     trailingIcon = {
                         IconButton(
-                            onClick = { /*TODO*/ },
+                            onClick = { },
                             modifier = Modifier
                                 .height(56.dp)
                                 .clip(RoundedCornerShape(topEnd = 12.dp, bottomEnd = 12.dp)),
@@ -149,7 +141,7 @@ fun HomeView(
                 Spacer(modifier = Modifier.width(10.dp))
 
                 IconButton(
-                    onClick = { /*TODO*/ },
+                    onClick = { viewModel.onCartClick() },
                     modifier = Modifier
                         .height(56.dp)
                         .weight(1f)
@@ -163,14 +155,14 @@ fun HomeView(
                 ) {
                     Icon(
                         imageVector = Icons.Filled.ShoppingCart,
-                        contentDescription = "Search Icon",
+                        contentDescription = "Cart Icon",
                         tint = Color.White,
                     )
                 }
             }
         }
 
-        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             CarouselSlider(
                 images = images,
                 pageCount = images.size,
@@ -179,7 +171,7 @@ fun HomeView(
             )
         }
 
-        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -190,7 +182,7 @@ fun HomeView(
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = { viewModel.onSeeAllFeaturedClick() }) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -209,11 +201,7 @@ fun HomeView(
             }
         }
 
-//        itemsIndexed(items = productList) { index, product ->
-//            ProductCard(index = index, productItem = product)
-//        }
-
-        item(span = { GridItemSpan(2) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
@@ -224,7 +212,7 @@ fun HomeView(
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center
                 )
-                TextButton(onClick = { /*TODO*/ }) {
+                TextButton(onClick = { }) {
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -243,14 +231,13 @@ fun HomeView(
             }
         }
 
-        item(span = { GridItemSpan(maxCurrentLineSpan) }) {
+        item(span = { GridItemSpan(maxLineSpan) }) {
             LazyRow(
                 modifier = Modifier
                     .height(250.dp)
                     .wrapContentWidth(),
             ) {
                 items(productList.size) { index ->
-//                    ProductCard(index = index, productItem = productList[index], width = 160.dp)
                     Spacer(modifier = Modifier.width(10.dp))
                 }
             }
@@ -258,15 +245,3 @@ fun HomeView(
 
     }
 }
-
-
-//@Preview
-//@Composable
-//fun HomeViewPreview(padding: PaddingValues = PaddingValues(16.dp)) {
-//    Column(
-//        modifier = Modifier
-//            .padding(padding)
-//            .fillMaxSize()
-//            .background(color = Color.White)
-//    ) { MainView() }
-//}

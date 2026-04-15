@@ -6,6 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.model.auth.SignUpRequest
 import com.example.price_tag.data.repository.auth.AuthRepository
+import com.example.price_tag.ui.navigation.NavigationCoordinator
+import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +19,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val navigationCoordinator: NavigationCoordinator
 ) :
     ViewModel() {
 
@@ -34,16 +37,6 @@ class SignUpViewModel @Inject constructor(
     var confirmPasswordError = mutableStateOf<String?>(null)
     var phoneNumberError = mutableStateOf<String?>(null)
 
-//    val userName: State<String> = _userName
-//    val email: State<String> = _email
-//    val phoneNumber: State<String> = _phoneNumber
-//    val password: State<String> = _password
-//    val confirmPassword: State<String> = _confirmPassword
-
-//    fun setEmail(newEmail: String) {
-//        _email.value = newEmail
-//    }
-
 
     private val _signupData: MutableStateFlow<ResourceState<LoginResponse>> =
         MutableStateFlow(ResourceState.Initial())
@@ -54,8 +47,15 @@ class SignUpViewModel @Inject constructor(
             authRepository.register(signUpRequest)
                 .collectLatest { signupResponse ->
                     _signupData.value = signupResponse
+                    if (signupResponse is ResourceState.Success) {
+                        navigationCoordinator.navigateTo(NavigationItem.OtpView)
+                    }
                 }
         }
+    }
+
+    fun onLoginClick() {
+        navigationCoordinator.navigateBack()
     }
 
     fun resetSignUpResponse() {

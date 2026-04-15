@@ -1,8 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
+//    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.hilt.android)
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.jetbrains.kotlin.serialization)
 }
 
 android {
@@ -15,8 +17,12 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables { useSupportLibrary = true }
+
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -34,10 +40,14 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    buildFeatures { compose = true }
+    buildFeatures {
+        compose = true
+    }
 
     packaging {
-        resources { excludes += "/META-INF/{AL2.0,LGPL2.1}" }
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
     }
 }
 
@@ -48,42 +58,69 @@ kotlin {
 }
 
 dependencies {
-    implementation(Dependencies.coreKtx)
-    implementation(Dependencies.lifecycleRuntimeKtx)
-    implementation(Dependencies.lifecycleRuntimeComposeKtx)
-    implementation(Dependencies.activityCompose)
 
-    implementation(platform(Dependencies.composeBom))
-    implementation(Dependencies.ui)
-    implementation(Dependencies.uiGraphics)
-    implementation(Dependencies.uiToolingPreview)
-    implementation(Dependencies.uiTooling)
-    implementation(Dependencies.material3)
-    implementation(Dependencies.materialIconExtended)
+    // ---------------- Core ----------------
+    implementation(libs.core.ktx)
 
-    implementation(Dependencies.navigationCompose)
-    implementation(Dependencies.constraintLayoutCompose)
-    implementation(Dependencies.coilCompose)
-    implementation(Dependencies.accompanistFlowlayout)
+    // ---------------- Lifecycle ----------------
+    implementation(libs.lifecycle.runtime)
+    implementation(libs.lifecycle.compose)
 
-    implementation(Dependencies.hiltAndroid)
-    implementation(Dependencies.hiltNavigationCompose)
-    ksp(Dependencies.hiltAndroidCompiler)
+    // ---------------- Activity ----------------
+    implementation(libs.activity.compose)
 
-    implementation(Dependencies.retrofit)
-    implementation(Dependencies.retrofitConverterGson)
-    implementation(Dependencies.retrofitConverterMoshi)
-    implementation(Dependencies.okHttp)
-    implementation(Dependencies.okHttpLoggingInterceptor)
-    implementation(Dependencies.moshi)
+    // ---------------- Compose ----------------
+    implementation(platform(libs.compose.bom))
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.preview)
+    implementation(libs.material3)
+    implementation(libs.material.icons)
 
-    implementation(Dependencies.coroutineCore)
-    implementation(Dependencies.coroutineAndroid)
+    debugImplementation(libs.ui.tooling)
+    debugImplementation(libs.ui.test)
 
-    testImplementation(Dependencies.junit)
-    androidTestImplementation(Dependencies.testJunit)
-    androidTestImplementation(Dependencies.espressoCore)
-    debugImplementation(Dependencies.uiTestManifest)
+    // ---------------- Navigation ----------------
+    implementation(libs.navigation.compose)
 
-    implementation(project(Modules.utilites))
+    // ---------------- Layout ----------------
+    implementation(libs.constraintlayout)
+
+    // ---------------- Image ----------------
+    implementation(libs.coil)
+
+    // ---------------- Accompanist ----------------
+    implementation(libs.accompanist.flow)
+
+    // ---------------- Hilt ----------------
+    implementation(libs.hilt)
+    implementation(libs.hilt.nav)
+    ksp(libs.hilt.compiler)
+
+    // ---------------- Network ----------------
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.gson)
+    implementation(libs.retrofit.moshi)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging)
+    implementation(libs.moshi)
+
+    // ---------------- Coroutines ----------------
+    implementation(libs.coroutines.core)
+    implementation(libs.coroutines.android)
+
+    // ---------------- Testing ----------------
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.android.junit)
+    androidTestImplementation(libs.espresso)
+
+    // ---------------- Navigation 3 ---------------
+//    implementation(libs.androidx.navigation3.ui)
+//    implementation(libs.androidx.navigation3.runtime)
+//    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+//    implementation(libs.androidx.material3.adaptive.navigation3)
+    implementation(libs.kotlinx.serialization.core)
+
+    // ---------------- Module ----------------
+    implementation(project(":utilites"))
 }

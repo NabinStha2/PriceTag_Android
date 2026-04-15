@@ -41,4 +41,11 @@ object Versions {
     const val junit = "4.13.2"
     const val junitVersion = "1.2.1"
     const val espressoCore = "3.6.1"
+
+    // Navigation3
+    const val nav3Core = "1.1.0"
+    const val lifecycleViewmodelNav3 = "2.11.0-alpha03"
+    const val kotlinSerialization = "2.2.21"
+    const val kotlinxSerializationCore = "1.9.0"
+    const val material3AdaptiveNav3 = "1.3.0-alpha10"
 }

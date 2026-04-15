@@ -57,7 +57,7 @@ import com.example.price_tag.CustomSnackbarVisuals
 import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.model.auth.OtpRequest
 import com.example.price_tag.ui.components.Loader
-import com.example.price_tag.ui.components.SharedViewModel
+import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.auth.signup.SignUpViewModel
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.theme.PrimaryColor
@@ -70,7 +70,7 @@ import kotlinx.coroutines.launch
 fun OtpView(
     navController: NavController = rememberNavController(),
     otpViewModel: OtpViewModel,
-    sharedViewModel: SharedViewModel,
+    selectedCategoryViewModel: SelectedCategoryViewModel,
 ) {
     var TAG = "OtpView"
 
@@ -78,7 +78,7 @@ fun OtpView(
     val coroutineScope = rememberCoroutineScope()
     var otpCode by remember { mutableStateOf("") }
     val verifyOtpData: ResourceState<LoginResponse> by otpViewModel.verifyOtpData.collectAsState()
-    val snackbarHostState: SnackbarHostState = sharedViewModel.snackbarHostState
+    val snackbarHostState: SnackbarHostState = selectedCategoryViewModel.snackbarHostState
     val context = LocalContext.current
 
     Scaffold(
@@ -139,8 +139,8 @@ fun OtpView(
                     }
                     delay(500)
                     coroutineScope.launch {
-                        navController.navigate(NavigationItem.MainView.route) {
-                            popUpTo(NavigationItem.LoginView.route) {
+                        navController.navigate(NavigationItem.MainView) {
+                            popUpTo(NavigationItem.LoginView) {
                                 inclusive = true
                             }
                         }

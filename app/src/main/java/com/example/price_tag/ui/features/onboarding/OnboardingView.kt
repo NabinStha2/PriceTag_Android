@@ -164,8 +164,8 @@ fun OnboardingView(
                     else ElevatedButton(
                         onClick = {
                             spUtils.save(spUtils.firstTimeInApp, false)
-                            navController.navigate(NavigationItem.LoginView.route) {
-                                popUpTo(NavigationItem.OnboardingView.route) {
+                            navController.navigate(NavigationItem.LoginView) {
+                                popUpTo(NavigationItem.OnboardingView) {
                                     inclusive = true
                                 }
                             }
@@ -187,4 +187,3 @@ fun OnboardingView(
         }
     }
 }
-
