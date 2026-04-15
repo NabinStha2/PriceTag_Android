@@ -5,9 +5,11 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.price_tag.data.model.product.ProductResponse
-import com.example.price_tag.data.model.product.ProductResult
-import com.example.price_tag.data.repository.product.ProductRepository
+import com.example.price_tag.domain.model.product.Product
+import com.example.price_tag.domain.model.product.ProductList
+import com.example.price_tag.domain.usecase.category.GetSelectedCategoryUseCase
+import com.example.price_tag.domain.usecase.product.GetAllSubCategoryProductsUseCase
+import com.example.price_tag.domain.usecase.product.GetAllSubCategorySearchProductsUseCase
 import com.example.price_tag.ui.navigation.NavigationCoordinator
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.utilites.ResourceState
@@ -22,26 +24,28 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProductViewModel @Inject constructor(
-    private val productRepository: ProductRepository,
+    private val getAllSubCategoryProductsUseCase: GetAllSubCategoryProductsUseCase,
+    private val getAllSubCategorySearchProductsUseCase: GetAllSubCategorySearchProductsUseCase,
+    private val getSelectedCategoryUseCase: GetSelectedCategoryUseCase,
     private val navigationCoordinator: NavigationCoordinator
 ) :
     ViewModel() {
 
-    val productsList = mutableStateListOf<ProductResult>()
-    val searchProductsList = mutableStateListOf<ProductResult>()
+    val productsList = mutableStateListOf<Product>()
     val isLoadingMore = mutableStateOf(false)
     var isLastPage = mutableStateOf(false)
-    var isSearchLastPage = mutableStateOf(false)
     var currentPage = mutableIntStateOf(1)
 
+    val selectedCategoryName: StateFlow<String?> = getSelectedCategoryUseCase()
+
     private val _getAllSubCategoryProductsData =
-        MutableStateFlow<ResourceState<ProductResponse>>(ResourceState.Initial())
-    val getAllSubCategoryProductsData: StateFlow<ResourceState<ProductResponse>> =
+        MutableStateFlow<ResourceState<ProductList>>(ResourceState.Initial())
+    val getAllSubCategoryProductsData: StateFlow<ResourceState<ProductList>> =
         _getAllSubCategoryProductsData.asStateFlow()
 
     private val _getAllSubCategorySearchProductsData =
-        MutableStateFlow<ResourceState<ProductResponse>>(ResourceState.Initial())
-    val getAllSubCategorySearchProductsData: StateFlow<ResourceState<ProductResponse>> =
+        MutableStateFlow<ResourceState<ProductList>>(ResourceState.Initial())
+    val getAllSubCategorySearchProductsData: StateFlow<ResourceState<ProductList>> =
         _getAllSubCategorySearchProductsData.asStateFlow()
 
 
@@ -62,25 +66,21 @@ class ProductViewModel @Inject constructor(
             isLoadingMore.value = true
             isLastPage.value = false
 
-            productRepository.getAllSubCategoryProducts(subCategoryId, page, limit, sortBy, order)
-                .collectLatest { getAllSubCategoryProductsResponse ->
-                    when (getAllSubCategoryProductsResponse) {
+            getAllSubCategoryProductsUseCase(subCategoryId, page, limit, sortBy, order)
+                .collectLatest { response ->
+                    when (response) {
                         is ResourceState.Success -> {
                             if (page == 1) {
                                 productsList.clear()
                             }
-                            _getAllSubCategoryProductsData.value =
-                                getAllSubCategoryProductsResponse
-                            productsList.addAll(getAllSubCategoryProductsResponse.data.data?.results.orEmpty())
-                            currentPage.intValue =
-                                getAllSubCategoryProductsResponse.data.data?.pagination?.currentPage!!.toInt() + 1
-                            isLastPage.value =
-                                getAllSubCategoryProductsResponse.data.data?.pagination?.hasNext == false
+                            _getAllSubCategoryProductsData.value = response
+                            productsList.addAll(response.data.products)
+                            currentPage.intValue = response.data.currentPage.toInt() + 1
+                            isLastPage.value = currentPage.intValue > response.data.totalPages
                         }
 
                         is ResourceState.Error -> {
-                            _getAllSubCategoryProductsData.value =
-                                getAllSubCategoryProductsResponse
+                            _getAllSubCategoryProductsData.value = response
                         }
 
                         else -> {}
@@ -104,31 +104,27 @@ class ProductViewModel @Inject constructor(
             isLoadingMore.value = true
             isLastPage.value = false
 
-            productRepository.getAllSubCategorySearchProducts(
+            getAllSubCategorySearchProductsUseCase(
                 subCategoryId,
                 page,
                 limit,
                 sortBy,
                 order,
                 name
-            ).collectLatest { getAllSubCategorySearchProductsResponse ->
-                when (getAllSubCategorySearchProductsResponse) {
+            ).collectLatest { response ->
+                when (response) {
                     is ResourceState.Success -> {
                         if (page == 1) {
                             productsList.clear()
                         }
-                        _getAllSubCategorySearchProductsData.value =
-                            getAllSubCategorySearchProductsResponse
-                        productsList.addAll(getAllSubCategorySearchProductsResponse.data.data?.results.orEmpty())
-                        currentPage.intValue =
-                            getAllSubCategorySearchProductsResponse.data.data?.pagination?.currentPage!!.toInt() + 1
-                        isLastPage.value =
-                            getAllSubCategorySearchProductsResponse.data.data?.pagination?.hasNext == false
+                        _getAllSubCategorySearchProductsData.value = response
+                        productsList.addAll(response.data.products)
+                        currentPage.intValue = response.data.currentPage.toInt() + 1
+                        isLastPage.value = currentPage.intValue > response.data.totalPages
                     }
 
                     is ResourceState.Error -> {
-                        _getAllSubCategorySearchProductsData.value =
-                            getAllSubCategorySearchProductsResponse
+                        _getAllSubCategorySearchProductsData.value = response
                     }
 
                     else -> {}

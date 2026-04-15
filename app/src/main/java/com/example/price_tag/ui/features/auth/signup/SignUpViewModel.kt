@@ -3,9 +3,9 @@ package com.example.price_tag.ui.features.auth.signup
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.model.auth.SignUpRequest
-import com.example.price_tag.data.repository.auth.AuthRepository
+import com.example.price_tag.domain.model.auth.User
+import com.example.price_tag.domain.usecase.auth.RegisterUseCase
 import com.example.price_tag.ui.navigation.NavigationCoordinator
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.utilites.ResourceState
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SignUpViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val registerUseCase: RegisterUseCase,
     private val navigationCoordinator: NavigationCoordinator
 ) :
     ViewModel() {
@@ -38,13 +38,13 @@ class SignUpViewModel @Inject constructor(
     var phoneNumberError = mutableStateOf<String?>(null)
 
 
-    private val _signupData: MutableStateFlow<ResourceState<LoginResponse>> =
+    private val _signupData: MutableStateFlow<ResourceState<User>> =
         MutableStateFlow(ResourceState.Initial())
-    val signUpData: StateFlow<ResourceState<LoginResponse>> = _signupData
+    val signUpData: StateFlow<ResourceState<User>> = _signupData
 
     fun register(signUpRequest: SignUpRequest) {
         viewModelScope.launch(Dispatchers.IO) {
-            authRepository.register(signUpRequest)
+            registerUseCase(signUpRequest)
                 .collectLatest { signupResponse ->
                     _signupData.value = signupResponse
                     if (signupResponse is ResourceState.Success) {
@@ -63,7 +63,7 @@ class SignUpViewModel @Inject constructor(
     }
 
     companion object {
-        const val TAG = "LoginViewModel"
+        const val TAG = "SignUpViewModel"
     }
 
 }

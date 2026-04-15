@@ -54,7 +54,6 @@ fun MainView(
                 navController = navController,
                 padding = paddingValues,
                 categoryViewModel = categoryViewModel,
-                selectedCategoryViewModel = selectedCategoryViewModel
             )
 
             2 -> WishlistView(paddingValues)

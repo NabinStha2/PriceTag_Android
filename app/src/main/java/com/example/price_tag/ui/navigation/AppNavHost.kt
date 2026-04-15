@@ -20,20 +20,24 @@ fun AppNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
     startDestination: Any,
-    selectedCategoryViewModel: SelectedCategoryViewModel,
     navigationCoordinator: NavigationCoordinator,
 ) {
     LaunchedEffect(Unit) {
         navigationCoordinator.navigationEvents.collectLatest { event ->
             when (event) {
                 is NavEvent.Navigate -> {
-                    navController.navigate(event.destination, event.builder)
+                    navController.navigate(event.destination,
+                                           event.builder)
                 }
+
                 is NavEvent.Back -> {
                     navController.popBackStack()
                 }
+
                 is NavEvent.PopTo -> {
-                    navController.popBackStack(event.destination, event.inclusive, event.saveState)
+                    navController.popBackStack(event.destination,
+                                               event.inclusive,
+                                               event.saveState)
                 }
             }
         }
@@ -50,8 +54,8 @@ fun AppNavHost(
         }
 
         // Feature Graphs
-        authGraph(navController, selectedCategoryViewModel)
-        mainGraph(navController, selectedCategoryViewModel)
-        productGraph(navController, selectedCategoryViewModel)
+        authGraph(navController)
+        mainGraph(navController)
+        productGraph(navController)
     }
 }

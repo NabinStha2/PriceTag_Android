@@ -2,9 +2,9 @@ package com.example.price_tag.ui.features.auth.otp
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.model.auth.OtpRequest
-import com.example.price_tag.data.repository.auth.AuthRepository
+import com.example.price_tag.domain.model.auth.User
+import com.example.price_tag.domain.usecase.auth.VerifyOtpUseCase
 import com.example.price_tag.ui.navigation.NavEvent
 import com.example.price_tag.ui.navigation.NavigationCoordinator
 import com.example.price_tag.ui.navigation.NavigationItem
@@ -20,17 +20,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class OtpViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val verifyOtpUseCase: VerifyOtpUseCase,
     private val navigationCoordinator: NavigationCoordinator
 ) : ViewModel() {
 
-    private val _verifyOtpData: MutableStateFlow<ResourceState<LoginResponse>> =
+    private val _verifyOtpData: MutableStateFlow<ResourceState<User>> =
         MutableStateFlow(ResourceState.Initial())
-    val verifyOtpData: StateFlow<ResourceState<LoginResponse>> = _verifyOtpData
+    val verifyOtpData: StateFlow<ResourceState<User>> = _verifyOtpData
 
     fun verifyOtp(otpRequest: OtpRequest) {
         viewModelScope.launch(Dispatchers.IO) {
-            authRepository.verifyOtp(otpRequest = otpRequest)
+            verifyOtpUseCase(otpRequest = otpRequest)
                 .collectLatest { otpResponse ->
                     _verifyOtpData.value = otpResponse
                     if (otpResponse is ResourceState.Success) {

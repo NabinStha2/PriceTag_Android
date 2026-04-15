@@ -48,11 +48,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
-import com.example.price_tag.data.model.category.CategoryData
-import com.example.price_tag.data.model.category.CategoryResponse
-import com.example.price_tag.data.model.category.SubCategoryResponse
-import com.example.price_tag.data.model.category.SubCategoryResult
-import com.example.price_tag.ui.components.SelectedCategoryViewModel
+import com.example.price_tag.domain.model.category.Category
+import com.example.price_tag.domain.model.category.SubCategory
 import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.utilites.ResourceState
 
@@ -61,13 +58,11 @@ fun CategoryView(
     navController: NavHostController = rememberNavController(),
     padding: PaddingValues,
     categoryViewModel: CategoryViewModel,
-    selectedCategoryViewModel: SelectedCategoryViewModel,
 ) {
     val TAG = "CategoryView"
     val configuration = LocalConfiguration.current
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
-    var selectedCategoryId by rememberSaveable { mutableStateOf<Long?>(null) } // Store the selected category ID
-    val spUtils = categoryViewModel.spUtils
+    var selectedCategoryId by rememberSaveable { mutableStateOf<Long?>(null) } 
     val getAllCategoriesData by categoryViewModel.getAllCategoriesData.collectAsStateWithLifecycle()
     val getSubCategoriesData by categoryViewModel.getSubCategoriesData.collectAsStateWithLifecycle()
 
@@ -87,7 +82,7 @@ fun CategoryView(
                 modifier = Modifier.fillMaxSize()
             ) {
                 Text(
-                    text = "Error: ${(getAllCategoriesData as ResourceState.Error<CategoryResponse>).error}",
+                    text = "Error: ${(getAllCategoriesData as ResourceState.Error).error}",
                     color = Color.Red,
                     textAlign = TextAlign.Center,
                     fontSize = 18.sp,
@@ -96,18 +91,16 @@ fun CategoryView(
         }
 
         is ResourceState.Success -> {
-            val categoryResponseData: CategoryResponse =
-                (getAllCategoriesData as ResourceState.Success<CategoryResponse>).data
+            val categories = (getAllCategoriesData as ResourceState.Success<List<Category>>).data
 
-            // Load subcategories for the first category by default
-            LaunchedEffect(categoryResponseData) {
+            LaunchedEffect(categories) {
                 if (selectedCategoryId != null) {
                     categoryViewModel.getSubCategoriesWithSelectedCategory(
                         categoryId = selectedCategoryId ?: 0
                     )
 
                 } else {
-                    val firstCategoryId = categoryResponseData.data?.firstOrNull()?.id
+                    val firstCategoryId = categories.firstOrNull()?.id
                     if (firstCategoryId != null) {
                         selectedCategoryId = firstCategoryId
                         categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId = firstCategoryId)
@@ -116,19 +109,13 @@ fun CategoryView(
                 }
             }
             LaunchedEffect(selectedItem) {
-                val categoryName =
-                    categoryResponseData.data?.getOrNull(selectedItem)?.name.orEmpty()
-                selectedCategoryViewModel.setCategoryName(categoryName)
+                val categoryName = categories.getOrNull(selectedItem)?.name.orEmpty()
+                categoryViewModel.setSelectedCategory(categoryName)
             }
 
-            Log.i(
-                TAG,
-                "🔹 Selected Category: ${selectedCategoryViewModel.selectedCategoryName.collectAsStateWithLifecycle().value}"
-            )
             Row {
-                /** 🔹 Category Navigation Rail (Only Updates Selected State) **/
                 CategoryNavigationRail(
-                    categories = categoryResponseData.data.orEmpty(),
+                    categories = categories,
                     selectedItem = selectedItem,
                     onCategorySelected = { index, categoryId ->
                         selectedItem = index
@@ -140,7 +127,6 @@ fun CategoryView(
 
                 Spacer(modifier = Modifier.width(10.dp))
 
-                /** 🔹 Subcategory Grid (Rebuilds Only When Subcategories Change) **/
                 SubCategoryGrid(
                     getSubCategoriesData = getSubCategoriesData,
                     navController = navController,
@@ -153,10 +139,9 @@ fun CategoryView(
     }
 }
 
-/** 🔹 Category Navigation Rail (Only Updates State) **/
 @Composable
 fun CategoryNavigationRail(
-    categories: List<CategoryData>,
+    categories: List<Category>,
     selectedItem: Int,
     onCategorySelected: (Int, Long) -> Unit,
     padding: PaddingValues,
@@ -180,10 +165,10 @@ fun CategoryNavigationRail(
             ) {
                 NavigationRailItem(
                     selected = isSelected,
-                    onClick = { onCategorySelected(index, item.id ?: 0) },
+                    onClick = { onCategorySelected(index, item.id) },
                     icon = {
                         Text(
-                            text = item.name ?: "",
+                            text = item.name,
                             modifier = Modifier
                                 .padding(horizontal = 8.dp)
                                 .fillMaxWidth(),
@@ -203,10 +188,9 @@ fun CategoryNavigationRail(
     }
 }
 
-/** 🔹 Subcategory Grid (Recomposes Only When Subcategories Change) **/
 @Composable
 fun SubCategoryGrid(
-    getSubCategoriesData: ResourceState<SubCategoryResponse>,
+    getSubCategoriesData: ResourceState<List<SubCategory>>,
     navController: NavHostController,
     padding: PaddingValues
 ) {
@@ -235,7 +219,7 @@ fun SubCategoryGrid(
         }
 
         is ResourceState.Success -> {
-            val subCategoryResponseData = getSubCategoriesData.data
+            val subCategories = getSubCategoriesData.data
             val gridState = rememberSaveable(saver = LazyGridState.Saver) {
                 LazyGridState()
             }
@@ -247,8 +231,8 @@ fun SubCategoryGrid(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                items(subCategoryResponseData.data?.results.orEmpty().size) { index ->
-                    val subCategory = subCategoryResponseData.data?.results?.get(index)
+                items(subCategories.size) { index ->
+                    val subCategory = subCategories[index]
                     SubCategoryItem(subCategory, navController)
                 }
             }
@@ -258,14 +242,13 @@ fun SubCategoryGrid(
     }
 }
 
-/** 🔹 Subcategory Item UI **/
 @Composable
-fun SubCategoryItem(subCategory: SubCategoryResult?, navController: NavHostController) {
+fun SubCategoryItem(subCategory: SubCategory, navController: NavHostController) {
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)
             .clickable {
-                navController.navigate(NavigationItem.ProductView(subCategoryId = subCategory?.id)) {
+                navController.navigate(NavigationItem.ProductView(subCategoryId = subCategory.id)) {
                     launchSingleTop = true
                     restoreState = true
                     popUpTo(NavigationItem.MainView) {
@@ -285,7 +268,7 @@ fun SubCategoryItem(subCategory: SubCategoryResult?, navController: NavHostContr
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = subCategory?.subCategoryName ?: "",
+                text = subCategory.name,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.W500,
                 textAlign = TextAlign.Center,
@@ -295,10 +278,3 @@ fun SubCategoryItem(subCategory: SubCategoryResult?, navController: NavHostContr
         }
     }
 }
-
-
-//@Preview
-//@Composable
-//fun CategoryViewPreview() {
-//    MainView()
-//}

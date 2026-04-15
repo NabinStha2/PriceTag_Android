@@ -2,9 +2,11 @@ package com.example.price_tag.ui.features.category
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.price_tag.data.model.category.CategoryResponse
-import com.example.price_tag.data.model.category.SubCategoryResponse
-import com.example.price_tag.data.repository.category.CategoryRepository
+import com.example.price_tag.domain.model.category.Category
+import com.example.price_tag.domain.model.category.SubCategory
+import com.example.price_tag.domain.usecase.category.GetCategoriesUseCase
+import com.example.price_tag.domain.usecase.category.GetSubCategoriesUseCase
+import com.example.price_tag.domain.usecase.category.SetSelectedCategoryUseCase
 import com.example.price_tag.utils.SharedPreferencesUtils
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,27 +20,29 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
-    private val categoryRepository: CategoryRepository,
+    private val getCategoriesUseCase: GetCategoriesUseCase,
+    private val getSubCategoriesUseCase: GetSubCategoriesUseCase,
+    private val setSelectedCategoryUseCase: SetSelectedCategoryUseCase,
     private val sharedPreferencesUtils: SharedPreferencesUtils,
     ) :
     ViewModel() {
     val spUtils: SharedPreferencesUtils = sharedPreferencesUtils
     private val _getAllCategoriesData =
-        MutableStateFlow<ResourceState<CategoryResponse>>(ResourceState.Initial())
-    val getAllCategoriesData: StateFlow<ResourceState<CategoryResponse>> =
+        MutableStateFlow<ResourceState<List<Category>>>(ResourceState.Initial())
+    val getAllCategoriesData: StateFlow<ResourceState<List<Category>>> =
         _getAllCategoriesData
 
     private val _getSubCategoriesData =
-        MutableStateFlow<ResourceState<SubCategoryResponse>>(ResourceState.Initial())
-    val getSubCategoriesData: StateFlow<ResourceState<SubCategoryResponse>> =
+        MutableStateFlow<ResourceState<List<SubCategory>>>(ResourceState.Initial())
+    val getSubCategoriesData: StateFlow<ResourceState<List<SubCategory>>> =
         _getSubCategoriesData
     private var lastFetchedCategoryId: Long? = null
 
 
     fun getAllCategories() {
         viewModelScope.launch(Dispatchers.IO) {
-            categoryRepository.getAllCategories().collectLatest { _getAllCategoriesResponse ->
-                _getAllCategoriesData.value = _getAllCategoriesResponse
+            getCategoriesUseCase().collectLatest { response ->
+                _getAllCategoriesData.value = response
             }
         }
     }
@@ -47,12 +51,15 @@ class CategoryViewModel @Inject constructor(
         if (lastFetchedCategoryId != categoryId) {
             lastFetchedCategoryId = categoryId
             viewModelScope.launch {
-                categoryRepository.getSubCategoriesWithSelectedCategory(categoryId)
-                    .collectLatest { _getSubCategoriesResponse ->
-                        _getSubCategoriesData.value = _getSubCategoriesResponse
-                    }
+                getSubCategoriesUseCase(categoryId).collectLatest { response ->
+                    _getSubCategoriesData.value = response
+                }
             }
         }
+    }
+
+    fun setSelectedCategory(name: String) {
+        setSelectedCategoryUseCase(name)
     }
 
 }

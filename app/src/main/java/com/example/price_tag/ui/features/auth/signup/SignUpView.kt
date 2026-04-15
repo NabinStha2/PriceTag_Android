@@ -39,9 +39,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,10 +51,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -64,7 +60,6 @@ import com.example.price_tag.CustomSnackbarVisuals
 import com.example.price_tag.data.model.auth.SignUpRequest
 import com.example.price_tag.ui.components.Loader
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
-import com.example.price_tag.ui.navigation.NavigationItem
 import com.example.price_tag.ui.theme.PrimaryColor
 import com.example.price_tag.utils.Validations
 import com.example.utilites.ResourceState
@@ -72,12 +67,11 @@ import com.example.utilites.ResourceState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpView(
-    navController: NavController,
+    navController: NavController = rememberNavController(),
     signUpViewModel: SignUpViewModel,
     selectedCategoryViewModel: SelectedCategoryViewModel,
 
 ) {
-//    val coroutineScope = rememberCoroutineScope()
     val snackbarHostState: SnackbarHostState = selectedCategoryViewModel.snackbarHostState
     val signUpResponse by signUpViewModel.signUpData.collectAsStateWithLifecycle()
     val TAG = "SignUpView"
@@ -122,31 +116,20 @@ fun SignUpView(
     ) { scaffoldPadding ->
         when (signUpResponse) {
             is ResourceState.Loading -> {
-                Log.i(TAG, "Inside Loading State")
                 Loader(message = "Registering, Please wait...")
             }
 
             is ResourceState.Success -> {
-                val response = (signUpResponse as ResourceState.Success).data
-                Log.i(
-                    TAG,
-                    "Inside Success State : ${response.message}"
-                )
-
                 Toast.makeText(
                     context,
-                    response.message,
+                    "Registration Successful",
                     Toast.LENGTH_SHORT,
                 ).show()
-                navController.navigate(NavigationItem.OtpView)
+                // Navigation is handled inside the ViewModel via NavigationCoordinator
                 signUpViewModel.resetSignUpResponse()
             }
 
             is ResourceState.Error -> {
-                Log.e(
-                    TAG,
-                    "Inside Error State : ${(signUpResponse as ResourceState.Error).error.toString()}"
-                )
                 Toast.makeText(
                     context,
                     (signUpResponse as ResourceState.Error).error.toString(),
@@ -154,9 +137,7 @@ fun SignUpView(
                 ).show()
             }
 
-            else -> {
-                Log.d(TAG, "Else State")
-            }
+            else -> {}
         }
 
 
@@ -427,11 +408,7 @@ fun SignUpView(
                 ClickableText(
                     text = AnnotatedString("Login Now"),
                     onClick = {
-                        navController.navigate(NavigationItem.LoginView) {
-                            popUpTo(NavigationItem.LoginView) {
-                                inclusive = true
-                            }
-                        }
+                        signUpViewModel.onLoginClick()
                     },
                     style = TextStyle(
                         color = PrimaryColor,

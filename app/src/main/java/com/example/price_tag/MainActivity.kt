@@ -12,10 +12,8 @@ import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.navigation.AppNavHost
 import com.example.price_tag.ui.navigation.NavigationCoordinator
 import com.example.price_tag.ui.navigation.NavigationItem
@@ -65,7 +63,6 @@ class MainActivity : ComponentActivity() {
                   "navigationRoute ${navigationRoute}")
 
             val navController: NavHostController = rememberNavController()
-            val selectedCategoryViewModel: SelectedCategoryViewModel = hiltViewModel()
 
 
             Surface(modifier = Modifier
@@ -74,7 +71,6 @@ class MainActivity : ComponentActivity() {
                 AppNavHost(
                     startDestination = navigationRoute,
                     navController = navController,
-                    selectedCategoryViewModel = selectedCategoryViewModel,
                     navigationCoordinator = navigationCoordinator
                 )
             }

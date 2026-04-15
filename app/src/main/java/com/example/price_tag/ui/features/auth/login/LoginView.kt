@@ -70,12 +70,8 @@ fun LoginView(
 ) {
     val TAG = "LoginView"
     val loginResponse by loginViewModel.loginData.collectAsState()
-    val spUtils = loginViewModel.spUtils
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
-
-
-    Log.e(TAG, "Outside of Scaffold")
 
 
     Scaffold(modifier = Modifier
@@ -96,51 +92,24 @@ fun LoginView(
                 }
             })
         }) { scaffoldPadding ->
-        Log.e(TAG, "Inside of Scaffold")
 
         when (loginResponse) {
             is ResourceState.Loading -> {
-                Log.i(TAG, "Inside Loading State")
                 Loader(message = "Logging in, Please wait...")
             }
 
             is ResourceState.Success -> {
-                val response = (loginResponse as ResourceState.Success).data
                 Log.e(TAG, "Inside of Success")
                 Toast.makeText(
                     context,
                     "Login Successfully",
                     Toast.LENGTH_SHORT,
                 ).show()
-                navController.navigate(NavigationItem.MainView) {
-                    popUpTo(NavigationItem.LoginView) {
-                        inclusive = true
-                    }
-                    // Avoid multiple copies of the same destination when
-                    // reselecting the same item
-                    launchSingleTop = true
-                    // Restore state when reselecting a previously selected item
-                    restoreState = true
-                }
-                if (response.data?.accessToken != null && response.data.refreshToken != null) {
-                    Log.i("Login response data", response.data.toString())
-                    spUtils.save(
-                        spUtils.bearerToken,
-                        response.data.accessToken
-                    )
-                    spUtils.save(
-                        spUtils.refreshToken,
-                        response.data.refreshToken
-                    )
-                }
+                // Navigation is handled inside the ViewModel via NavigationCoordinator
                 loginViewModel.resetLoginResponse()
             }
 
             is ResourceState.Error -> {
-                Log.e(
-                    TAG, "Inside Error State : ${(loginResponse as ResourceState.Error).error}"
-                )
-
                 Toast.makeText(
                     context,
                     (loginResponse as ResourceState.Error).error.toString(),
@@ -148,9 +117,7 @@ fun LoginView(
                 ).show()
             }
 
-            else -> {
-                Log.d(TAG, "Else State")
-            }
+            else -> {}
         }
 
 
@@ -291,7 +258,7 @@ fun LoginView(
                 ClickableText(
                     text = AnnotatedString("Sign Up"),
                     onClick = {
-                        navController.navigate(NavigationItem.SignUpView)
+                        loginViewModel.onSignUpClick()
                     },
                     style = TextStyle(
                         color = PrimaryColor,

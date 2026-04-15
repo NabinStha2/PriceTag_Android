@@ -1,6 +1,7 @@
 package com.example.price_tag.ui.navigation.graphs
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.runtime.remember
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -20,12 +21,16 @@ data object ProductGraph
 
 fun NavGraphBuilder.productGraph(
     navController: NavController,
-    selectedCategoryViewModel: SelectedCategoryViewModel
 ) {
     navigation<ProductGraph>(startDestination = NavigationItem.ProductView(null)) {
         animatedComposable<NavigationItem.ProductView> { backStackEntry ->
             val vm: ProductViewModel = hiltViewModel()
             val destination = backStackEntry.toRoute<NavigationItem.ProductView>()
+            
+            val productGraphEntry = remember(backStackEntry) {
+                navController.getBackStackEntry<ProductGraph>()
+            }
+            val selectedCategoryViewModel: SelectedCategoryViewModel = hiltViewModel(productGraphEntry)
 
             ProductView(
                 navController = navController,
@@ -39,6 +44,11 @@ fun NavGraphBuilder.productGraph(
         animatedComposable<NavigationItem.ProductDetailsView> { backStackEntry ->
             val vm: ProductDetailsViewModel = hiltViewModel()
             val destination = backStackEntry.toRoute<NavigationItem.ProductDetailsView>()
+
+            val productGraphEntry = remember(backStackEntry) {
+                navController.getBackStackEntry<ProductGraph>()
+            }
+            val selectedCategoryViewModel: SelectedCategoryViewModel = hiltViewModel(productGraphEntry)
 
             ProductDetailsView(
                 navController = navController,

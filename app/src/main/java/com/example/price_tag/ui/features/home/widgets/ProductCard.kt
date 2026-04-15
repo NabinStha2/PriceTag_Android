@@ -30,13 +30,13 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import com.example.price_tag.data.model.product.ProductResult
+import com.example.price_tag.domain.model.product.Product
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductCard(
     index: Int? = 0,
-    productResult: ProductResult?,
+    product: Product,
     width: Dp = 160.dp,
     categoryName: String? = "",
     onClick: () -> Unit
@@ -48,16 +48,14 @@ fun ProductCard(
         onClick = onClick,
         colors = CardDefaults.cardColors(
             Color.White
-
-
         ),
     ) {
         Column(
             modifier = Modifier
                 .padding(8.dp)
         ) {
-            if (productResult?.images?.isNotEmpty() == true) {
-                val painter = rememberAsyncImagePainter(model = productResult.images[0]?.url)
+            if (product.imageUrl != null) {
+                val painter = rememberAsyncImagePainter(model = product.imageUrl)
                 val state = painter.state
                 Box(
                     modifier = Modifier
@@ -102,7 +100,7 @@ fun ProductCard(
             Spacer(modifier = Modifier.height(8.dp))
             Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                 Text(
-                    text = productResult?.name ?: "",
+                    text = product.name,
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                 )
@@ -118,7 +116,7 @@ fun ProductCard(
 
                 Row {
                     Text(
-                        text = productResult?.variants?.get(0)?.actualPrice?.toString() ?: "0",
+                        text = product.price.toString(),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Red,
@@ -126,7 +124,7 @@ fun ProductCard(
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
-                        text = productResult?.variants?.get(0)?.discountedPrice?.toString() ?: "0",
+                        text = product.discountedPrice?.toString() ?: product.price.toString(),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.W600,
                     )

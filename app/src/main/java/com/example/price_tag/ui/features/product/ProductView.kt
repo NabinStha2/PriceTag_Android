@@ -55,7 +55,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.example.price_tag.data.model.product.ProductResponse
+import com.example.price_tag.domain.model.product.ProductList
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.home.widgets.ProductCard
 import com.example.price_tag.ui.navigation.NavigationItem
@@ -79,10 +79,8 @@ fun ProductView(
     }
     val getAllSubCategoryProducts by productViewModel.getAllSubCategoryProductsData.collectAsStateWithLifecycle()
     val productsList = productViewModel.productsList
-    val searchProductsList = productViewModel.searchProductsList
     val isLoadingMore by productViewModel.isLoadingMore
     val isLastPage by productViewModel.isLastPage
-    val isSearchLastPage by productViewModel.isSearchLastPage
     val currentPage by productViewModel.currentPage
     val lazyGridState = rememberLazyGridState()
 
@@ -238,7 +236,7 @@ fun ProductView(
                         modifier = Modifier.fillMaxSize()
                     ) {
                         Text(
-                            text = "Error: ${(getAllSubCategoryProducts as ResourceState.Error<ProductResponse>).error}",
+                            text = "Error: ${(getAllSubCategoryProducts as ResourceState.Error<ProductList>).error}",
                             color = Color.Red,
                             textAlign = TextAlign.Center,
                             fontSize = 18.sp,
@@ -247,8 +245,6 @@ fun ProductView(
                 }
 
                 is ResourceState.Success -> {
-//                    val productResponseData: ProductResponse =
-//                        (getAllSubCategoryProducts as ResourceState.Success<ProductResponse>).data
                     if (productsList.isNotEmpty()) {
                         LazyVerticalGrid(
                             state = lazyGridState,
@@ -262,12 +258,10 @@ fun ProductView(
                             itemsIndexed(items = productsList) { index, product ->
                                 ProductCard(
                                     index = index,
-                                    productResult = product,
+                                    product = product,
                                     categoryName = categoryName,
                                     onClick = {
-                                        navController.navigate(
-                                            NavigationItem.ProductDetailsView(productId = product.id)
-                                        )
+                                        productViewModel.onProductClick(product.id)
                                     }
                                 )
                             }
@@ -317,10 +311,3 @@ fun ProductView(
 
 
 }
-
-
-//@Preview
-//@Composable
-//fun ProductViewPreview() {
-//    ProductView(subCategoryId = 0, paddingValues = PaddingValues(0.dp, 0.dp, 0.dp, 0.dp))
-//}

@@ -54,8 +54,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.CustomSnackbarVisuals
-import com.example.price_tag.data.model.auth.LoginResponse
 import com.example.price_tag.data.model.auth.OtpRequest
+import com.example.price_tag.domain.model.auth.User
 import com.example.price_tag.ui.components.Loader
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.auth.signup.SignUpViewModel
@@ -77,7 +77,7 @@ fun OtpView(
     val signUpViewModel: SignUpViewModel = hiltViewModel()
     val coroutineScope = rememberCoroutineScope()
     var otpCode by remember { mutableStateOf("") }
-    val verifyOtpData: ResourceState<LoginResponse> by otpViewModel.verifyOtpData.collectAsState()
+    val verifyOtpData: ResourceState<User> by otpViewModel.verifyOtpData.collectAsState()
     val snackbarHostState: SnackbarHostState = selectedCategoryViewModel.snackbarHostState
     val context = LocalContext.current
 
@@ -126,13 +126,12 @@ fun OtpView(
             }
 
             is ResourceState.Success -> {
-                val response = (verifyOtpData as ResourceState.Success).data
                 LaunchedEffect(Unit) {
                     coroutineScope.launch {
                         snackbarHostState.showSnackbar(
                             CustomSnackbarVisuals(
                                 containerColor = PrimaryColor,
-                                message = response.message,
+                                message = "OTP Verified Successfully",
                                 contentColor = Color.White,
                             ),
                         )
