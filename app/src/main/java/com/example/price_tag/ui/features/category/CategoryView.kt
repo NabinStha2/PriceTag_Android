@@ -62,25 +62,21 @@ fun CategoryView(
     val TAG = "CategoryView"
     val configuration = LocalConfiguration.current
     var selectedItem by rememberSaveable { mutableIntStateOf(0) }
-    var selectedCategoryId by rememberSaveable { mutableStateOf<Long?>(null) } 
+    var selectedCategoryId by rememberSaveable { mutableStateOf<Long?>(null) }
     val getAllCategoriesData by categoryViewModel.getAllCategoriesData.collectAsStateWithLifecycle()
     val getSubCategoriesData by categoryViewModel.getSubCategoriesData.collectAsStateWithLifecycle()
 
 
     when (getAllCategoriesData) {
         is ResourceState.Loading -> {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-            )
+            CircularProgressIndicator(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding))
         }
 
         is ResourceState.Error -> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()
-            ) {
+            Box(contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()) {
                 Text(
                     text = "Error: ${(getAllCategoriesData as ResourceState.Error).error}",
                     color = Color.Red,
@@ -91,13 +87,11 @@ fun CategoryView(
         }
 
         is ResourceState.Success -> {
-            val categories = (getAllCategoriesData as ResourceState.Success<List<Category>>).data
+            val categories: List<Category> = (getAllCategoriesData as ResourceState.Success<List<Category>>).data
 
             LaunchedEffect(categories) {
                 if (selectedCategoryId != null) {
-                    categoryViewModel.getSubCategoriesWithSelectedCategory(
-                        categoryId = selectedCategoryId ?: 0
-                    )
+                    categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId = selectedCategoryId ?: 0)
 
                 } else {
                     val firstCategoryId = categories.firstOrNull()?.id
@@ -114,24 +108,20 @@ fun CategoryView(
             }
 
             Row {
-                CategoryNavigationRail(
-                    categories = categories,
-                    selectedItem = selectedItem,
-                    onCategorySelected = { index, categoryId ->
-                        selectedItem = index
-                        selectedCategoryId = categoryId
-                        categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId)
-                    },
-                    padding = padding
-                )
+                CategoryNavigationRail(categories = categories,
+                                       selectedItem = selectedItem,
+                                       onCategorySelected = { index, categoryId ->
+                                           selectedItem = index
+                                           selectedCategoryId = categoryId
+                                           categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId)
+                                       },
+                                       padding = padding)
 
                 Spacer(modifier = Modifier.width(10.dp))
 
-                SubCategoryGrid(
-                    getSubCategoriesData = getSubCategoriesData,
-                    navController = navController,
-                    padding = padding
-                )
+                SubCategoryGrid(getSubCategoriesData = getSubCategoriesData,
+                                navController = navController,
+                                padding = padding)
             }
         }
 
@@ -160,22 +150,24 @@ fun CategoryNavigationRail(
 
             Box(
                 modifier = Modifier
-                    .padding(vertical = 10.dp, horizontal = 8.dp)
+                    .padding(vertical = 10.dp,
+                             horizontal = 8.dp)
                     .clip(RoundedCornerShape(8.dp)),
             ) {
                 NavigationRailItem(
                     selected = isSelected,
-                    onClick = { onCategorySelected(index, item.id) },
+                    onClick = {
+                        onCategorySelected(index,
+                                           item.id)
+                    },
                     icon = {
-                        Text(
-                            text = item.name,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .fillMaxWidth(),
-                            fontSize = 14.sp,
-                            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            textAlign = TextAlign.Center
-                        )
+                        Text(text = item.name,
+                             modifier = Modifier
+                                 .padding(horizontal = 8.dp)
+                                 .fillMaxWidth(),
+                             fontSize = 14.sp,
+                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                             textAlign = TextAlign.Center)
                     },
                     colors = NavigationRailItemDefaults.colors(
                         indicatorColor = Color(0xFF3F51B5),
@@ -189,17 +181,13 @@ fun CategoryNavigationRail(
 }
 
 @Composable
-fun SubCategoryGrid(
-    getSubCategoriesData: ResourceState<List<SubCategory>>,
-    navController: NavHostController,
-    padding: PaddingValues
-) {
+fun SubCategoryGrid(getSubCategoriesData: ResourceState<List<SubCategory>>,
+                    navController: NavHostController,
+                    padding: PaddingValues) {
     when (getSubCategoriesData) {
         is ResourceState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
@@ -223,17 +211,15 @@ fun SubCategoryGrid(
             val gridState = rememberSaveable(saver = LazyGridState.Saver) {
                 LazyGridState()
             }
-            LazyVerticalGrid(
-                state = gridState,
-                columns = GridCells.Fixed(2),
-                modifier = Modifier
-                    .padding(padding),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            LazyVerticalGrid(state = gridState,
+                             columns = GridCells.Fixed(2),
+                             modifier = Modifier.padding(padding),
+                             verticalArrangement = Arrangement.spacedBy(12.dp),
+                             horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(subCategories.size) { index ->
                     val subCategory = subCategories[index]
-                    SubCategoryItem(subCategory, navController)
+                    SubCategoryItem(subCategory,
+                                    navController)
                 }
             }
         }
@@ -243,7 +229,8 @@ fun SubCategoryGrid(
 }
 
 @Composable
-fun SubCategoryItem(subCategory: SubCategory, navController: NavHostController) {
+fun SubCategoryItem(subCategory: SubCategory,
+                    navController: NavHostController) {
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)
@@ -258,22 +245,18 @@ fun SubCategoryItem(subCategory: SubCategory, navController: NavHostController) 
             },
     ) {
         Column {
-            Image(
-                painter = painterResource(id = R.drawable.carousel1),
-                contentDescription = "Product Image",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .height(120.dp)
-                    .clip(RoundedCornerShape(12.dp))
-            )
+            Image(painter = painterResource(id = R.drawable.carousel1),
+                  contentDescription = "Product Image",
+                  contentScale = ContentScale.Crop,
+                  modifier = Modifier
+                      .height(120.dp)
+                      .clip(RoundedCornerShape(12.dp)))
             Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = subCategory.name,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.W500,
-                textAlign = TextAlign.Center,
-                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
-            )
+            Text(text = subCategory.name,
+                 fontSize = 14.sp,
+                 fontWeight = FontWeight.W500,
+                 textAlign = TextAlign.Center,
+                 modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
             Spacer(modifier = Modifier.height(8.dp))
         }
     }

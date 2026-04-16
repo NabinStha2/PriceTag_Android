@@ -13,6 +13,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -30,12 +31,12 @@ class CategoryViewModel @Inject constructor(
     private val _getAllCategoriesData =
         MutableStateFlow<ResourceState<List<Category>>>(ResourceState.Initial())
     val getAllCategoriesData: StateFlow<ResourceState<List<Category>>> =
-        _getAllCategoriesData
+        _getAllCategoriesData.asStateFlow()
 
     private val _getSubCategoriesData =
         MutableStateFlow<ResourceState<List<SubCategory>>>(ResourceState.Initial())
     val getSubCategoriesData: StateFlow<ResourceState<List<SubCategory>>> =
-        _getSubCategoriesData
+        _getSubCategoriesData.asStateFlow()
     private var lastFetchedCategoryId: Long? = null
 
 
