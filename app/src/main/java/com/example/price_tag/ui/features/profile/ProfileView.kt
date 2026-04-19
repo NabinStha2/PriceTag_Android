@@ -46,7 +46,7 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
-import com.example.price_tag.ui.navigation.NavigationItem
+import com.example.price_tag.core.navigation.NavigationItem
 
 @Composable
 fun ProfileView(

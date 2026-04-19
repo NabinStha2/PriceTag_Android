@@ -1,7 +1,7 @@
 package com.example.price_tag.ui.features.onboarding
 
 import androidx.lifecycle.ViewModel
-import com.example.price_tag.utils.SharedPreferencesUtils
+import com.example.price_tag.core.utils.SharedPreferencesUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

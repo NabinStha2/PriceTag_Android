@@ -14,12 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.price_tag.ui.navigation.AppNavHost
-import com.example.price_tag.ui.navigation.NavigationCoordinator
-import com.example.price_tag.ui.navigation.NavigationItem
-import com.example.price_tag.ui.navigation.graphs.AuthGraph
-import com.example.price_tag.ui.navigation.graphs.MainGraph
-import com.example.price_tag.utils.SharedPreferencesUtils
+import com.example.price_tag.core.navigation.AppNavHost
+import com.example.price_tag.core.navigation.NavigationCoordinator
+import com.example.price_tag.core.navigation.NavigationItem
+import com.example.price_tag.core.navigation.graph.AuthGraph
+import com.example.price_tag.core.navigation.graph.MainGraph
+import com.example.price_tag.core.utils.SharedPreferencesUtils
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

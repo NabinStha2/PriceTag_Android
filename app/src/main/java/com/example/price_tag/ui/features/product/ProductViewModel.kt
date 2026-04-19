@@ -10,8 +10,8 @@ import com.example.price_tag.domain.model.product.ProductList
 import com.example.price_tag.domain.usecase.category.GetSelectedCategoryUseCase
 import com.example.price_tag.domain.usecase.product.GetAllSubCategoryProductsUseCase
 import com.example.price_tag.domain.usecase.product.GetAllSubCategorySearchProductsUseCase
-import com.example.price_tag.ui.navigation.NavigationCoordinator
-import com.example.price_tag.ui.navigation.NavigationItem
+import com.example.price_tag.core.navigation.NavigationCoordinator
+import com.example.price_tag.core.navigation.NavigationItem
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

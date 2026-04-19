@@ -58,7 +58,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.domain.model.product.ProductList
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.home.widgets.ProductCard
-import com.example.price_tag.ui.navigation.NavigationItem
+import com.example.price_tag.core.navigation.NavigationItem
 import com.example.utilites.ResourceState
 
 

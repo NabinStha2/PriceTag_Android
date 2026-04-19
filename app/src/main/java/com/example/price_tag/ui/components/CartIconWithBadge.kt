@@ -19,8 +19,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.price_tag.ui.theme.AccentColor50
-import com.example.price_tag.ui.theme.AccentColor500
+import com.example.price_tag.core.theme.AccentColor50
+import com.example.price_tag.core.theme.AccentColor500
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Preview

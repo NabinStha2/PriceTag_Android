@@ -68,14 +68,14 @@ import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.components.StarRating
 import com.example.price_tag.ui.features.home.CarouselItem
 import com.example.price_tag.ui.features.home.widgets.CarouselSlider
-import com.example.price_tag.ui.theme.NeutralColor100
-import com.example.price_tag.ui.theme.NeutralColor200
-import com.example.price_tag.ui.theme.NeutralColor800
-import com.example.price_tag.ui.theme.Poppins
-import com.example.price_tag.ui.theme.PrimaryColor
-import com.example.price_tag.ui.theme.PrimaryColor50
-import com.example.price_tag.ui.theme.PrimaryColor600
-import com.example.price_tag.ui.theme.WarningColor
+import com.example.price_tag.core.theme.NeutralColor100
+import com.example.price_tag.core.theme.NeutralColor200
+import com.example.price_tag.core.theme.NeutralColor800
+import com.example.price_tag.core.theme.Poppins
+import com.example.price_tag.core.theme.PrimaryColor
+import com.example.price_tag.core.theme.PrimaryColor50
+import com.example.price_tag.core.theme.PrimaryColor600
+import com.example.price_tag.core.theme.WarningColor
 import com.example.utilites.ResourceState
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)

@@ -50,7 +50,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
 import com.example.price_tag.domain.model.category.Category
 import com.example.price_tag.domain.model.category.SubCategory
-import com.example.price_tag.ui.navigation.NavigationItem
+import com.example.price_tag.core.navigation.NavigationItem
 import com.example.utilites.ResourceState
 
 @Composable

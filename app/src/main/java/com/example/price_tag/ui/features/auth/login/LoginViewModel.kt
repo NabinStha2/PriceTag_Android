@@ -6,10 +6,10 @@ import androidx.lifecycle.viewModelScope
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.domain.model.auth.User
 import com.example.price_tag.domain.usecase.auth.LoginUseCase
-import com.example.price_tag.ui.navigation.NavEvent
-import com.example.price_tag.ui.navigation.NavigationCoordinator
-import com.example.price_tag.ui.navigation.NavigationItem
-import com.example.price_tag.utils.SharedPreferencesUtils
+import com.example.price_tag.core.navigation.NavEvent
+import com.example.price_tag.core.navigation.NavigationCoordinator
+import com.example.price_tag.core.navigation.NavigationItem
+import com.example.price_tag.core.utils.SharedPreferencesUtils
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

@@ -1,6 +1,6 @@
 package com.example.price_tag.data.repository.auth
 
-import com.example.price_tag.data.datasource.auth.AuthDataSource
+import com.example.price_tag.data.remote.datasource.auth.AuthDataSource
 import com.example.price_tag.data.mapper.auth.toDomain
 import com.example.price_tag.data.model.CommonErrorResponse
 import com.example.price_tag.data.model.auth.LoginRequest

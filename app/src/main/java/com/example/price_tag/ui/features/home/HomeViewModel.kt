@@ -1,8 +1,8 @@
 package com.example.price_tag.ui.features.home
 
 import androidx.lifecycle.ViewModel
-import com.example.price_tag.ui.navigation.NavigationCoordinator
-import com.example.price_tag.ui.navigation.NavigationItem
+import com.example.price_tag.core.navigation.NavigationCoordinator
+import com.example.price_tag.core.navigation.NavigationItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 

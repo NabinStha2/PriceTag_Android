@@ -7,7 +7,7 @@ import com.example.price_tag.domain.model.category.SubCategory
 import com.example.price_tag.domain.usecase.category.GetCategoriesUseCase
 import com.example.price_tag.domain.usecase.category.GetSubCategoriesUseCase
 import com.example.price_tag.domain.usecase.category.SetSelectedCategoryUseCase
-import com.example.price_tag.utils.SharedPreferencesUtils
+import com.example.price_tag.core.utils.SharedPreferencesUtils
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

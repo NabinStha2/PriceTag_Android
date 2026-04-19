@@ -1,6 +1,6 @@
 package com.example.price_tag.data.repository.product
 
-import com.example.price_tag.data.datasource.product.ProductDataSource
+import com.example.price_tag.data.remote.datasource.product.ProductDataSource
 import com.example.price_tag.data.mapper.product.toDomain
 import com.example.price_tag.data.model.CommonErrorResponse
 import com.example.price_tag.domain.model.product.Product

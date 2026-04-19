@@ -59,8 +59,8 @@ import com.example.price_tag.domain.model.auth.User
 import com.example.price_tag.ui.components.Loader
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.auth.signup.SignUpViewModel
-import com.example.price_tag.ui.navigation.NavigationItem
-import com.example.price_tag.ui.theme.PrimaryColor
+import com.example.price_tag.core.navigation.NavigationItem
+import com.example.price_tag.core.theme.PrimaryColor
 import com.example.utilites.ResourceState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch

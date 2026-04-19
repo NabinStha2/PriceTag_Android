@@ -1,12 +1,12 @@
 package com.example.price_tag.data.repository.category
 
-import com.example.price_tag.data.datasource.category.CategoryDataSource
+import com.example.price_tag.data.remote.datasource.category.CategoryDataSource
 import com.example.price_tag.data.mapper.category.toDomain
 import com.example.price_tag.data.model.CommonErrorResponse
 import com.example.price_tag.domain.model.category.Category
 import com.example.price_tag.domain.model.category.SubCategory
 import com.example.price_tag.domain.repository.category.CategoryRepository
-import com.example.price_tag.utils.SharedPreferencesUtils
+import com.example.price_tag.core.utils.SharedPreferencesUtils
 import com.example.utilites.ResourceState
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi

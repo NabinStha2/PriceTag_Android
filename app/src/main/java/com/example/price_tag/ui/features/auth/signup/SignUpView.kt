@@ -1,6 +1,5 @@
 package com.example.price_tag.ui.features.auth.signup
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -60,8 +59,8 @@ import com.example.price_tag.CustomSnackbarVisuals
 import com.example.price_tag.data.model.auth.SignUpRequest
 import com.example.price_tag.ui.components.Loader
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
-import com.example.price_tag.ui.theme.PrimaryColor
-import com.example.price_tag.utils.Validations
+import com.example.price_tag.core.theme.PrimaryColor
+import com.example.price_tag.core.utils.Validations
 import com.example.utilites.ResourceState
 
 @OptIn(ExperimentalMaterial3Api::class)
