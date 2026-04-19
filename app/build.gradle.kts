@@ -121,6 +121,9 @@ dependencies {
 //    implementation(libs.androidx.material3.adaptive.navigation3)
     implementation(libs.kotlinx.serialization.core)
 
+    // ---------------- DataStore -------------------
+    implementation(libs.datastore.preferences)
+
     // ---------------- Module ----------------
     implementation(project(":utilites"))
 }

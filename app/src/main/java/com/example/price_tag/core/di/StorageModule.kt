@@ -3,6 +3,7 @@ package com.example.price_tag.core.di
 import android.content.Context
 import android.content.SharedPreferences
 import com.example.price_tag.core.common.AppConstants
+import com.example.price_tag.core.datastore.DataStoreManager
 import com.example.price_tag.core.utils.SharedPreferencesUtils
 import dagger.Module
 import dagger.Provides
@@ -18,12 +19,20 @@ object StorageModule {
     @Provides
     @Singleton
     fun provideSharedPreferences(@ApplicationContext context: Context): SharedPreferences {
-        return context.getSharedPreferences(AppConstants.SHARED_PREF_NAME, Context.MODE_PRIVATE)
+        return context.getSharedPreferences(AppConstants.SHARED_PREF_NAME,
+                                            Context.MODE_PRIVATE)
     }
 
     @Provides
     @Singleton
     fun provideSharedPreferencesUtils(sharedPreferences: SharedPreferences): SharedPreferencesUtils {
         return SharedPreferencesUtils(sharedPreferences)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideDataStoreManager(@ApplicationContext context: Context): DataStoreManager {
+        return DataStoreManager(context)
     }
 }
