@@ -48,13 +48,13 @@ class SignUpViewModel @Inject constructor(
                 .collectLatest { signupResponse ->
                     _signupData.value = signupResponse
                     if (signupResponse is ResourceState.Success) {
-                        navigationCoordinator.navigateTo(NavigationItem.OtpView)
+                        navigationCoordinator.navigate(NavigationItem.LoginView)
                     }
                 }
         }
     }
 
-    fun onLoginClick() {
+    suspend fun onLoginClick() {
         navigationCoordinator.navigateBack()
     }
 

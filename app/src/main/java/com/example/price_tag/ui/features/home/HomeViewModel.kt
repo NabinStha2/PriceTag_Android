@@ -12,7 +12,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
 
     fun onProductClick(productId: Long) {
-        navigationCoordinator.navigateTo(NavigationItem.ProductDetailsView(productId))
+//        navigationCoordinator.navigateTo(NavigationItem.ProductDetailsView(productId))
     }
     
     fun onSeeAllFeaturedClick() {

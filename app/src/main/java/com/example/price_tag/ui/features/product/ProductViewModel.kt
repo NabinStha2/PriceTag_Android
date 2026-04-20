@@ -50,7 +50,7 @@ class ProductViewModel @Inject constructor(
 
 
     fun onProductClick(productId: Long) {
-        navigationCoordinator.navigateTo(NavigationItem.ProductDetailsView(productId))
+//        navigationCoordinator.navigateTo(NavigationItem.ProductDetailsView(productId))
     }
 
     fun getAllSubCategoryProducts(

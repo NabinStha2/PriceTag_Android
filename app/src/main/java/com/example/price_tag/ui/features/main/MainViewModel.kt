@@ -2,7 +2,7 @@ package com.example.price_tag.ui.features.main
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import com.example.price_tag.ui.navigation.NavigationCoordinator
+import com.example.price_tag.core.navigation.NavigationCoordinator
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -22,7 +22,7 @@ class MainViewModel @Inject constructor(
         _selectedMainBottomBarIndex.value = index
     }
     
-    fun navigateBack() {
+    suspend fun navigateBack() {
         navigationCoordinator.navigateBack()
     }
 }

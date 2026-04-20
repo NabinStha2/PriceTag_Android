@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.price_tag.data.model.auth.OtpRequest
 import com.example.price_tag.domain.model.auth.User
 import com.example.price_tag.domain.usecase.auth.VerifyOtpUseCase
-import com.example.price_tag.core.navigation.ObserveNavigationEvent
 import com.example.price_tag.core.navigation.NavigationCoordinator
 import com.example.price_tag.core.navigation.NavigationItem
+import com.example.price_tag.core.navigation.ObserveNavigationEvents
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -34,11 +34,11 @@ class OtpViewModel @Inject constructor(
                 .collectLatest { otpResponse ->
                     _verifyOtpData.value = otpResponse
                     if (otpResponse is ResourceState.Success) {
-                        navigationCoordinator.navigate(
-                            ObserveNavigationEvent.Navigate(NavigationItem.MainView) {
-                                popUpTo(NavigationItem.LoginView) { inclusive = true }
-                            }
-                        )
+//                        navigationCoordinator.navigate(
+//                            ObserveNavigationEvents(NavigationItem.MainView,nav) {
+//                                popUpTo(NavigationItem.LoginView) { inclusive = true }
+//                            }
+//                        )
                     }
                 }
         }
