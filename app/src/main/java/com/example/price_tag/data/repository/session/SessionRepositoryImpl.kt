@@ -6,37 +6,46 @@ import com.example.price_tag.domain.repository.session.SessionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import javax.inject.Inject
+import javax.inject.Singleton
 
-
-class SessionRepositoryImpl @Inject constructor(private val dataStore: DataStoreManager) :
+@Singleton
+class SessionRepositoryImpl @Inject constructor(private val dataStoreManager: DataStoreManager) :
     SessionRepository {
 
-    override val appState: Flow<AppState> = combine(dataStore.firstTimeInApp,
-                                                    dataStore.bearerToken) { firstTime, token ->
+    /**
+     * Combines two DataStore streams into a single AppState.
+     *
+     * Decision matrix:
+     * ┌────────────┬──────────────┬─────────────────┐
+     * │ firstTime  │ bearerToken  │   AppState       │
+     * ├────────────┼──────────────┼─────────────────┤
+     * │   true     │   any        │   Onboarding     │
+     * │   false    │   null/blank │   Unauthenticated│
+     * │   false    │   non-blank  │   Authenticated  │
+     * └────────────┴──────────────┴─────────────────┘
+     *
+     * The Loading state is set as the initial value in AppViewModel
+     * (stateIn initialValue) so the splash screen shows while
+     * DataStore cold-starts from disk.
+     */
+    override val appState: Flow<AppState> = combine(dataStoreManager.firstTimeInApp,
+                                                    dataStoreManager.bearerToken) { isFirstTime, token ->
         when {
-            firstTime -> AppState.OnBoarding
-            token != null -> AppState.Authenticated
-            else -> AppState.Unauthenticated
+            isFirstTime -> AppState.OnBoarding
+            token.isNullOrBlank() -> AppState.Unauthenticated
+            else -> AppState.Authenticated
         }
     }
 
-    override val bearerToken: Flow<String?>
-        get() = dataStore.bearerToken
-
-    override suspend fun saveSession(token: String,
-                                     refreshToken: String,
-                                     userId: Long) {
-        dataStore.saveAuthTokens(token,
-                                 refreshToken,
-                                 userId)
+    override suspend fun saveToken(token: String) {
+        dataStoreManager.saveBearerToken(token)
     }
 
     override suspend fun clearSession() {
-        dataStore.clearAuthTokens()
+        dataStoreManager.clearAuthTokens()
     }
 
-    override suspend fun setFirstTime(isFirstTime: Boolean) {
-        dataStore.setFirstTime(isFirstTime)
-
+    override suspend fun completeOnboarding() {
+        dataStoreManager.setFirstTime(isFirstTime = true)
     }
 }

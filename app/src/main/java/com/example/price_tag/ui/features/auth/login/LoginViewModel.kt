@@ -3,13 +3,12 @@ package com.example.price_tag.ui.features.auth.login
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.price_tag.data.model.auth.LoginRequest
-import com.example.price_tag.domain.model.auth.User
-import com.example.price_tag.domain.usecase.auth.LoginUseCase
-import com.example.price_tag.core.navigation.NavEvent
 import com.example.price_tag.core.navigation.NavigationCoordinator
 import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.core.utils.SharedPreferencesUtils
+import com.example.price_tag.data.model.auth.LoginRequest
+import com.example.price_tag.domain.model.auth.User
+import com.example.price_tag.domain.usecase.auth.LoginUseCase
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -21,11 +20,10 @@ import javax.inject.Inject
 
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase,
-    private val sharedPreferencesUtils: SharedPreferencesUtils,
-    private val navigationCoordinator: NavigationCoordinator
-) : ViewModel() {
+class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase,
+                                         private val sharedPreferencesUtils: SharedPreferencesUtils,
+                                         private val navigationCoordinator: NavigationCoordinator) :
+    ViewModel() {
     val spUtils: SharedPreferencesUtils = sharedPreferencesUtils
 
     var email = mutableStateOf("admin@gmail.com")
@@ -44,23 +42,19 @@ class LoginViewModel @Inject constructor(
                 _loginData.value = loginResponse
                 if (loginResponse is ResourceState.Success) {
                     val user = loginResponse.data
-                    spUtils.save(spUtils.bearerToken, user.accessToken)
-                    spUtils.save(spUtils.refreshToken, user.refreshToken)
-                    
-                    navigationCoordinator.navigate(
-                        NavEvent.Navigate(NavigationItem.MainView) {
-                            popUpTo(NavigationItem.LoginView) { inclusive = true }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    )
+                    spUtils.save(spUtils.bearerToken,
+                                 user.accessToken)
+                    spUtils.save(spUtils.refreshToken,
+                                 user.refreshToken)
+
+                    navigationCoordinator.navigate(NavigationItem.MainView)
                 }
             }
         }
     }
 
-    fun onSignUpClick() {
-        navigationCoordinator.navigateTo(NavigationItem.SignUpView)
+    suspend fun onSignUpClick() {
+        navigationCoordinator.navigate(NavigationItem.OnboardingView)
     }
 
     fun resetLoginResponse() {

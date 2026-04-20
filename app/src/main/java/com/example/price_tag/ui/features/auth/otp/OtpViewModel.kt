@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.price_tag.data.model.auth.OtpRequest
 import com.example.price_tag.domain.model.auth.User
 import com.example.price_tag.domain.usecase.auth.VerifyOtpUseCase
-import com.example.price_tag.core.navigation.NavEvent
+import com.example.price_tag.core.navigation.ObserveNavigationEvent
 import com.example.price_tag.core.navigation.NavigationCoordinator
 import com.example.price_tag.core.navigation.NavigationItem
 import com.example.utilites.ResourceState
@@ -35,7 +35,7 @@ class OtpViewModel @Inject constructor(
                     _verifyOtpData.value = otpResponse
                     if (otpResponse is ResourceState.Success) {
                         navigationCoordinator.navigate(
-                            NavEvent.Navigate(NavigationItem.MainView) {
+                            ObserveNavigationEvent.Navigate(NavigationItem.MainView) {
                                 popUpTo(NavigationItem.LoginView) { inclusive = true }
                             }
                         )

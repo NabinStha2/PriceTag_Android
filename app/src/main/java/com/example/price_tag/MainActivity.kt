@@ -1,25 +1,25 @@
 package com.example.price_tag
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.price_tag.core.navigation.AppNavHost
 import com.example.price_tag.core.navigation.NavigationCoordinator
-import com.example.price_tag.core.navigation.NavigationItem
-import com.example.price_tag.core.navigation.graph.AuthGraph
-import com.example.price_tag.core.navigation.graph.MainGraph
-import com.example.price_tag.core.utils.SharedPreferencesUtils
+import com.example.price_tag.core.navigation.ObserveNavigationEvents
+import com.example.price_tag.core.navigation.RootNavHost
+import com.example.price_tag.core.state.AppState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -29,50 +29,31 @@ class MainActivity : ComponentActivity() {
 
     val TAG = "MainActivity"
 
-    @Inject
-    lateinit var sharedPreferencesUtils: SharedPreferencesUtils
-    
+    //    @Inject
+    //    lateinit var sharedPreferencesUtils: SharedPreferencesUtils
+
     @Inject
     lateinit var navigationCoordinator: NavigationCoordinator
+
+    private val appViewModel: AppViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var navigationRoute: Any = NavigationItem.OnboardingView
-
-            Log.i(TAG,
-                  "${
-                      sharedPreferencesUtils.getValueBoolean(sharedPreferencesUtils.firstTimeInApp,
-                                                             true)
-                  } => ${
-                      sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken)
-                  }")
-
-            if (!sharedPreferencesUtils.getValueBoolean(sharedPreferencesUtils.firstTimeInApp,
-                                                        true)) {
-                navigationRoute =
-                    if (sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken) != null) {
-                        MainGraph
-                    } else {
-                        AuthGraph
-                    }
-            }
-
-            Log.i(TAG,
-                  "navigationRoute ${navigationRoute}")
-
             val navController: NavHostController = rememberNavController()
+            val appState: AppState by appViewModel.appState.collectAsStateWithLifecycle()
 
+            // Wire the coordinator to the NavController.
+            // Lives at the root — handles ALL navigation events app-wide.
+            ObserveNavigationEvents(coordinator = navigationCoordinator,
+                                    navController = navController)
 
             Surface(modifier = Modifier
                 .fillMaxSize()
-                .background(color = Color.White)) {
-                AppNavHost(
-                    startDestination = navigationRoute,
-                    navController = navController,
-                    navigationCoordinator = navigationCoordinator
-                )
+                .background(color = Color.White)) { // Render the correct graph for the current session state.
+                RootNavHost(navController = navController,
+                            appState = appState)
             }
         }
     }

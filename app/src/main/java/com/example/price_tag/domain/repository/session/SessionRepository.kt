@@ -3,16 +3,21 @@ package com.example.price_tag.domain.repository.session
 import com.example.price_tag.core.state.AppState
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * Contract for session management.
+ * Lives in the domain layer — no Android/DataStore imports here.
+ */
 interface SessionRepository {
+
+    /** Reactive stream of the current AppState. */
     val appState: Flow<AppState>
 
-    val bearerToken: Flow<String?>
+    /** Persist the bearer token after successful login/OTP verification. */
+    suspend fun saveToken(token: String)
 
-    suspend fun saveSession(token: String,
-                            refreshToken: String,
-                            userId: Long)
-
+    /** Clear token and mark session as expired. */
     suspend fun clearSession()
 
-    suspend fun setFirstTime(isFirstTime: Boolean)
+    /** Mark onboarding as completed so it never shows again. */
+    suspend fun completeOnboarding()
 }

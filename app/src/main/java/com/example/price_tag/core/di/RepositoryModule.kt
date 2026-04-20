@@ -3,9 +3,11 @@ package com.example.price_tag.core.di
 import com.example.price_tag.data.repository.auth.AuthRepositoryImpl
 import com.example.price_tag.data.repository.category.CategoryRepositoryImpl
 import com.example.price_tag.data.repository.product.ProductRepositoryImpl
+import com.example.price_tag.data.repository.session.SessionRepositoryImpl
 import com.example.price_tag.domain.repository.auth.AuthRepository
 import com.example.price_tag.domain.repository.category.CategoryRepository
 import com.example.price_tag.domain.repository.product.ProductRepository
+import com.example.price_tag.domain.repository.session.SessionRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -33,4 +35,10 @@ abstract class RepositoryModule {
     abstract fun bindProductRepository(
         productRepositoryImpl: ProductRepositoryImpl
     ): ProductRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSessionRepository(
+        sessionRepositoryImpl: SessionRepositoryImpl
+    ): SessionRepository
 }
