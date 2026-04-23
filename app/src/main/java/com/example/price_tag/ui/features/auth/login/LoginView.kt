@@ -36,6 +36,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -52,19 +53,16 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.CustomSnackbarVisuals
 import com.example.price_tag.R
-import com.example.price_tag.data.model.auth.LoginRequest
-import com.example.price_tag.ui.components.Loader
 import com.example.price_tag.core.theme.PrimaryColor
 import com.example.price_tag.core.utils.Validations
+import com.example.price_tag.data.model.auth.LoginRequest
+import com.example.price_tag.ui.components.Loader
 import com.example.utilites.ResourceState
 
 @Composable
 fun LoginView(
-    navController: NavController = rememberNavController(),
     loginViewModel: LoginViewModel,
 ) {
     val TAG = "LoginView"
@@ -72,51 +70,64 @@ fun LoginView(
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
+    LaunchedEffect(loginResponse) {
+        when (loginResponse) {
+            is ResourceState.Success -> {
+                Log.e(TAG,
+                      "Inside of Success")
+                Toast.makeText(
+                    context,
+                    "Login Successfully",
+                    Toast.LENGTH_SHORT,
+                )
+                    .show() // Navigation is handled inside the ViewModel via NavigationCoordinator
+                loginViewModel.resetLoginResponse()
+            }
+
+            is ResourceState.Error -> {
+                Log.e(TAG,
+                      "Inside of Error")
+                Toast.makeText(
+                    context,
+                    (loginResponse as ResourceState.Error).error.toString(),
+                    Toast.LENGTH_SHORT,
+                )
+                    .show()
+            }
+
+            else -> {}
+        }
+    }
+
+
 
     Scaffold(modifier = Modifier
         .fillMaxSize()
         .safeContentPadding(),
-        containerColor = Color.White,
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState, snackbar = { snackbarData ->
-                val customVisuals = snackbarData.visuals as? CustomSnackbarVisuals
-                if (customVisuals != null) {
-                    Snackbar(
-                        snackbarData = snackbarData,
-                        contentColor = customVisuals.contentColor,
-                        containerColor = customVisuals.containerColor,
-                    )
-                } else {
-                    Snackbar(snackbarData = snackbarData)
-                }
-            })
-        }) { scaffoldPadding ->
+             containerColor = Color.White,
+             snackbarHost = {
+                 SnackbarHost(hostState = snackbarHostState,
+                              snackbar = { snackbarData ->
+                                  val customVisuals = snackbarData.visuals as? CustomSnackbarVisuals
+                                  if (customVisuals != null) {
+                                      Snackbar(
+                                          snackbarData = snackbarData,
+                                          contentColor = customVisuals.contentColor,
+                                          containerColor = customVisuals.containerColor,
+                                      )
+                                  } else {
+                                      Snackbar(snackbarData = snackbarData)
+                                  }
+                              })
+             }) { scaffoldPadding ->
 
         when (loginResponse) {
             is ResourceState.Loading -> {
                 Loader(message = "Logging in, Please wait...")
             }
 
-            is ResourceState.Success -> {
-                Log.e(TAG, "Inside of Success")
-                Toast.makeText(
-                    context,
-                    "Login Successfully",
-                    Toast.LENGTH_SHORT,
-                ).show()
-                // Navigation is handled inside the ViewModel via NavigationCoordinator
-                loginViewModel.resetLoginResponse()
-            }
-
-            is ResourceState.Error -> {
-                Toast.makeText(
-                    context,
-                    (loginResponse as ResourceState.Error).error.toString(),
-                    Toast.LENGTH_SHORT,
-                ).show()
-            }
-
             else -> {}
+
         }
 
 
@@ -158,9 +169,8 @@ fun LoginView(
                 modifier = Modifier.fillMaxWidth(),
                 placeholder = { Text(text = "Email") },
                 leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Email, contentDescription = "Email"
-                    )
+                    Icon(imageVector = Icons.Default.Email,
+                         contentDescription = "Email")
                 },
             )
             loginViewModel.emailError.value?.let {
@@ -175,55 +185,51 @@ fun LoginView(
                 )
             }
             Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(
-                value = loginViewModel.password.value,
-                onValueChange = { loginViewModel.password.value = it },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text(text = "Password") },
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Lock, contentDescription = "Password"
-                    )
-                },
-                trailingIcon = {
-                    IconButton(onClick = {
-                        loginViewModel.obscurePassword.value = !loginViewModel.obscurePassword.value
-                    }) {
-                        if (loginViewModel.obscurePassword.value) {
-                            Icon(
-                                imageVector = Icons.Default.Visibility,
-                                contentDescription = "Hide Password",
-                            )
-                        } else {
-                            Icon(
-                                imageVector = Icons.Default.VisibilityOff,
-                                contentDescription = "Show Password",
-                            )
-                        }
-                    }
-                },
-                visualTransformation = if (loginViewModel.obscurePassword.value) PasswordVisualTransformation() else VisualTransformation.None
+            OutlinedTextField(value = loginViewModel.password.value,
+                              onValueChange = { loginViewModel.password.value = it },
+                              modifier = Modifier.fillMaxWidth(),
+                              placeholder = { Text(text = "Password") },
+                              singleLine = true,
+                              shape = RoundedCornerShape(12.dp),
+                              leadingIcon = {
+                                  Icon(imageVector = Icons.Default.Lock,
+                                       contentDescription = "Password")
+                              },
+                              trailingIcon = {
+                                  IconButton(onClick = {
+                                      loginViewModel.obscurePassword.value =
+                                          !loginViewModel.obscurePassword.value
+                                  }) {
+                                      if (loginViewModel.obscurePassword.value) {
+                                          Icon(
+                                              imageVector = Icons.Default.Visibility,
+                                              contentDescription = "Hide Password",
+                                          )
+                                      } else {
+                                          Icon(
+                                              imageVector = Icons.Default.VisibilityOff,
+                                              contentDescription = "Show Password",
+                                          )
+                                      }
+                                  }
+                              },
+                              visualTransformation = if (loginViewModel.obscurePassword.value) PasswordVisualTransformation() else VisualTransformation.None
 
 
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-                    loginViewModel.login(
-                        loginRequest = LoginRequest(
-                            email = loginViewModel.email.value,
-                            password = loginViewModel.password.value
-                        )
-                    )
+                    loginViewModel.login(loginRequest = LoginRequest(email = loginViewModel.email.value,
+                                                                     password = loginViewModel.password.value))
                 },
                 colors = ButtonDefaults.buttonColors(containerColor = Color.Blue),
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
             ) {
                 Text(
-                    text = "LOGIN", modifier = Modifier.padding(vertical = 6.dp),
+                    text = "LOGIN",
+                    modifier = Modifier.padding(vertical = 6.dp),
                     style = TextStyle(
                         fontWeight = FontWeight.W500,
                         fontSize = 16.sp,
@@ -256,8 +262,7 @@ fun LoginView(
 
                 ClickableText(
                     text = AnnotatedString("Sign Up"),
-                    onClick = {
-//                        loginViewModel.onSignUpClick()
+                    onClick = { //                        loginViewModel.onSignUpClick()
                     },
                     style = TextStyle(
                         color = PrimaryColor,

@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.price_tag.core.navigation.graph.authGraph
+import com.example.price_tag.core.navigation.graph.authNavGraph
 import com.example.price_tag.core.navigation.graph.mainGraph
 import com.example.price_tag.core.navigation.graph.onboardingNavGraph
 import com.example.price_tag.core.state.AppState
@@ -49,7 +49,7 @@ fun RootNavHost(
 
         // Nested graphs
         onboardingNavGraph(navController)
-        authGraph(navController)
+        authNavGraph(navController)
         mainGraph(navController)
     }
 }
