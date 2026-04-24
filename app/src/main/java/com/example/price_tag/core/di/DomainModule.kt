@@ -8,7 +8,7 @@ import com.example.price_tag.domain.usecase.auth.RegisterUseCase
 import com.example.price_tag.domain.usecase.auth.VerifyOtpUseCase
 import com.example.price_tag.domain.usecase.category.GetCategoriesUseCase
 import com.example.price_tag.domain.usecase.category.GetSelectedCategoryUseCase
-import com.example.price_tag.domain.usecase.category.GetSubCategoriesUseCase
+import com.example.price_tag.domain.usecase.category.GetSubCategoriesWithSelectedCategoryUseCase
 import com.example.price_tag.domain.usecase.category.SetSelectedCategoryUseCase
 import com.example.price_tag.domain.usecase.product.GetAllSubCategoryProductsUseCase
 import com.example.price_tag.domain.usecase.product.GetAllSubCategorySearchProductsUseCase
@@ -49,8 +49,8 @@ object DomainModule {
 
     @Provides
     @Singleton
-    fun provideGetSubCategoriesUseCase(repository: CategoryRepository): GetSubCategoriesUseCase {
-        return GetSubCategoriesUseCase(repository)
+    fun provideGetSubCategoriesWithSelectedCategoryUseCase(repository: CategoryRepository): GetSubCategoriesWithSelectedCategoryUseCase {
+        return GetSubCategoriesWithSelectedCategoryUseCase(repository)
     }
 
     @Provides

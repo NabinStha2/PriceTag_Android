@@ -42,10 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.example.price_tag.core.navigation.NavigationItem
 import kotlinx.coroutines.launch
 
 
@@ -53,30 +50,24 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingView(
-    navController: NavController,
-    onboardingViewModel: OnboardingViewModel = hiltViewModel(),
+    onboardingViewModel: OnboardingViewModel,
 ) {
     val TAG = "OnboardingView"
-    val spUtils = onboardingViewModel.spUtils
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        containerColor = Color.Gray
-    ) { padding ->
+    Scaffold(modifier = Modifier.fillMaxSize(),
+             containerColor = Color.Gray) { padding ->
         val pagerState = rememberPagerState(pageCount = { 3 })
         val coroutineScope = rememberCoroutineScope()
         val configuration = LocalConfiguration.current
-        val screenHeightDp = configuration.screenHeightDp
-        // Calculate half the screen height in dp
+        val screenHeightDp = configuration.screenHeightDp // Calculate half the screen height in dp
         val halfScreenHeightDp = (screenHeightDp / 1.5).dp
 
 
-        Box(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-        ) {
-            HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { page ->
+        Box(modifier = Modifier
+            .padding(padding)
+            .fillMaxSize()) {
+            HorizontalPager(state = pagerState,
+                            modifier = Modifier.fillMaxSize()) { page ->
                 AsyncImage(
                     model = if (page == 0) "https://www.designhill.com/resize_img.php?w=767&h=640&atyp=st_page_file&pth=stdio_ad_ca||4219||custom_banner_new1_mobile_background_img&flp=1708689455-45420308665d8882f25e093-53314313.png" else if (page == 1) "https://media.very.co.uk/i/sd/ctmt-210-womens-dept-1?%24poi%24=&aspect=1%3A1&w=900&qlt=default&fmt=jpg&fmt.jpeg.interlaced=true" else "https://oldnavyprod.a.bigcontent.io/v1/static/240501_25-M1202_G_DP_Sale_0501",
                     contentDescription = "Onboarding Image",
@@ -90,7 +81,8 @@ fun OnboardingView(
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .height(screenHeightDp.dp - halfScreenHeightDp)
-                    .clip(shape = RoundedCornerShape(28.dp, 28.dp)),
+                    .clip(shape = RoundedCornerShape(28.dp,
+                                                     28.dp)),
             ) {
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
@@ -101,7 +93,9 @@ fun OnboardingView(
                             modifier = Modifier
                                 .height(10.dp)
                                 .width(10.dp)
-                                .border(1.dp, Color.Gray, shape = CircleShape)
+                                .border(1.dp,
+                                        Color.Gray,
+                                        shape = CircleShape)
                                 .clip(shape = CircleShape)
                                 .background(color = if (pagerState.currentPage == 0) Color.Blue else Color.White),
                         )
@@ -110,7 +104,9 @@ fun OnboardingView(
                             modifier = Modifier
                                 .height(10.dp)
                                 .width(10.dp)
-                                .border(1.dp, Color.Gray, shape = CircleShape)
+                                .border(1.dp,
+                                        Color.Gray,
+                                        shape = CircleShape)
                                 .clip(shape = CircleShape)
                                 .background(color = if (pagerState.currentPage == 1) Color.Blue else Color.White),
                         )
@@ -119,7 +115,9 @@ fun OnboardingView(
                             modifier = Modifier
                                 .height(10.dp)
                                 .width(10.dp)
-                                .border(1.dp, Color.Gray, shape = CircleShape)
+                                .border(1.dp,
+                                        Color.Gray,
+                                        shape = CircleShape)
                                 .clip(shape = CircleShape)
                                 .background(color = if (pagerState.currentPage == 2) Color.Blue else Color.White),
                         )
@@ -153,22 +151,16 @@ fun OnboardingView(
                         },
                         modifier = Modifier
                             .size(32.dp)
-                            .background(color = Color.Black, shape = CircleShape),
+                            .background(color = Color.Black,
+                                        shape = CircleShape),
                     ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = "Arrow forward",
-                            tint = Color.White
-                        )
+                        Icon(imageVector = Icons.Default.ArrowForward,
+                             contentDescription = "Arrow forward",
+                             tint = Color.White)
                     }
                     else ElevatedButton(
                         onClick = {
-                            spUtils.save(spUtils.firstTimeInApp, false)
-                            navController.navigate(NavigationItem.LoginView) {
-                                popUpTo(NavigationItem.OnboardingView) {
-                                    inclusive = true
-                                }
-                            }
+                            onboardingViewModel.onGetStartedClick()
                         },
                         colors = ButtonDefaults.elevatedButtonColors(
                             containerColor = Color.Blue,

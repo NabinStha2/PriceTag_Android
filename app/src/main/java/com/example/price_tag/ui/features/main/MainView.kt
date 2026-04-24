@@ -29,9 +29,9 @@ fun MainView(
 ) {
     val selectedIndex by viewModel.selectedMainBottomBarIndex.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        categoryViewModel.getAllCategories()
-    }
+//    LaunchedEffect(Unit) {
+//        categoryViewModel.getAllCategories()
+//    }
 
     Scaffold(
         modifier = Modifier
@@ -51,7 +51,7 @@ fun MainView(
             )
 
             1 -> CategoryView(
-                navController = navController,
+//                navController = navController,
                 padding = paddingValues,
                 categoryViewModel = categoryViewModel,
             )

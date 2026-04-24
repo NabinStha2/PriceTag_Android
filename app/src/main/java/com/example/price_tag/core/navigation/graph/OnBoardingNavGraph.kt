@@ -5,7 +5,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.price_tag.core.navigation.NavigationItem
+import com.example.price_tag.core.utils.sharedViewModel
 import com.example.price_tag.ui.features.onboarding.OnboardingView
+import com.example.price_tag.ui.features.onboarding.OnboardingViewModel
 
 /**
  * Single-screen graph.
@@ -17,7 +19,10 @@ import com.example.price_tag.ui.features.onboarding.OnboardingView
 fun NavGraphBuilder.onboardingNavGraph(navController: NavHostController) {
     navigation<NavigationItem.OnboardingGraph>(startDestination = NavigationItem.OnboardingView) {
         composable<NavigationItem.OnboardingView> {
-            OnboardingView(navController)
+            val vm: OnboardingViewModel =
+                it.sharedViewModel<OnboardingViewModel, NavigationItem.OnboardingGraph>(navController)
+
+            OnboardingView(onboardingViewModel = vm)
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.example.price_tag.ui.features.category
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,8 +15,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -27,44 +26,32 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.R
 import com.example.price_tag.domain.model.category.Category
 import com.example.price_tag.domain.model.category.SubCategory
-import com.example.price_tag.core.navigation.NavigationItem
 import com.example.utilites.ResourceState
 
 @Composable
 fun CategoryView(
-    navController: NavHostController = rememberNavController(),
     padding: PaddingValues,
     categoryViewModel: CategoryViewModel,
 ) {
     val TAG = "CategoryView"
-    val configuration = LocalConfiguration.current
-    var selectedItem by rememberSaveable { mutableIntStateOf(0) }
-    var selectedCategoryId by rememberSaveable { mutableStateOf<Long?>(null) }
     val getAllCategoriesData by categoryViewModel.getAllCategoriesData.collectAsStateWithLifecycle()
-    val getSubCategoriesData by categoryViewModel.getSubCategoriesData.collectAsStateWithLifecycle()
+    val getSubCategoriesWithSelectedCategoryData by categoryViewModel.getSubCategoriesWithSelectedCategoryData.collectAsStateWithLifecycle()
+    val selectedIndex by categoryViewModel.selectedIndex.collectAsStateWithLifecycle()
 
 
     when (getAllCategoriesData) {
@@ -87,41 +74,32 @@ fun CategoryView(
         }
 
         is ResourceState.Success -> {
-            val categories: List<Category> = (getAllCategoriesData as ResourceState.Success<List<Category>>).data
-
-            LaunchedEffect(categories) {
-                if (selectedCategoryId != null) {
-                    categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId = selectedCategoryId ?: 0)
-
-                } else {
-                    val firstCategoryId = categories.firstOrNull()?.id
-                    if (firstCategoryId != null) {
-                        selectedCategoryId = firstCategoryId
-                        categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId = firstCategoryId)
-                    }
-
-                }
-            }
-            LaunchedEffect(selectedItem) {
-                val categoryName = categories.getOrNull(selectedItem)?.name.orEmpty()
-                categoryViewModel.setSelectedCategory(categoryName)
-            }
+            val categories: List<Category> =
+                (getAllCategoriesData as ResourceState.Success<List<Category>>).data
 
             Row {
-                CategoryNavigationRail(categories = categories,
-                                       selectedItem = selectedItem,
-                                       onCategorySelected = { index, categoryId ->
-                                           selectedItem = index
-                                           selectedCategoryId = categoryId
-                                           categoryViewModel.getSubCategoriesWithSelectedCategory(categoryId)
-                                       },
-                                       padding = padding)
+                CategoryNavigationRail(
+                    categories = categories,
+                    selectedIndex = selectedIndex,
+                    onCategorySelected = { index, category ->
+                        categoryViewModel.getSubCategoriesWithSelectedCategory(
+                            category.id,
+                            index,
+                            category.name,
+                        )
+                    },
+                    padding = padding,
+                )
 
                 Spacer(modifier = Modifier.width(10.dp))
 
-                SubCategoryGrid(getSubCategoriesData = getSubCategoriesData,
-                                navController = navController,
-                                padding = padding)
+                SubCategoryGrid(
+                    getSubCategoriesWithSelectedCategoryData = getSubCategoriesWithSelectedCategoryData,
+                    padding = padding,
+                    onSubCategoryClick = { id ->
+                        categoryViewModel.onSubCategoryClick(id)
+                    },
+                )
             }
         }
 
@@ -132,8 +110,8 @@ fun CategoryView(
 @Composable
 fun CategoryNavigationRail(
     categories: List<Category>,
-    selectedItem: Int,
-    onCategorySelected: (Int, Long) -> Unit,
+    selectedIndex: Int,
+    onCategorySelected: (Int, Category) -> Unit,
     padding: PaddingValues,
 ) {
     NavigationRail(
@@ -146,8 +124,6 @@ fun CategoryNavigationRail(
         contentColor = Color.Black,
     ) {
         categories.forEachIndexed { index, item ->
-            val isSelected = selectedItem == index
-
             Box(
                 modifier = Modifier
                     .padding(vertical = 10.dp,
@@ -155,10 +131,12 @@ fun CategoryNavigationRail(
                     .clip(RoundedCornerShape(8.dp)),
             ) {
                 NavigationRailItem(
-                    selected = isSelected,
+                    selected = selectedIndex == index,
                     onClick = {
-                        onCategorySelected(index,
-                                           item.id)
+                        onCategorySelected(
+                            index,
+                            item,
+                        )
                     },
                     icon = {
                         Text(text = item.name,
@@ -166,7 +144,7 @@ fun CategoryNavigationRail(
                                  .padding(horizontal = 8.dp)
                                  .fillMaxWidth(),
                              fontSize = 14.sp,
-                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                             fontWeight = if (selectedIndex == index) FontWeight.Bold else FontWeight.Normal,
                              textAlign = TextAlign.Center)
                     },
                     colors = NavigationRailItemDefaults.colors(
@@ -181,10 +159,12 @@ fun CategoryNavigationRail(
 }
 
 @Composable
-fun SubCategoryGrid(getSubCategoriesData: ResourceState<List<SubCategory>>,
-                    navController: NavHostController,
-                    padding: PaddingValues) {
-    when (getSubCategoriesData) {
+fun SubCategoryGrid(
+    getSubCategoriesWithSelectedCategoryData: ResourceState<List<SubCategory>>,
+    padding: PaddingValues,
+    onSubCategoryClick: (Long) -> Unit,
+) {
+    when (getSubCategoriesWithSelectedCategoryData) {
         is ResourceState.Loading -> {
             Box(modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center) {
@@ -198,7 +178,7 @@ fun SubCategoryGrid(getSubCategoriesData: ResourceState<List<SubCategory>>,
                 modifier = Modifier.fillMaxSize(),
             ) {
                 Text(
-                    text = "Error: ${getSubCategoriesData.error}",
+                    text = "Error: ${getSubCategoriesWithSelectedCategoryData.error}",
                     color = Color.Red,
                     textAlign = TextAlign.Center,
                     fontSize = 18.sp,
@@ -207,10 +187,8 @@ fun SubCategoryGrid(getSubCategoriesData: ResourceState<List<SubCategory>>,
         }
 
         is ResourceState.Success -> {
-            val subCategories = getSubCategoriesData.data
-            val gridState = rememberSaveable(saver = LazyGridState.Saver) {
-                LazyGridState()
-            }
+            val subCategories = getSubCategoriesWithSelectedCategoryData.data
+            val gridState = rememberLazyGridState()
             LazyVerticalGrid(state = gridState,
                              columns = GridCells.Fixed(2),
                              modifier = Modifier.padding(padding),
@@ -218,8 +196,12 @@ fun SubCategoryGrid(getSubCategoriesData: ResourceState<List<SubCategory>>,
                              horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(subCategories.size) { index ->
                     val subCategory = subCategories[index]
-                    SubCategoryItem(subCategory,
-                                    navController)
+                    SubCategoryItem(
+                        subCategory,
+                        onClick = { id ->
+                            onSubCategoryClick(id)
+                        },
+                    )
                 }
             }
         }
@@ -229,19 +211,21 @@ fun SubCategoryGrid(getSubCategoriesData: ResourceState<List<SubCategory>>,
 }
 
 @Composable
-fun SubCategoryItem(subCategory: SubCategory,
-                    navController: NavHostController) {
+fun SubCategoryItem(
+    subCategory: SubCategory,
+    onClick: (Long) -> Unit,
+) {
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)
-            .clickable {
-                navController.navigate(NavigationItem.ProductView(subCategoryId = subCategory.id)) {
-                    launchSingleTop = true
-                    restoreState = true
-                    popUpTo(NavigationItem.MainView) {
-                        saveState = true
-                    }
-                }
+            .clickable { //                navController.navigate(NavigationItem.ProductView(subCategoryId = subCategory.id)) {
+                //                    launchSingleTop = true
+                //                    restoreState = true
+                //                    popUpTo(NavigationItem.MainView) {
+                //                        saveState = true
+                //                    }
+                //                }
+                onClick(subCategory.id)
             },
     ) {
         Column {

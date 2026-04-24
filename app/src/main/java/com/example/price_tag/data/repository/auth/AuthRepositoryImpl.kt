@@ -1,11 +1,12 @@
 package com.example.price_tag.data.repository.auth
 
-import com.example.price_tag.data.remote.datasource.auth.AuthDataSource
+import android.util.Log
 import com.example.price_tag.data.mapper.auth.toDomain
 import com.example.price_tag.data.model.CommonErrorResponse
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.OtpRequest
 import com.example.price_tag.data.model.auth.SignUpRequest
+import com.example.price_tag.data.remote.datasource.auth.AuthDataSource
 import com.example.price_tag.domain.model.auth.User
 import com.example.price_tag.domain.repository.auth.AuthRepository
 import com.example.utilites.ResourceState
@@ -16,10 +17,8 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
-class AuthRepositoryImpl @Inject constructor(
-    private val authDataSource: AuthDataSource,
-    private val moshi: Moshi
-) : AuthRepository {
+class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDataSource,
+                                             private val moshi: Moshi) : AuthRepository {
 
     private val jsonErrorAdapter: JsonAdapter<CommonErrorResponse> =
         moshi.adapter(CommonErrorResponse::class.java)
@@ -28,13 +27,22 @@ class AuthRepositoryImpl @Inject constructor(
         emit(ResourceState.Loading())
         val response = authDataSource.login(loginRequest)
         if (response.isSuccessful && response.body() != null) {
-            emit(ResourceState.Success(response.body()!!.toDomain()))
+            Log.d("AuthRepositoryImpl",
+                  "login: ${response.body()}")
+            response.body()
+                ?.let { emit(ResourceState.Success(it.toDomain())) }
         } else {
-            val errorBody = response.errorBody()?.string()
+            val errorBody = response.errorBody()
+                ?.string()
             val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
+
+            Log.e("AuthRepositoryImpl",
+                  "login: ${commonErrorResponse?.message}")
             emit(ResourceState.Error(commonErrorResponse?.message ?: "Login failed"))
         }
     }.catch { e ->
+        Log.e("AuthRepositoryImpl",
+              "login: ${e.localizedMessage}")
         emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
     }
 
@@ -42,9 +50,11 @@ class AuthRepositoryImpl @Inject constructor(
         emit(ResourceState.Loading())
         val response = authDataSource.register(signUpRequest)
         if (response.isSuccessful && response.body() != null) {
-            emit(ResourceState.Success(response.body()!!.toDomain()))
+            emit(ResourceState.Success(response.body()!!
+                                           .toDomain()))
         } else {
-            val errorBody = response.errorBody()?.string()
+            val errorBody = response.errorBody()
+                ?.string()
             val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
             emit(ResourceState.Error(commonErrorResponse?.message ?: "Registration failed"))
         }
@@ -56,9 +66,11 @@ class AuthRepositoryImpl @Inject constructor(
         emit(ResourceState.Loading())
         val response = authDataSource.verifyOtp(otpRequest)
         if (response.isSuccessful && response.body() != null) {
-            emit(ResourceState.Success(response.body()!!.toDomain()))
+            emit(ResourceState.Success(response.body()!!
+                                           .toDomain()))
         } else {
-            val errorBody = response.errorBody()?.string()
+            val errorBody = response.errorBody()
+                ?.string()
             val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
             emit(ResourceState.Error(commonErrorResponse?.message ?: "OTP verification failed"))
         }

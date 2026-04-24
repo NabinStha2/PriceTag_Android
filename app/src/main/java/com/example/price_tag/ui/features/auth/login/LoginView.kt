@@ -262,7 +262,8 @@ fun LoginView(
 
                 ClickableText(
                     text = AnnotatedString("Sign Up"),
-                    onClick = { //                        loginViewModel.onSignUpClick()
+                    onClick = {
+                        loginViewModel.onSignUpClick()
                     },
                     style = TextStyle(
                         color = PrimaryColor,

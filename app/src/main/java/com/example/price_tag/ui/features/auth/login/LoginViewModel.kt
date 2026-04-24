@@ -11,7 +11,6 @@ import com.example.price_tag.domain.model.auth.User
 import com.example.price_tag.domain.usecase.auth.LoginUseCase
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -26,8 +25,8 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase,
     ViewModel() {
     val spUtils: SharedPreferencesUtils = sharedPreferencesUtils
 
-    var email = mutableStateOf("admin@gmail.com")
-    var password = mutableStateOf("hello123")
+    var email = mutableStateOf("david@example.com")
+    var password = mutableStateOf("Password123")
     var obscurePassword = mutableStateOf(true)
     var emailError = mutableStateOf<String?>(null)
 
@@ -35,9 +34,8 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase,
         MutableStateFlow(ResourceState.Initial())
     val loginData: StateFlow<ResourceState<User>> = _loginData
 
-
     fun login(loginRequest: LoginRequest) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             loginUseCase(loginRequest).collectLatest { loginResponse ->
                 _loginData.value = loginResponse
                 if (loginResponse is ResourceState.Success) {
@@ -47,14 +45,16 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase,
                     spUtils.save(spUtils.refreshToken,
                                  user.refreshToken)
 
-                    navigationCoordinator.navigate(NavigationItem.MainView)
+                    navigationCoordinator.navigateAndClear(NavigationItem.MainGraph)
                 }
             }
         }
     }
 
-    suspend fun onSignUpClick() {
-        navigationCoordinator.navigate(NavigationItem.OnboardingView)
+    fun onSignUpClick() {
+        viewModelScope.launch {
+            navigationCoordinator.navigate(NavigationItem.SignUpView)
+        }
     }
 
     fun resetLoginResponse() {

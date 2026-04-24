@@ -6,7 +6,7 @@ import com.example.utilites.ResourceState
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetSubCategoriesUseCase @Inject constructor(
+class GetSubCategoriesWithSelectedCategoryUseCase @Inject constructor(
     private val repository: CategoryRepository
 ) {
     suspend operator fun invoke(categoryId: Long): Flow<ResourceState<List<SubCategory>>> {
