@@ -68,4 +68,8 @@ sealed interface NavigationItem {
 
     @Serializable
     data object OnboardingGraph : NavigationItem
+
+    @Serializable
+    data object ProductGraph : NavigationItem
+
 }

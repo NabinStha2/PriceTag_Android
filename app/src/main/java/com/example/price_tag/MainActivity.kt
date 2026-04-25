@@ -29,12 +29,8 @@ class MainActivity : ComponentActivity() {
 
     val TAG = "MainActivity"
 
-    //    @Inject
-    //    lateinit var sharedPreferencesUtils: SharedPreferencesUtils
-
     @Inject
     lateinit var navigationCoordinator: NavigationCoordinator
-
     private val appViewModel: AppViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,22 +42,28 @@ class MainActivity : ComponentActivity() {
 
             // Wire the coordinator to the NavController.
             // Lives at the root — handles ALL navigation events app-wide.
-            ObserveNavigationEvents(coordinator = navigationCoordinator,
-                                    navController = navController)
+            ObserveNavigationEvents(
+                coordinator = navigationCoordinator,
+                navController = navController,
+            )
 
             Surface(modifier = Modifier
                 .fillMaxSize()
                 .background(color = Color.White)) { // Render the correct graph for the current session state.
-                RootNavHost(navController = navController,
-                            appState = appState)
+                RootNavHost(
+                    navController = navController,
+                    appState = appState,
+                )
             }
         }
     }
 }
 
-data class CustomSnackbarVisuals(override val message: String,
-                                 override val duration: SnackbarDuration = SnackbarDuration.Short,
-                                 val containerColor: Color = Color.White,
-                                 val contentColor: Color = Color.Red,
-                                 override val actionLabel: String? = null,
-                                 override val withDismissAction: Boolean = false) : SnackbarVisuals
+data class CustomSnackbarVisuals(
+    override val message: String,
+    override val duration: SnackbarDuration = SnackbarDuration.Short,
+    val containerColor: Color = Color.White,
+    val contentColor: Color = Color.Red,
+    override val actionLabel: String? = null,
+    override val withDismissAction: Boolean = false,
+) : SnackbarVisuals

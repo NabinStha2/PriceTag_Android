@@ -4,21 +4,20 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.core.navigation.NavigationCoordinator
 import com.example.price_tag.core.navigation.NavigationItem
-import com.example.price_tag.domain.model.category.Category
-import com.example.price_tag.domain.model.category.SubCategory
 import com.example.price_tag.domain.usecase.category.GetCategoriesUseCase
 import com.example.price_tag.domain.usecase.category.GetSubCategoriesWithSelectedCategoryUseCase
 import com.example.price_tag.domain.usecase.category.SetSelectedCategoryUseCase
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
 
 @HiltViewModel
 class CategoryViewModel @Inject constructor(
@@ -27,70 +26,79 @@ class CategoryViewModel @Inject constructor(
     private val getSubCategoriesWithSelectedCategoryUseCase: GetSubCategoriesWithSelectedCategoryUseCase,
     private val setSelectedCategoryUseCase: SetSelectedCategoryUseCase,
 ) : ViewModel() {
-    private val _getAllCategoriesData =
-        MutableStateFlow<ResourceState<List<Category>>>(ResourceState.Initial())
-    val getAllCategoriesData: StateFlow<ResourceState<List<Category>>> =
-        _getAllCategoriesData.asStateFlow()
 
-    private val _getSubCategoriesWithSelectedCategoryData =
-        MutableStateFlow<ResourceState<List<SubCategory>>>(ResourceState.Initial())
-    val getSubCategoriesWithSelectedCategoryData: StateFlow<ResourceState<List<SubCategory>>> =
-        _getSubCategoriesWithSelectedCategoryData.asStateFlow()
+    private val _uiState = MutableStateFlow(CategoryContract.State())
+    val uiState = _uiState.asStateFlow()
 
-    private val _selectedCategoryId = MutableStateFlow<Long?>(null)
-    val selectedCategoryId = _selectedCategoryId.asStateFlow()
-
-    private val _selectedIndex = MutableStateFlow(0)
-    val selectedIndex = _selectedIndex.asStateFlow()
+    private val _effect = Channel<CategoryContract.Effect>()
+    val effect = _effect.receiveAsFlow()
 
     init {
-        getAllCategories()
+        onIntent(CategoryContract.Intent.LoadCategories)
     }
 
+    fun onIntent(intent: CategoryContract.Intent) {
+        when (intent) {
+            is CategoryContract.Intent.LoadCategories -> getAllCategories()
+            is CategoryContract.Intent.SelectCategory -> {
+                getSubCategoriesWithSelectedCategory(
+                    intent.category.id,
+                    intent.index,
+                    intent.category.name,
+                )
+            }
+            is CategoryContract.Intent.SubCategoryClick -> {
+                onSubCategoryClick(intent.subCategoryId)
+            }
+        }
+    }
 
-    fun getAllCategories() {
+    private fun getAllCategories() {
         viewModelScope.launch(Dispatchers.IO) {
             getCategoriesUseCase().collectLatest { response ->
-                _getAllCategoriesData.value = response
+                _uiState.update { it.copy(categories = response) }
                 if (response is ResourceState.Success && response.data.isNotEmpty()) {
-                    setSelectedCategory(response.data.first().name)
+                    val firstCategory = response.data.first()
+                    setSelectedCategory(firstCategory.name)
                     getSubCategoriesWithSelectedCategory(
-                        response.data.first().id,
+                        firstCategory.id,
                         0,
-                        response.data.first().name,
+                        firstCategory.name,
                     )
                 }
             }
         }
     }
 
-    fun getSubCategoriesWithSelectedCategory(
+    private fun getSubCategoriesWithSelectedCategory(
         categoryId: Long,
         index: Int,
         name: String,
     ) {
-        if (_selectedCategoryId.value == categoryId) return
+        if (_uiState.value.selectedCategoryId == categoryId) return
 
-        _selectedCategoryId.value = categoryId
-        _selectedIndex.value = index
+        _uiState.update { 
+            it.copy(
+                selectedCategoryId = categoryId,
+                selectedIndex = index
+            )
+        }
         setSelectedCategory(name)
         viewModelScope.launch {
             getSubCategoriesWithSelectedCategoryUseCase(categoryId).collectLatest { response ->
-                _getSubCategoriesWithSelectedCategoryData.value = response
-
+                _uiState.update { it.copy(subCategories = response) }
             }
         }
     }
 
-    fun setSelectedCategory(name: String) {
+    private fun setSelectedCategory(name: String) {
         setSelectedCategoryUseCase(name)
     }
 
-    fun onSubCategoryClick(subCategoryId: Long) {
+    private fun onSubCategoryClick(subCategoryId: Long) {
         viewModelScope.launch {
+//            _effect.send(CategoryContract.Effect.NavigateToProducts(subCategoryId))
             navigationCoordinator.navigate(NavigationItem.ProductView(subCategoryId = subCategoryId))
         }
-
     }
-
 }

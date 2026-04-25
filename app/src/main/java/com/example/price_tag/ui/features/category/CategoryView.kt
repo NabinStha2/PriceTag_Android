@@ -26,6 +26,7 @@ import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,33 +40,48 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.price_tag.R
+import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.domain.model.category.Category
 import com.example.price_tag.domain.model.category.SubCategory
 import com.example.utilites.ResourceState
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun CategoryView(
     padding: PaddingValues,
     categoryViewModel: CategoryViewModel,
 ) {
-    val TAG = "CategoryView"
-    val getAllCategoriesData by categoryViewModel.getAllCategoriesData.collectAsStateWithLifecycle()
-    val getSubCategoriesWithSelectedCategoryData by categoryViewModel.getSubCategoriesWithSelectedCategoryData.collectAsStateWithLifecycle()
-    val selectedIndex by categoryViewModel.selectedIndex.collectAsStateWithLifecycle()
+    val uiState by categoryViewModel.uiState.collectAsStateWithLifecycle()
 
+    LaunchedEffect(Unit) {
+        categoryViewModel.effect.collectLatest { effect ->
+            when (effect) {
+                is CategoryContract.Effect.NavigateToProducts -> {
+                    // Navigation is already handled in ViewModel via Coordinator
+                }
+            }
+        }
+    }
 
-    when (getAllCategoriesData) {
+    when (val categoriesState = uiState.categories) {
         is ResourceState.Loading -> {
-            CircularProgressIndicator(modifier = Modifier
-                .fillMaxSize()
-                .padding(padding))
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
 
         is ResourceState.Error -> {
-            Box(contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize()) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxSize()
+            ) {
                 Text(
-                    text = "Error: ${(getAllCategoriesData as ResourceState.Error).error}",
+                    text = "Error: ${categoriesState.error}",
                     color = Color.Red,
                     textAlign = TextAlign.Center,
                     fontSize = 18.sp,
@@ -74,18 +90,15 @@ fun CategoryView(
         }
 
         is ResourceState.Success -> {
-            val categories: List<Category> =
-                (getAllCategoriesData as ResourceState.Success<List<Category>>).data
+            val categories: List<Category> = categoriesState.data
 
             Row {
                 CategoryNavigationRail(
                     categories = categories,
-                    selectedIndex = selectedIndex,
+                    selectedIndex = uiState.selectedIndex,
                     onCategorySelected = { index, category ->
-                        categoryViewModel.getSubCategoriesWithSelectedCategory(
-                            category.id,
-                            index,
-                            category.name,
+                        categoryViewModel.onIntent(
+                            CategoryContract.Intent.SelectCategory(category, index)
                         )
                     },
                     padding = padding,
@@ -94,10 +107,12 @@ fun CategoryView(
                 Spacer(modifier = Modifier.width(10.dp))
 
                 SubCategoryGrid(
-                    getSubCategoriesWithSelectedCategoryData = getSubCategoriesWithSelectedCategoryData,
+                    subCategoriesState = uiState.subCategories,
                     padding = padding,
                     onSubCategoryClick = { id ->
-                        categoryViewModel.onSubCategoryClick(id)
+                        categoryViewModel.onIntent(
+                            CategoryContract.Intent.SubCategoryClick(id)
+                        )
                     },
                 )
             }
@@ -126,26 +141,24 @@ fun CategoryNavigationRail(
         categories.forEachIndexed { index, item ->
             Box(
                 modifier = Modifier
-                    .padding(vertical = 10.dp,
-                             horizontal = 8.dp)
+                    .padding(vertical = 10.dp, horizontal = 8.dp)
                     .clip(RoundedCornerShape(8.dp)),
             ) {
                 NavigationRailItem(
                     selected = selectedIndex == index,
                     onClick = {
-                        onCategorySelected(
-                            index,
-                            item,
-                        )
+                        onCategorySelected(index, item)
                     },
                     icon = {
-                        Text(text = item.name,
-                             modifier = Modifier
-                                 .padding(horizontal = 8.dp)
-                                 .fillMaxWidth(),
-                             fontSize = 14.sp,
-                             fontWeight = if (selectedIndex == index) FontWeight.Bold else FontWeight.Normal,
-                             textAlign = TextAlign.Center)
+                        Text(
+                            text = item.name,
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .fillMaxWidth(),
+                            fontSize = 14.sp,
+                            fontWeight = if (selectedIndex == index) FontWeight.Bold else FontWeight.Normal,
+                            textAlign = TextAlign.Center
+                        )
                     },
                     colors = NavigationRailItemDefaults.colors(
                         indicatorColor = Color(0xFF3F51B5),
@@ -160,14 +173,16 @@ fun CategoryNavigationRail(
 
 @Composable
 fun SubCategoryGrid(
-    getSubCategoriesWithSelectedCategoryData: ResourceState<List<SubCategory>>,
+    subCategoriesState: ResourceState<List<SubCategory>>,
     padding: PaddingValues,
     onSubCategoryClick: (Long) -> Unit,
 ) {
-    when (getSubCategoriesWithSelectedCategoryData) {
+    when (subCategoriesState) {
         is ResourceState.Loading -> {
-            Box(modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 CircularProgressIndicator()
             }
         }
@@ -178,7 +193,7 @@ fun SubCategoryGrid(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 Text(
-                    text = "Error: ${getSubCategoriesWithSelectedCategoryData.error}",
+                    text = "Error: ${subCategoriesState.error}",
                     color = Color.Red,
                     textAlign = TextAlign.Center,
                     fontSize = 18.sp,
@@ -187,13 +202,15 @@ fun SubCategoryGrid(
         }
 
         is ResourceState.Success -> {
-            val subCategories = getSubCategoriesWithSelectedCategoryData.data
+            val subCategories = subCategoriesState.data
             val gridState = rememberLazyGridState()
-            LazyVerticalGrid(state = gridState,
-                             columns = GridCells.Fixed(2),
-                             modifier = Modifier.padding(padding),
-                             verticalArrangement = Arrangement.spacedBy(12.dp),
-                             horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            LazyVerticalGrid(
+                state = gridState,
+                columns = GridCells.Fixed(2),
+                modifier = Modifier.padding(padding),
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
                 items(subCategories.size) { index ->
                     val subCategory = subCategories[index]
                     SubCategoryItem(
@@ -218,29 +235,27 @@ fun SubCategoryItem(
     Box(
         modifier = Modifier
             .padding(horizontal = 8.dp)
-            .clickable { //                navController.navigate(NavigationItem.ProductView(subCategoryId = subCategory.id)) {
-                //                    launchSingleTop = true
-                //                    restoreState = true
-                //                    popUpTo(NavigationItem.MainView) {
-                //                        saveState = true
-                //                    }
-                //                }
+            .clickable {
                 onClick(subCategory.id)
             },
     ) {
         Column {
-            Image(painter = painterResource(id = R.drawable.carousel1),
-                  contentDescription = "Product Image",
-                  contentScale = ContentScale.Crop,
-                  modifier = Modifier
-                      .height(120.dp)
-                      .clip(RoundedCornerShape(12.dp)))
+            Image(
+                painter = painterResource(id = R.drawable.carousel1),
+                contentDescription = "Product Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(12.dp))
+            )
             Spacer(modifier = Modifier.height(8.dp))
-            Text(text = subCategory.name,
-                 fontSize = 14.sp,
-                 fontWeight = FontWeight.W500,
-                 textAlign = TextAlign.Center,
-                 modifier = Modifier.align(alignment = Alignment.CenterHorizontally))
+            Text(
+                text = subCategory.name,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.W500,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.align(alignment = Alignment.CenterHorizontally)
+            )
             Spacer(modifier = Modifier.height(8.dp))
         }
     }

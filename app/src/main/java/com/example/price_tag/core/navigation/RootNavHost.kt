@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import com.example.price_tag.core.navigation.graph.authNavGraph
 import com.example.price_tag.core.navigation.graph.mainGraph
 import com.example.price_tag.core.navigation.graph.onboardingNavGraph
+import com.example.price_tag.core.navigation.graph.productGraph
 import com.example.price_tag.core.state.AppState
 
 /**
@@ -51,5 +52,6 @@ fun RootNavHost(
         onboardingNavGraph(navController)
         authNavGraph(navController)
         mainGraph(navController)
+        productGraph(navController)
     }
 }
