@@ -34,20 +34,20 @@ class CategoryViewModel @Inject constructor(
     val effect = _effect.receiveAsFlow()
 
     init {
-        onIntent(CategoryContract.Intent.LoadCategories)
+        onIntent(CategoryContract.Intent.GetAllCategories)
     }
 
     fun onIntent(intent: CategoryContract.Intent) {
         when (intent) {
-            is CategoryContract.Intent.LoadCategories -> getAllCategories()
-            is CategoryContract.Intent.SelectCategory -> {
+            is CategoryContract.Intent.GetAllCategories -> getAllCategories()
+            is CategoryContract.Intent.GetSubCategoriesWithSelectedCategory -> {
                 getSubCategoriesWithSelectedCategory(
                     intent.category.id,
                     intent.index,
                     intent.category.name,
                 )
             }
-            is CategoryContract.Intent.SubCategoryClick -> {
+            is CategoryContract.Intent.OnSubCategoryClick -> {
                 onSubCategoryClick(intent.subCategoryId)
             }
         }
@@ -84,7 +84,7 @@ class CategoryViewModel @Inject constructor(
             )
         }
         setSelectedCategory(name)
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             getSubCategoriesWithSelectedCategoryUseCase(categoryId).collectLatest { response ->
                 _uiState.update { it.copy(subCategories = response) }
             }

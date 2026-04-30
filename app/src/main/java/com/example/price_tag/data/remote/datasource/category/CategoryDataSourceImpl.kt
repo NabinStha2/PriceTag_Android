@@ -10,7 +10,7 @@ class CategoryDataSourceImpl @Inject constructor(private val apiService: ApiServ
     CategoryDataSource {
 
     override suspend fun getAllCategories(accessToken: String): Response<CategoryResponse> {
-        return apiService.getAllCategories()
+        return apiService.getAllCategories(accessToken)
     }
 
     override suspend fun getSubCategoriesWithSelectedCategory(categoryId: Long): Response<SubCategoryResponse> {

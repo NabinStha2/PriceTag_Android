@@ -7,9 +7,9 @@ import com.example.utilites.ResourceState
 class CategoryContract {
 
     sealed interface Intent {
-        data object LoadCategories : Intent
-        data class SelectCategory(val category: Category, val index: Int) : Intent
-        data class SubCategoryClick(val subCategoryId: Long) : Intent
+        data object GetAllCategories : Intent
+        data class GetSubCategoriesWithSelectedCategory(val category: Category, val index: Int) : Intent
+        data class OnSubCategoryClick(val subCategoryId: Long) : Intent
     }
 
     data class State(

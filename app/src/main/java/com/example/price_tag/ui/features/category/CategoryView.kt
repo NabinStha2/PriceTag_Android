@@ -98,7 +98,7 @@ fun CategoryView(
                     selectedIndex = uiState.selectedIndex,
                     onCategorySelected = { index, category ->
                         categoryViewModel.onIntent(
-                            CategoryContract.Intent.SelectCategory(category, index)
+                            CategoryContract.Intent.GetSubCategoriesWithSelectedCategory(category, index)
                         )
                     },
                     padding = padding,
@@ -111,7 +111,7 @@ fun CategoryView(
                     padding = padding,
                     onSubCategoryClick = { id ->
                         categoryViewModel.onIntent(
-                            CategoryContract.Intent.SubCategoryClick(id)
+                            CategoryContract.Intent.OnSubCategoryClick(id)
                         )
                     },
                 )

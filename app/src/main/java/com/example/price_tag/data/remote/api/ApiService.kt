@@ -11,6 +11,7 @@ import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -28,7 +29,7 @@ interface ApiService {
 
     @GET(value = "category/")
     suspend fun getAllCategories(
-//        @Header("Authorization") accessToken: String
+        @Header("Authorization") accessToken: String
     ): Response<CategoryResponse>
 
     @GET(value = "subcategory/{category_id}")
