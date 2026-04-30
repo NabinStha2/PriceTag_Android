@@ -8,8 +8,10 @@ class CategoryContract {
 
     sealed interface Intent {
         data object GetAllCategories : Intent
+        data object RefreshCategories : Intent
         data class GetSubCategoriesWithSelectedCategory(val category: Category, val index: Int) : Intent
         data class OnSubCategoryClick(val subCategoryId: Long) : Intent
+        data object RetryLastOperation : Intent
     }
 
     data class State(

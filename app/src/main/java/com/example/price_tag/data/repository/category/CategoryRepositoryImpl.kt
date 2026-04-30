@@ -1,12 +1,13 @@
 package com.example.price_tag.data.repository.category
 
-import com.example.price_tag.data.remote.datasource.category.CategoryDataSource
+import android.util.Log
+import com.example.price_tag.core.utils.SharedPreferencesUtils
 import com.example.price_tag.data.mapper.category.toDomain
 import com.example.price_tag.data.model.CommonErrorResponse
+import com.example.price_tag.data.remote.datasource.category.CategoryDataSource
 import com.example.price_tag.domain.model.category.Category
 import com.example.price_tag.domain.model.category.SubCategory
 import com.example.price_tag.domain.repository.category.CategoryRepository
-import com.example.price_tag.core.utils.SharedPreferencesUtils
 import com.example.utilites.ResourceState
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
@@ -22,11 +23,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CategoryRepositoryImpl @Inject constructor(
-    private val categoryDataSource: CategoryDataSource,
-    private val sharedPreferencesUtils: SharedPreferencesUtils,
-    private val moshi: Moshi
-) : CategoryRepository {
+class CategoryRepositoryImpl @Inject constructor(private val categoryDataSource: CategoryDataSource,
+                                                 private val sharedPreferencesUtils: SharedPreferencesUtils,
+                                                 private val moshi: Moshi) : CategoryRepository {
     // Shared State Implementation
     private val _selectedCategoryName = MutableStateFlow<String?>(null)
     override val selectedCategoryName: StateFlow<String?> = _selectedCategoryName.asStateFlow()
@@ -53,8 +52,7 @@ class CategoryRepositoryImpl @Inject constructor(
      * Checks if the categories cache is still valid
      */
     private fun isCategoriesCacheValid(): Boolean {
-        return categoriesCache != null &&
-               (System.currentTimeMillis() - categoriesCacheTimestamp) < CACHE_DURATION_MILLIS
+        return categoriesCache != null && (System.currentTimeMillis() - categoriesCacheTimestamp) < CACHE_DURATION_MILLIS
     }
 
     /**
@@ -62,8 +60,7 @@ class CategoryRepositoryImpl @Inject constructor(
      */
     private fun isSubCategoriesCacheValid(categoryId: Long): Boolean {
         val cachedData = subCategoriesCache[categoryId]
-        return cachedData != null &&
-               (System.currentTimeMillis() - cachedData.second) < CACHE_DURATION_MILLIS
+        return cachedData != null && (System.currentTimeMillis() - cachedData.second) < CACHE_DURATION_MILLIS
     }
 
     /**
@@ -96,68 +93,78 @@ class CategoryRepositoryImpl @Inject constructor(
         return INITIAL_RETRY_DELAY * (1 shl attemptNumber.toInt()) // 1s, 2s, 4s
     }
 
-    override suspend fun getAllCategories(): Flow<ResourceState<List<Category>>> = flow {
-        // Check cache first
-        if (isCategoriesCacheValid()) {
-            emit(ResourceState.Success(categoriesCache ?: emptyList()))
-            return@flow
-        }
-
-        emit(ResourceState.Loading())
-        val token = sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken) ?: ""
-        val response = categoryDataSource.getAllCategories("Bearer $token")
-        if (response.isSuccessful && response.body() != null) {
-            val categories = response.body()!!.data?.map { it.toDomain() } ?: emptyList()
-            // Update cache
-            categoriesCache = categories
-            categoriesCacheTimestamp = System.currentTimeMillis()
-            emit(ResourceState.Success(categories))
-        } else {
-            val errorBody = response.errorBody()?.string()
-            val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
-            emit(ResourceState.Error(commonErrorResponse?.message ?: "Failed to fetch categories"))
-        }
-    }.retryWhen { cause, attempt ->
-        if (attempt < MAX_RETRY_ATTEMPTS && cause.isRetryable()) {
-            delay(getRetryDelay(attempt))
-            true
-        } else {
-            false
-        }
-    }.catch { e ->
-        emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
-    }
-
-    override suspend fun getSubCategoriesWithSelectedCategory(categoryId: Long): Flow<ResourceState<List<SubCategory>>> = flow {
-        // Check cache first
-        if (isSubCategoriesCacheValid(categoryId)) {
-            val cachedData = subCategoriesCache[categoryId]
-            if (cachedData != null) {
-                emit(ResourceState.Success(cachedData.first))
+    override suspend fun getAllCategories(): Flow<ResourceState<List<Category>>> =
+        flow { // Check cache first
+            if (isCategoriesCacheValid()) {
+                Log.i("getAllCategories",
+                      "getAllCategories: Returning cached categories (timestamp: $categoriesCacheTimestamp, age: ${System.currentTimeMillis() - categoriesCacheTimestamp} ms)")
+                emit(ResourceState.Success(categoriesCache ?: emptyList()))
                 return@flow
             }
-        }
 
-        emit(ResourceState.Loading())
-        val response = categoryDataSource.getSubCategoriesWithSelectedCategory(categoryId)
-        if (response.isSuccessful && response.body() != null) {
-            val subCategories = response.body()!!.data?.results?.map { it.toDomain() } ?: emptyList()
-            // Update cache with timestamp
-            subCategoriesCache[categoryId] = Pair(subCategories, System.currentTimeMillis())
-            emit(ResourceState.Success(subCategories))
-        } else {
-            val errorBody = response.errorBody()?.string()
-            val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
-            emit(ResourceState.Error(commonErrorResponse?.message ?: "Failed to fetch sub-categories"))
+            emit(ResourceState.Loading())
+            val token =
+                sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken) ?: ""
+            val response = categoryDataSource.getAllCategories("Bearer $token")
+            if (response.isSuccessful && response.body() != null) {
+                val categories =
+                    response.body()!!.data?.map { it.toDomain() } ?: emptyList() // Update cache
+                categoriesCache = categories
+                categoriesCacheTimestamp = System.currentTimeMillis()
+                emit(ResourceState.Success(categories))
+            } else {
+                val errorBody = response.errorBody()
+                    ?.string()
+                val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
+                emit(ResourceState.Error(commonErrorResponse?.message
+                                         ?: "Failed to fetch categories"))
+            }
+        }.retryWhen { cause, attempt ->
+            if (attempt < MAX_RETRY_ATTEMPTS && cause.isRetryable()) {
+                delay(getRetryDelay(attempt))
+                true
+            } else {
+                false
+            }
         }
-    }.retryWhen { cause, attempt ->
-        if (attempt < MAX_RETRY_ATTEMPTS && cause.isRetryable()) {
-            delay(getRetryDelay(attempt))
-            true
-        } else {
-            false
+            .catch { e ->
+                emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
+            }
+
+    override suspend fun getSubCategoriesWithSelectedCategory(categoryId: Long): Flow<ResourceState<List<SubCategory>>> =
+        flow { // Check cache first
+            if (isSubCategoriesCacheValid(categoryId)) {
+                val cachedData = subCategoriesCache[categoryId]
+                if (cachedData != null) {
+                    emit(ResourceState.Success(cachedData.first))
+                    return@flow
+                }
+            }
+
+            emit(ResourceState.Loading())
+            val response = categoryDataSource.getSubCategoriesWithSelectedCategory(categoryId)
+            if (response.isSuccessful && response.body() != null) {
+                val subCategories = response.body()!!.data?.results?.map { it.toDomain() }
+                                    ?: emptyList() // Update cache with timestamp
+                subCategoriesCache[categoryId] = Pair(subCategories,
+                                                      System.currentTimeMillis())
+                emit(ResourceState.Success(subCategories))
+            } else {
+                val errorBody = response.errorBody()
+                    ?.string()
+                val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
+                emit(ResourceState.Error(commonErrorResponse?.message
+                                         ?: "Failed to fetch sub-categories"))
+            }
+        }.retryWhen { cause, attempt ->
+            if (attempt < MAX_RETRY_ATTEMPTS && cause.isRetryable()) {
+                delay(getRetryDelay(attempt))
+                true
+            } else {
+                false
+            }
         }
-    }.catch { e ->
-        emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
-    }
+            .catch { e ->
+                emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
+            }
 }

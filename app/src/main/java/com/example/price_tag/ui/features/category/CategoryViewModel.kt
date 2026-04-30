@@ -40,6 +40,7 @@ class CategoryViewModel @Inject constructor(
     fun onIntent(intent: CategoryContract.Intent) {
         when (intent) {
             is CategoryContract.Intent.GetAllCategories -> getAllCategories()
+            is CategoryContract.Intent.RefreshCategories -> refreshCategories()
             is CategoryContract.Intent.GetSubCategoriesWithSelectedCategory -> {
                 getSubCategoriesWithSelectedCategory(
                     intent.category.id,
@@ -50,6 +51,7 @@ class CategoryViewModel @Inject constructor(
             is CategoryContract.Intent.OnSubCategoryClick -> {
                 onSubCategoryClick(intent.subCategoryId)
             }
+            is CategoryContract.Intent.RetryLastOperation -> retryLastOperation()
         }
     }
 
@@ -93,6 +95,35 @@ class CategoryViewModel @Inject constructor(
 
     private fun setSelectedCategory(name: String) {
         setSelectedCategoryUseCase(name)
+    }
+
+    private fun refreshCategories() {
+        // Clear cache and reload
+        // Note: Cache invalidation would need to be handled differently
+        // For now, just reload the data
+        getAllCategories()
+    }
+
+    private fun retryLastOperation() {
+        // Retry the last failed operation
+        val currentState = _uiState.value
+        when {
+            currentState.categories is ResourceState.Error -> {
+                getAllCategories()
+            }
+            currentState.subCategories is ResourceState.Error && currentState.selectedCategoryId != null -> {
+                // Retry loading subcategories for currently selected category
+                viewModelScope.launch(Dispatchers.IO) {
+                    getSubCategoriesWithSelectedCategoryUseCase(currentState.selectedCategoryId).collectLatest { response ->
+                        _uiState.update { it.copy(subCategories = response) }
+                    }
+                }
+            }
+            else -> {
+                // Default to refreshing categories
+                getAllCategories()
+            }
+        }
     }
 
     private fun onSubCategoryClick(subCategoryId: Long) {

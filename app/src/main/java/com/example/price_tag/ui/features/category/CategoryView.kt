@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -20,11 +21,18 @@ import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.NavigationRailItemDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -114,6 +122,12 @@ fun CategoryView(
                             CategoryContract.Intent.OnSubCategoryClick(id)
                         )
                     },
+                    onRefresh = {
+                        categoryViewModel.onIntent(CategoryContract.Intent.RefreshCategories)
+                    },
+                    onRetry = {
+                        categoryViewModel.onIntent(CategoryContract.Intent.RetryLastOperation)
+                    },
                 )
             }
         }
@@ -176,54 +190,62 @@ fun SubCategoryGrid(
     subCategoriesState: ResourceState<List<SubCategory>>,
     padding: PaddingValues,
     onSubCategoryClick: (Long) -> Unit,
+    onRefresh: () -> Unit = {},
+    onRetry: () -> Unit = {},
 ) {
-    when (subCategoriesState) {
-        is ResourceState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
-        }
+    val pullRefreshState = rememberPullToRefreshState()
 
-        is ResourceState.Error -> {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxSize(),
-            ) {
-                Text(
-                    text = "Error: ${subCategoriesState.error}",
-                    color = Color.Red,
-                    textAlign = TextAlign.Center,
-                    fontSize = 18.sp,
-                )
-            }
-        }
-
-        is ResourceState.Success -> {
-            val subCategories = subCategoriesState.data
-            val gridState = rememberLazyGridState()
-            LazyVerticalGrid(
-                state = gridState,
-                columns = GridCells.Fixed(2),
-                modifier = Modifier.padding(padding),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                items(subCategories.size) { index ->
-                    val subCategory = subCategories[index]
-                    SubCategoryItem(
-                        subCategory,
-                        onClick = { id ->
-                            onSubCategoryClick(id)
-                        },
-                    )
+    PullToRefreshBox(
+        state = pullRefreshState,
+        isRefreshing = subCategoriesState is ResourceState.Loading,
+        onRefresh = onRefresh,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        when (subCategoriesState) {
+            is ResourceState.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
-        }
 
-        else -> {}
+            is ResourceState.Error -> {
+                ErrorState(
+                    errorMessage = (subCategoriesState.error as? String) ?: "Unknown error",
+                    onRetry = onRetry
+                )
+            }
+
+            is ResourceState.Success -> {
+                val subCategories = subCategoriesState.data
+                if (subCategories.isEmpty()) {
+                    EmptyState()
+                } else {
+                    val gridState = rememberLazyGridState()
+                    LazyVerticalGrid(
+                        state = gridState,
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.padding(padding),
+                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(subCategories.size) { index ->
+                            val subCategory = subCategories[index]
+                            SubCategoryItem(
+                                subCategory,
+                                onClick = { id ->
+                                    onSubCategoryClick(id)
+                                },
+                            )
+                        }
+                    }
+                }
+            }
+
+            else -> {}
+        }
     }
 }
 
@@ -258,5 +280,99 @@ fun SubCategoryItem(
             )
             Spacer(modifier = Modifier.height(8.dp))
         }
+    }
+}
+
+@Composable
+fun ErrorState(
+    errorMessage: String,
+    onRetry: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Using existing drawable as placeholder
+        Icon(
+            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            contentDescription = "Error",
+            tint = Color.Red,
+            modifier = Modifier.size(64.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Oops! Something went wrong",
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.Red,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = errorMessage,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.Gray,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        Button(
+            onClick = onRetry,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color(0xFF3F51B5)
+            )
+        ) {
+            Text(
+                text = "Try Again",
+                color = Color.White,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+@Composable
+fun EmptyState() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Using existing drawable as placeholder
+        Icon(
+            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            contentDescription = "Empty",
+            tint = Color.Gray,
+            modifier = Modifier.size(64.dp)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "No subcategories found",
+            style = MaterialTheme.typography.headlineSmall,
+            color = Color.Gray,
+            textAlign = TextAlign.Center
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = "This category doesn't have any subcategories yet.",
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.Gray,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 32.dp)
+        )
     }
 }
