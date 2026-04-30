@@ -42,7 +42,7 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase,
                     dataStoreManager.saveBearerToken(user.accessToken)
                     dataStoreManager.saveRefreshToken(user.refreshToken)
 
-                    navigationCoordinator.navigateAndClear(NavigationItem.MainGraph)
+//                    navigationCoordinator.navigateAndClear(NavigationItem.MainGraph)
                 }
             }
         }

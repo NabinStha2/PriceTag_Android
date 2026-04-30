@@ -19,7 +19,7 @@ class ProfileViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch(Dispatchers.IO) {
             dataStoreManager.clearAuthTokens()
-            navigationCoordinator.navigateAndClear(NavigationItem.LoginView)
+//            navigationCoordinator.navigateAndClear(NavigationItem.LoginView)
         }
     }
 }
