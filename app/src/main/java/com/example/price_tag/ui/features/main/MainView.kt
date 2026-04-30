@@ -60,7 +60,6 @@ fun MainView(
 
             3 -> ProfileView(
                 padding = paddingValues,
-                navController = navController
             )
         }
     }

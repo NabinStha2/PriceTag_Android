@@ -70,6 +70,12 @@ class DataStoreManager @Inject constructor(@ApplicationContext private val conte
         }
     }
 
+    suspend fun saveRefreshToken(token: String) {
+        dataStore.edit { prefs ->
+            prefs[Keys.REFRESH_TOKEN] = token
+        }
+    }
+
     suspend fun clearAuthTokens() {
         dataStore.edit { prefs ->
             prefs.remove(Keys.BEARER_TOKEN)

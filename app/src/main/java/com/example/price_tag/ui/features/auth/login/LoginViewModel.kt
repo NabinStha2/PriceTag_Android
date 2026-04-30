@@ -3,9 +3,9 @@ package com.example.price_tag.ui.features.auth.login
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.price_tag.core.datastore.DataStoreManager
 import com.example.price_tag.core.navigation.NavigationCoordinator
 import com.example.price_tag.core.navigation.NavigationItem
-import com.example.price_tag.core.utils.SharedPreferencesUtils
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.domain.model.auth.User
 import com.example.price_tag.domain.usecase.auth.LoginUseCase
@@ -20,11 +20,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase,
-                                         private val sharedPreferencesUtils: SharedPreferencesUtils,
+                                         private val dataStoreManager: DataStoreManager,
                                          private val navigationCoordinator: NavigationCoordinator) :
     ViewModel() {
-    val spUtils: SharedPreferencesUtils = sharedPreferencesUtils
-
     var email = mutableStateOf("david@example.com")
     var password = mutableStateOf("Password123")
     var obscurePassword = mutableStateOf(true)
@@ -40,10 +38,9 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase,
                 _loginData.value = loginResponse
                 if (loginResponse is ResourceState.Success) {
                     val user = loginResponse.data
-                    spUtils.save(spUtils.bearerToken,
-                                 user.accessToken)
-                    spUtils.save(spUtils.refreshToken,
-                                 user.refreshToken)
+
+                    dataStoreManager.saveBearerToken(user.accessToken)
+                    dataStoreManager.saveRefreshToken(user.refreshToken)
 
                     navigationCoordinator.navigateAndClear(NavigationItem.MainGraph)
                 }

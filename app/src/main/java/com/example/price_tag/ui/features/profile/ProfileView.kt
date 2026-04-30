@@ -46,25 +46,15 @@ import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.transform.CircleCropTransformation
+import com.example.price_tag.core.datastore.DataStoreManager
 import com.example.price_tag.core.navigation.NavigationItem
 
 @Composable
 fun ProfileView(
     padding: PaddingValues,
-    navController: NavHostController = rememberNavController(),
     profileViewModel: ProfileViewModel = hiltViewModel(),
 ) {
-    val spUtils = profileViewModel.spUtils
     var showLogoutDialog by remember { mutableStateOf(false) }
-
-    fun handleLogout() {
-        spUtils.clearSharedPreference()
-        navController.navigate(NavigationItem.LoginView) {
-            popUpTo(NavigationItem.MainView) {
-                inclusive = true
-            }
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -236,7 +226,6 @@ fun ProfileView(
                     text = "Logout",
                     color = Color(0xFFFF6F6F),
                     fontWeight = FontWeight.W600,
-
                     )
             },
             leadingContent = {
@@ -261,7 +250,7 @@ fun ProfileView(
                 confirmButton = {
                     Button(
                         onClick = {
-                            handleLogout()
+                            profileViewModel.logout()
                             showLogoutDialog = false
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
