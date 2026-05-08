@@ -15,9 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.price_tag.core.theme.Price_tagTheme
 import com.example.price_tag.domain.model.category.Category
 import com.example.price_tag.domain.model.category.SubCategory
 import com.example.price_tag.ui.features.category.components.CategoryNavigationRail
@@ -31,28 +33,47 @@ fun CategoryView(
 ) {
     val uiState by categoryViewModel.uiState.collectAsStateWithLifecycle()
 
+    CategoryView(uiState = uiState,
+                 padding = padding,
+                 onCategorySelected = { index, category ->
+                     categoryViewModel.onIntent(CategoryContract.Intent.GetSubCategoriesWithSelectedCategory(category = category,
+                                                                                                             index = index))
+                 },
+                 onSubCategoryClick = { id ->
+                     categoryViewModel.onIntent(CategoryContract.Intent.OnSubCategoryClick(id))
+                 },
+                 onRefresh = {
+                     categoryViewModel.onIntent(CategoryContract.Intent.RefreshCategories)
+                 },
+                 onRetry = {
+                     categoryViewModel.onIntent(CategoryContract.Intent.RetryLastOperation)
+                 })
+}
+
+@Composable
+private fun CategoryView(
+    uiState: CategoryContract.State,
+    padding: PaddingValues,
+    onCategorySelected: (Int, Category) -> Unit,
+    onSubCategoryClick: (Long) -> Unit,
+    onRefresh: () -> Unit,
+    onRetry: () -> Unit,
+) {
     when (val categoriesState = uiState.categories) {
         is ResourceState.Loading -> CategoriesLoadingState(padding)
 
         is ResourceState.Error -> CategoriesErrorState(errorMessage = categoriesState.error.toString())
 
-        is ResourceState.Success -> CategoriesSuccessState(categories = categoriesState.data,
-                                                           subCategoriesState = uiState.subCategories,
-                                                           selectedIndex = uiState.selectedIndex,
-                                                           padding = padding,
-                                                           onCategorySelected = { index, category ->
-                                                               categoryViewModel.onIntent(CategoryContract.Intent.GetSubCategoriesWithSelectedCategory(category = category,
-                                                                                                                                                       index = index))
-                                                           },
-                                                           onSubCategoryClick = { id ->
-                                                               categoryViewModel.onIntent(CategoryContract.Intent.OnSubCategoryClick(id))
-                                                           },
-                                                           onRefresh = {
-                                                               categoryViewModel.onIntent(CategoryContract.Intent.RefreshCategories)
-                                                           },
-                                                           onRetry = {
-                                                               categoryViewModel.onIntent(CategoryContract.Intent.RetryLastOperation)
-                                                           })
+        is ResourceState.Success -> CategoriesSuccessState(
+            categories = categoriesState.data,
+            subCategoriesState = uiState.subCategories,
+            selectedIndex = uiState.selectedIndex,
+            padding = padding,
+            onCategorySelected = onCategorySelected,
+            onSubCategoryClick = onSubCategoryClick,
+            onRefresh = onRefresh,
+            onRetry = onRetry,
+        )
 
         else -> {}
     }
@@ -60,10 +81,12 @@ fun CategoryView(
 
 @Composable
 private fun CategoriesLoadingState(padding: PaddingValues) {
-    Box(modifier = Modifier
-        .fillMaxSize()
-        .padding(padding),
-        contentAlignment = Alignment.Center) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(padding),
+        contentAlignment = Alignment.Center,
+    ) {
         CircularProgressIndicator()
     }
 }
@@ -72,10 +95,12 @@ private fun CategoriesLoadingState(padding: PaddingValues) {
 private fun CategoriesErrorState(errorMessage: String) {
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center) {
-        Text(text = "Error: $errorMessage",
-             color = Color.Red,
-             textAlign = TextAlign.Center,
-             fontSize = 18.sp)
+        Text(
+            text = "Error: $errorMessage",
+            color = Color.Red,
+            textAlign = TextAlign.Center,
+            fontSize = 18.sp,
+        )
     }
 }
 
@@ -90,7 +115,7 @@ private fun CategoriesSuccessState(
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
 ) {
-    Row {
+    Row(modifier = Modifier.padding(padding)) {
         CategoryNavigationRail(
             categories = categories,
             selectedIndex = selectedIndex,
@@ -109,15 +134,64 @@ private fun CategoriesSuccessState(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun CategoryViewPreview() {
+    Price_tagTheme {
+        val sampleCategories = listOf(
+            Category(id = 1,
+                     name = "Electronics",
+                     imageUrl = null),
+            Category(id = 2,
+                     name = "Clothing",
+                     imageUrl = null),
+            Category(id = 3,
+                     name = "Food",
+                     imageUrl = null),
+            Category(id = 4,
+                     name = "Books",
+                     imageUrl = null),
+            Category(id = 5,
+                     name = "Sports",
+                     imageUrl = null),
+        )
 
+        val sampleSubCategories = listOf(
+            SubCategory(id = 1,
+                        name = "Phones",
+                        categoryId = 1,
+                        imageUrl = null),
+            SubCategory(id = 2,
+                        name = "Laptops",
+                        categoryId = 1,
+                        imageUrl = null),
+            SubCategory(id = 3,
+                        name = "Watches",
+                        categoryId = 1,
+                        imageUrl = null),
+            SubCategory(id = 4,
+                        name = "Headphones",
+                        categoryId = 1,
+                        imageUrl = null),
+            SubCategory(id = 5,
+                        name = "Cameras",
+                        categoryId = 1,
+                        imageUrl = null),
+            SubCategory(id = 6,
+                        name = "Tablets",
+                        categoryId = 1,
+                        imageUrl = null),
+        )
 
+        val state = CategoryContract.State(categories = ResourceState.Success(sampleCategories),
+                                           subCategories = ResourceState.Success(sampleSubCategories),
+                                           selectedIndex = 0)
 
-
-
-
-
-
-
-
-
-
+        CategoryView(uiState = state,
+                     padding = PaddingValues(0.dp),
+                     onCategorySelected = { _, _ -> },
+                     onSubCategoryClick = {},
+                     onRefresh = {},
+                     onRetry = {})
+    }
+}

@@ -1,20 +1,21 @@
 package com.example.price_tag.data.model.category
 
-data class SubCategoryResponse (
+data class SubCategoryResponse(
     val message: String?,
     val data: SubCategoryData?,
-    val success: Boolean?
+    val success: Boolean?,
 )
 
-data class SubCategoryData (
+data class SubCategoryData(
     val results: List<SubCategoryResult>?,
-    val categoryName: String?
+    val categoryName: String?,
 )
 
-data class SubCategoryResult (
+data class SubCategoryResult(
     val id: Long?,
     val subCategoryName: String?,
     val createdAt: String?,
     val updatedAt: String?,
-    val categoryId: Long?
+    val categoryId: Long?,
+    val imageUrl: String? = null,
 )

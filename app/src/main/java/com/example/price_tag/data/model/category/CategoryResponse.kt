@@ -1,14 +1,10 @@
 package com.example.price_tag.data.model.category
 
-import com.google.gson.annotations.JsonAdapter
-import com.squareup.moshi.JsonClass
-
 data class CategoryResponse(
     val message: String?,
     val data: List<CategoryData>?,
     val success: Boolean?,
-    val status: Int?,
-//    val meta: Object?,
+    val status: Int?, //    val meta: Object?,
 )
 
 data class CategoryData(
@@ -16,4 +12,5 @@ data class CategoryData(
     val name: String?,
     val createdAt: String?,
     val updatedAt: String?,
+    val imageUrl: String?,
 )
