@@ -6,7 +6,7 @@ import retrofit2.Response
 
 interface CategoryDataSource {
 
-    suspend fun getAllCategories(accessToken:String): Response<CategoryResponse>
+    suspend fun getAllCategories(): Response<CategoryResponse>
     suspend fun getSubCategoriesWithSelectedCategory(categoryId : Long): Response<SubCategoryResponse>
 
 //    suspend fun getAllSubCategories(categoryId: Long): Response<SubCategoryResponse>

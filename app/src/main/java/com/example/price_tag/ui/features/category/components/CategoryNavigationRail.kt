@@ -49,7 +49,7 @@ fun CategoryNavigationRail(
     NavigationRail(
         modifier = Modifier
             .padding(vertical = 16.dp)
-            .width(120.dp)
+            .width(100.dp)
             .fillMaxHeight()
             .verticalScroll(rememberScrollState()),
         containerColor = Color(0xFFF8F8F8),
@@ -89,15 +89,15 @@ private fun CategoryNavigationRailItem(
                 modifier = Modifier.fillMaxSize(),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                if (isSelected) {
-                    Box(
-                        modifier = Modifier
-                            .width(6.dp)
-                            .fillMaxHeight(0.8f)
-                            .clip(RoundedCornerShape(6.dp))
-                            .background(color = AccentColor),
-                    )
-                }
+//                if (isSelected) {
+//                    Box(
+//                        modifier = Modifier
+//                            .width(6.dp)
+//                            .fillMaxHeight(0.8f)
+//                            .clip(RoundedCornerShape(6.dp))
+//                            .background(color = AccentColor),
+//                    )
+//                }
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,

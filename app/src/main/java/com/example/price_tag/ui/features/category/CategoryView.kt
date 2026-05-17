@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -67,6 +68,7 @@ private fun CategoryView(
         is ResourceState.Success -> CategoriesSuccessState(
             categories = categoriesState.data,
             subCategoriesState = uiState.subCategories,
+            selectedCategoryName = uiState.selectedCategoryName,
             selectedIndex = uiState.selectedIndex,
             padding = padding,
             onCategorySelected = onCategorySelected,
@@ -108,6 +110,7 @@ private fun CategoriesErrorState(errorMessage: String) {
 private fun CategoriesSuccessState(
     categories: List<Category>,
     subCategoriesState: ResourceState<List<SubCategory>>,
+    selectedCategoryName: String?,
     selectedIndex: Int,
     padding: PaddingValues,
     onCategorySelected: (Int, Category) -> Unit,
@@ -115,7 +118,7 @@ private fun CategoriesSuccessState(
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
 ) {
-    Row(modifier = Modifier.padding(padding)) {
+    Row(modifier = Modifier.padding(padding).padding(top = 16.dp)) {
         CategoryNavigationRail(
             categories = categories,
             selectedIndex = selectedIndex,
@@ -126,10 +129,13 @@ private fun CategoriesSuccessState(
 
         SubCategoryGrid(
             subCategoriesState = subCategoriesState,
-            padding = padding,
+            selectedCategoryName = selectedCategoryName,
             onSubCategoryClick = onSubCategoryClick,
             onRefresh = onRefresh,
             onRetry = onRetry,
+            modifier = Modifier
+                .weight(1f)
+                .fillMaxHeight(),
         )
     }
 }

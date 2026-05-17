@@ -1,17 +1,19 @@
 package com.example.price_tag.core.network
 
 import android.util.Log
-import com.example.price_tag.core.utils.SharedPreferencesUtils
+import com.example.price_tag.core.datastore.DataStoreManager
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
 class AuthInterceptor @Inject constructor(
-    private val sharedPreferencesUtils: SharedPreferencesUtils
+    private val dataStoreManager: DataStoreManager
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val originalRequest = chain.request()
-        val token = sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken)
+        val token = runBlocking { dataStoreManager.bearerToken.first() }
 
         Log.i("Authorization", "Bearer $token")
 

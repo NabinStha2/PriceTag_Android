@@ -1,7 +1,6 @@
 package com.example.price_tag.data.repository.category
 
 import android.util.Log
-import com.example.price_tag.core.utils.SharedPreferencesUtils
 import com.example.price_tag.data.mapper.category.toDomain
 import com.example.price_tag.data.model.CommonErrorResponse
 import com.example.price_tag.data.remote.datasource.category.CategoryDataSource
@@ -23,9 +22,10 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class CategoryRepositoryImpl @Inject constructor(private val categoryDataSource: CategoryDataSource,
-                                                 private val sharedPreferencesUtils: SharedPreferencesUtils,
-                                                 private val moshi: Moshi) : CategoryRepository {
+class CategoryRepositoryImpl @Inject constructor(
+    private val categoryDataSource: CategoryDataSource,
+    private val moshi: Moshi,
+) : CategoryRepository {
     // Shared State Implementation
     private val _selectedCategoryName = MutableStateFlow<String?>(null)
     override val selectedCategoryName: StateFlow<String?> = _selectedCategoryName.asStateFlow()
@@ -103,9 +103,7 @@ class CategoryRepositoryImpl @Inject constructor(private val categoryDataSource:
             }
 
             emit(ResourceState.Loading())
-            val token =
-                sharedPreferencesUtils.getValueString(sharedPreferencesUtils.bearerToken) ?: ""
-            val response = categoryDataSource.getAllCategories("Bearer $token")
+            val response = categoryDataSource.getAllCategories()
             if (response.isSuccessful && response.body() != null) {
                 val categories =
                     response.body()!!.data?.map { it.toDomain() } ?: emptyList() // Update cache

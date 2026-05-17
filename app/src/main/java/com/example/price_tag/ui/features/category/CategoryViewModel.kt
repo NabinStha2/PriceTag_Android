@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.price_tag.core.navigation.NavigationCoordinator
 import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.domain.usecase.category.GetCategoriesUseCase
+import com.example.price_tag.domain.usecase.category.GetSelectedCategoryUseCase
 import com.example.price_tag.domain.usecase.category.GetSubCategoriesWithSelectedCategoryUseCase
 import com.example.price_tag.domain.usecase.category.SetSelectedCategoryUseCase
 import com.example.utilites.ResourceState
@@ -25,6 +26,7 @@ class CategoryViewModel @Inject constructor(
     private val getCategoriesUseCase: GetCategoriesUseCase,
     private val getSubCategoriesWithSelectedCategoryUseCase: GetSubCategoriesWithSelectedCategoryUseCase,
     private val setSelectedCategoryUseCase: SetSelectedCategoryUseCase,
+    private val getSelectedCategoryUseCase: GetSelectedCategoryUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(CategoryContract.State())
@@ -35,6 +37,15 @@ class CategoryViewModel @Inject constructor(
 
     init {
         onIntent(CategoryContract.Intent.GetAllCategories)
+        observeSelectedCategoryName()
+    }
+
+    private fun observeSelectedCategoryName() {
+        viewModelScope.launch(Dispatchers.IO) {
+            getSelectedCategoryUseCase().collectLatest { name ->
+                _uiState.update { it.copy(selectedCategoryName = name) }
+            }
+        }
     }
 
     fun onIntent(intent: CategoryContract.Intent) {
@@ -48,9 +59,11 @@ class CategoryViewModel @Inject constructor(
                     intent.category.name,
                 )
             }
+
             is CategoryContract.Intent.OnSubCategoryClick -> {
                 onSubCategoryClick(intent.subCategoryId)
             }
+
             is CategoryContract.Intent.RetryLastOperation -> retryLastOperation()
         }
     }
@@ -79,11 +92,9 @@ class CategoryViewModel @Inject constructor(
     ) {
         if (_uiState.value.selectedCategoryId == categoryId) return
 
-        _uiState.update { 
-            it.copy(
-                selectedCategoryId = categoryId,
-                selectedIndex = index
-            )
+        _uiState.update {
+            it.copy(selectedCategoryId = categoryId,
+                    selectedIndex = index)
         }
         setSelectedCategory(name)
         viewModelScope.launch(Dispatchers.IO) {
@@ -97,38 +108,35 @@ class CategoryViewModel @Inject constructor(
         setSelectedCategoryUseCase(name)
     }
 
-    private fun refreshCategories() {
-        // Clear cache and reload
+    private fun refreshCategories() { // Clear cache and reload
         // Note: Cache invalidation would need to be handled differently
         // For now, just reload the data
         getAllCategories()
     }
 
-    private fun retryLastOperation() {
-        // Retry the last failed operation
+    private fun retryLastOperation() { // Retry the last failed operation
         val currentState = _uiState.value
         when {
             currentState.categories is ResourceState.Error -> {
                 getAllCategories()
             }
-            currentState.subCategories is ResourceState.Error && currentState.selectedCategoryId != null -> {
-                // Retry loading subcategories for currently selected category
+
+            currentState.subCategories is ResourceState.Error && currentState.selectedCategoryId != null -> { // Retry loading subcategories for currently selected category
                 viewModelScope.launch(Dispatchers.IO) {
                     getSubCategoriesWithSelectedCategoryUseCase(currentState.selectedCategoryId).collectLatest { response ->
                         _uiState.update { it.copy(subCategories = response) }
                     }
                 }
             }
-            else -> {
-                // Default to refreshing categories
+
+            else -> { // Default to refreshing categories
                 getAllCategories()
             }
         }
     }
 
     private fun onSubCategoryClick(subCategoryId: Long) {
-        viewModelScope.launch {
-//            _effect.send(CategoryContract.Effect.NavigateToProducts(subCategoryId))
+        viewModelScope.launch { //            _effect.send(CategoryContract.Effect.NavigateToProducts(subCategoryId))
             navigationCoordinator.navigate(NavigationItem.ProductView(subCategoryId = subCategoryId))
         }
     }

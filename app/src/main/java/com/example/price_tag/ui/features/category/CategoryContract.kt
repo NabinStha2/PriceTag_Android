@@ -18,7 +18,8 @@ class CategoryContract {
         val categories: ResourceState<List<Category>> = ResourceState.Initial(),
         val subCategories: ResourceState<List<SubCategory>> = ResourceState.Initial(),
         val selectedIndex: Int = 0,
-        val selectedCategoryId: Long? = null
+        val selectedCategoryId: Long? = null,
+        val selectedCategoryName: String? = null
     )
 
     sealed interface Effect {

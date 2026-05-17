@@ -11,7 +11,6 @@ import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -28,9 +27,7 @@ interface ApiService {
     suspend fun verifyOtp(@Body otpRequest: OtpRequest): Response<LoginResponse>
 
     @GET(value = "category/")
-    suspend fun getAllCategories(
-        @Header("Authorization") accessToken: String
-    ): Response<CategoryResponse>
+    suspend fun getAllCategories(): Response<CategoryResponse>
 
     @GET(value = "subcategory/{category_id}")
     suspend fun getSubCategoriesWithSelectedCategory(@Path("category_id") categoryId: Long): Response<SubCategoryResponse>
