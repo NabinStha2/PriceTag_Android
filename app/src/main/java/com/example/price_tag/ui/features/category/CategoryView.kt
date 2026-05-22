@@ -34,21 +34,23 @@ fun CategoryView(
 ) {
     val uiState by categoryViewModel.uiState.collectAsStateWithLifecycle()
 
-    CategoryView(uiState = uiState,
-                 padding = padding,
-                 onCategorySelected = { index, category ->
-                     categoryViewModel.onIntent(CategoryContract.Intent.GetSubCategoriesWithSelectedCategory(category = category,
-                                                                                                             index = index))
-                 },
-                 onSubCategoryClick = { id ->
-                     categoryViewModel.onIntent(CategoryContract.Intent.OnSubCategoryClick(id))
-                 },
-                 onRefresh = {
-                     categoryViewModel.onIntent(CategoryContract.Intent.RefreshCategories)
-                 },
-                 onRetry = {
-                     categoryViewModel.onIntent(CategoryContract.Intent.RetryLastOperation)
-                 })
+    CategoryView(
+        uiState = uiState,
+        padding = padding,
+        onCategorySelected = { index, category ->
+            categoryViewModel.onIntent(CategoryContract.Intent.GetSubCategoriesWithSelectedCategory(category = category,
+                                                                                                    index = index))
+        },
+        onSubCategoryClick = { id ->
+            categoryViewModel.onIntent(CategoryContract.Intent.OnSubCategoryClick(id))
+        },
+        onRefresh = {
+            categoryViewModel.onIntent(CategoryContract.Intent.RefreshCategories)
+        },
+        onRetry = {
+            categoryViewModel.onIntent(CategoryContract.Intent.RetryLastOperation)
+        },
+    )
 }
 
 @Composable
@@ -118,7 +120,9 @@ private fun CategoriesSuccessState(
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
 ) {
-    Row(modifier = Modifier.padding(padding).padding(top = 16.dp)) {
+    Row(modifier = Modifier
+        .padding(padding)
+        .padding(top = 16.dp)) {
         CategoryNavigationRail(
             categories = categories,
             selectedIndex = selectedIndex,
