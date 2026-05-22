@@ -58,15 +58,16 @@ import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.domain.model.product.ProductList
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.home.widgets.ProductCard
-import com.example.price_tag.core.navigation.NavigationItem
 import com.example.utilites.ResourceState
 
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class,
+       ExperimentalMaterial3Api::class)
 @Composable
 fun ProductView(
     navController: NavController = rememberNavController(),
     subCategoryId: Long?,
+    subCategoryName: String? = "",
     paddingValues: PaddingValues,
     productViewModel: ProductViewModel,
     selectedCategoryViewModel: SelectedCategoryViewModel,
@@ -88,10 +89,8 @@ fun ProductView(
         snapshotFlow {
             lazyGridState.canScrollForward
         }.collect { canScrollForward ->
-            Log.e(
-                "ProductView",
-                "canScrollForward: $canScrollForward page: $currentPage lastPage: $isLastPage isLoadingMore: $isLoadingMore"
-            )
+            Log.e("ProductView",
+                  "canScrollForward: $canScrollForward page: $currentPage lastPage: $isLastPage isLoadingMore: $isLoadingMore")
             if (!canScrollForward && !isLoadingMore && !isLastPage) {
                 if (productSearchValue.isEmpty()) {
                     subCategoryId?.let {
@@ -106,7 +105,7 @@ fun ProductView(
                         subCategoryId = subCategoryId!!,
                         page = productViewModel.currentPage.intValue,
                         limit = 5,
-                        name = productSearchValue
+                        name = productSearchValue,
                     )
                 }
             }
@@ -114,31 +113,25 @@ fun ProductView(
     }
 
 
-    Scaffold(
-        modifier = Modifier
-            .padding(horizontal = 16.dp),
-        topBar = {
-            TopAppBar(title = {
-                Text(
-                    text = "Products",
-                    fontSize = 22.sp,
-                    fontWeight = FontWeight.W800,
-                )
-            }, navigationIcon = {
-                IconButton(onClick = { navController.popBackStack() }) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Back"
-                    )
-                }
-            })
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize()
-        ) {
+    Scaffold(modifier = Modifier.padding(horizontal = 16.dp),
+             topBar = {
+                 TopAppBar(title = {
+                     Text(
+                         text = "Products",
+                         fontSize = 22.sp,
+                         fontWeight = FontWeight.W800,
+                     )
+                 },
+                           navigationIcon = {
+                               IconButton(onClick = { navController.popBackStack() }) {
+                                   Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                        contentDescription = "Back")
+                               }
+                           })
+             }) { innerPadding ->
+        Column(modifier = Modifier
+            .padding(innerPadding)
+            .fillMaxSize()) {
             Row {
                 OutlinedTextField(
                     value = productSearchValue,
@@ -149,22 +142,16 @@ fun ProductView(
                         .height(56.dp)
                         .weight(6f),
                     singleLine = true,
-                    keyboardOptions = KeyboardOptions.Default.copy(
-                        imeAction = ImeAction.Search
-                    ),
-                    keyboardActions = KeyboardActions(
-                        onSearch = {
-                            focusManager.clearFocus()
-                            if (!isLoadingMore) {
-                                productViewModel.getAllSubCategorySearchProductsData(
-                                    subCategoryId = subCategoryId!!,
-                                    page = 1,
-                                    limit = 5,
-                                    name = productSearchValue
-                                )
-                            }
+                    keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = {
+                        focusManager.clearFocus()
+                        if (!isLoadingMore) {
+                            productViewModel.getAllSubCategorySearchProductsData(subCategoryId = subCategoryId!!,
+                                                                                 page = 1,
+                                                                                 limit = 5,
+                                                                                 name = productSearchValue)
                         }
-                    ),
+                    }),
                     shape = RoundedCornerShape(12.dp),
                     placeholder = { Text(text = "Search") },
                     trailingIcon = {
@@ -172,22 +159,16 @@ fun ProductView(
                             onClick = {
                                 focusManager.clearFocus()
                                 if (!isLoadingMore) {
-                                    productViewModel.getAllSubCategorySearchProductsData(
-                                        subCategoryId = subCategoryId!!,
-                                        page = 1,
-                                        limit = 5,
-                                        name = productSearchValue
-                                    )
+                                    productViewModel.getAllSubCategorySearchProductsData(subCategoryId = subCategoryId!!,
+                                                                                         page = 1,
+                                                                                         limit = 5,
+                                                                                         name = productSearchValue)
                                 }
                             },
                             modifier = Modifier
                                 .height(56.dp)
-                                .clip(
-                                    RoundedCornerShape(
-                                        topEnd = 12.dp,
-                                        bottomEnd = 12.dp
-                                    )
-                                ),
+                                .clip(RoundedCornerShape(topEnd = 12.dp,
+                                                         bottomEnd = 12.dp)),
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Search,
@@ -222,19 +203,15 @@ fun ProductView(
 
             when (getAllSubCategoryProducts) {
                 is ResourceState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .padding(paddingValues)
-                        )
+                    Box(modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(modifier = Modifier.padding(paddingValues))
                     }
                 }
 
                 is ResourceState.Error -> {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
+                    Box(contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()) {
                         Text(
                             text = "Error: ${(getAllSubCategoryProducts as ResourceState.Error<ProductList>).error}",
                             color = Color.Red,
@@ -246,53 +223,43 @@ fun ProductView(
 
                 is ResourceState.Success -> {
                     if (productsList.isNotEmpty()) {
-                        LazyVerticalGrid(
-                            state = lazyGridState,
-                            columns = GridCells.Fixed(2),
-                            verticalArrangement = Arrangement.spacedBy(12.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.White)
-                        ) {
+                        LazyVerticalGrid(state = lazyGridState,
+                                         columns = GridCells.Fixed(2),
+                                         verticalArrangement = Arrangement.spacedBy(12.dp),
+                                         horizontalArrangement = Arrangement.spacedBy(12.dp),
+                                         modifier = Modifier
+                                             .fillMaxSize()
+                                             .background(Color.White)) {
                             itemsIndexed(items = productsList) { index, product ->
-                                ProductCard(
-                                    index = index,
-                                    product = product,
-                                    categoryName = categoryName,
-                                    onClick = {
-                                        productViewModel.onProductClick(product.id)
-                                    }
-                                )
+                                ProductCard(index = index,
+                                            product = product,
+                                            categoryName = categoryName,
+                                            onClick = {
+                                                productViewModel.onProductClick(product.id)
+                                            })
                             }
 
                             item {
-                                Spacer(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(20.dp)
-                                )
+                                Spacer(modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(20.dp))
                             }
 
                             // Show loading indicator at the bottom
                             item(span = { GridItemSpan(maxLineSpan) }) {
                                 if (isLoadingMore) {
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(bottom = 16.dp),
-                                        contentAlignment = Alignment.Center
-                                    ) {
+                                    Box(modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(bottom = 16.dp),
+                                        contentAlignment = Alignment.Center) {
                                         CircularProgressIndicator()
                                     }
                                 }
                             }
                         }
                     } else {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
+                        Box(modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center) {
                             Text(
                                 text = "No Products Found",
                                 color = Color.Black,

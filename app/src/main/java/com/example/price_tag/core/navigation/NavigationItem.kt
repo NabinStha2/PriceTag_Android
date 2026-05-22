@@ -50,7 +50,10 @@ sealed interface NavigationItem {
      * @param subCategoryId Optional filter; null means show all products.
      */
     @Serializable
-    data class ProductView(val subCategoryId: Long? = null) : NavigationItem
+    data class ProductView(
+        val subCategoryId: Long? = null,
+        val subCategoryName: String? = null,
+    ) : NavigationItem
 
     /**
      * @param productId The ID of the product to display.

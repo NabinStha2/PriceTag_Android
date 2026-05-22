@@ -41,8 +41,11 @@ fun CategoryView(
             categoryViewModel.onIntent(CategoryContract.Intent.GetSubCategoriesWithSelectedCategory(category = category,
                                                                                                     index = index))
         },
-        onSubCategoryClick = { id ->
-            categoryViewModel.onIntent(CategoryContract.Intent.OnSubCategoryClick(id))
+        onSubCategoryClick = { id, name ->
+            categoryViewModel.onIntent(CategoryContract.Intent.OnSubCategoryClick(
+                id,
+                name,
+            ))
         },
         onRefresh = {
             categoryViewModel.onIntent(CategoryContract.Intent.RefreshCategories)
@@ -58,7 +61,7 @@ private fun CategoryView(
     uiState: CategoryContract.State,
     padding: PaddingValues,
     onCategorySelected: (Int, Category) -> Unit,
-    onSubCategoryClick: (Long) -> Unit,
+    onSubCategoryClick: (Long, String) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
 ) {
@@ -116,7 +119,7 @@ private fun CategoriesSuccessState(
     selectedIndex: Int,
     padding: PaddingValues,
     onCategorySelected: (Int, Category) -> Unit,
-    onSubCategoryClick: (Long) -> Unit,
+    onSubCategoryClick: (Long, String) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
 ) {
@@ -200,7 +203,7 @@ fun CategoryViewPreview() {
         CategoryView(uiState = state,
                      padding = PaddingValues(0.dp),
                      onCategorySelected = { _, _ -> },
-                     onSubCategoryClick = {},
+                     onSubCategoryClick = { _, _ -> },
                      onRefresh = {},
                      onRetry = {})
     }

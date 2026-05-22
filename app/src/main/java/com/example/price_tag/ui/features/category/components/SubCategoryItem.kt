@@ -29,11 +29,16 @@ import com.example.price_tag.domain.model.category.SubCategory
 @Composable
 fun SubCategoryItem(
     subCategory: SubCategory,
-    onClick: (Long) -> Unit,
+    onClick: (Long, String) -> Unit,
 ) {
     Box(modifier = Modifier
         .padding(horizontal = 8.dp)
-        .clickable { onClick(subCategory.id) }) {
+        .clickable {
+            onClick(
+                subCategory.id,
+                subCategory.name,
+            )
+        }) {
         Column { // Load image from URL using Coil
             Box(
                 modifier = Modifier

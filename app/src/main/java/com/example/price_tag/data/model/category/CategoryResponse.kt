@@ -4,7 +4,8 @@ data class CategoryResponse(
     val message: String?,
     val data: List<CategoryData>?,
     val success: Boolean?,
-    val status: Int?, //    val meta: Object?,
+    val status: Int?,
+    //    val meta: Object?,
 )
 
 data class CategoryData(

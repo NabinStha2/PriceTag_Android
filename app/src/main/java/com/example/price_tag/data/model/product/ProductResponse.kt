@@ -1,9 +1,10 @@
 package com.example.price_tag.data.model.product
 
 data class ProductResponse (
-    val message: String? = null,
-    val data: ProductData? = null,
-    val success: Boolean? = null
+    val message: String?,
+    val data: ProductData?,
+    val success: Boolean?,
+    val status: Int?,
 )
 
 data class ProductData (

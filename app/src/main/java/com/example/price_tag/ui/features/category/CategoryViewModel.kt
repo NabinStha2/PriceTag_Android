@@ -61,7 +61,10 @@ class CategoryViewModel @Inject constructor(
             }
 
             is CategoryContract.Intent.OnSubCategoryClick -> {
-                onSubCategoryClick(intent.subCategoryId)
+                onSubCategoryClick(
+                    intent.subCategoryId,
+                    intent.subCategoryName,
+                )
             }
 
             is CategoryContract.Intent.RetryLastOperation -> retryLastOperation()
@@ -135,9 +138,15 @@ class CategoryViewModel @Inject constructor(
         }
     }
 
-    private fun onSubCategoryClick(subCategoryId: Long) {
+    private fun onSubCategoryClick(
+        subCategoryId: Long,
+        subCategoryName: String,
+    ) {
         viewModelScope.launch { //            _effect.send(CategoryContract.Effect.NavigateToProducts(subCategoryId))
-            navigationCoordinator.navigate(NavigationItem.ProductView(subCategoryId = subCategoryId))
+            navigationCoordinator.navigate(NavigationItem.ProductView(
+                subCategoryId = subCategoryId,
+                subCategoryName = subCategoryName,
+            ))
         }
     }
 }

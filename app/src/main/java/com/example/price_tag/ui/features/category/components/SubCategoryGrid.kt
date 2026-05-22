@@ -59,7 +59,7 @@ fun SubCategoryGrid(
     subCategoriesState: ResourceState<List<SubCategory>>,
     selectedCategoryName: String?,
     modifier: Modifier = Modifier,
-    onSubCategoryClick: (Long) -> Unit,
+    onSubCategoryClick: (Long, String) -> Unit,
     onRefresh: () -> Unit = {},
     onRetry: () -> Unit = {},
 ) {

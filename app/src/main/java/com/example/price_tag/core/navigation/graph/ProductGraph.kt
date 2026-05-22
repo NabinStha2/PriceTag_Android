@@ -16,7 +16,10 @@ import com.example.price_tag.ui.features.product.ProductViewModel
 
 fun NavGraphBuilder.productGraph(navController: NavController) {
     navigation<NavigationItem.ProductGraph>(
-        startDestination = NavigationItem.ProductView(null),
+        startDestination = NavigationItem.ProductView(
+            null,
+            null,
+        ),
     ) {
         animatedComposable<NavigationItem.ProductView> { backStackEntry ->
             val productViewModel: ProductViewModel =
@@ -32,6 +35,7 @@ fun NavGraphBuilder.productGraph(navController: NavController) {
                 productViewModel = productViewModel,
                 selectedCategoryViewModel = selectedCategoryViewModel, //                subCategoryId = backStackEntry.arguments?.getLong("subCategoryId"),
                 subCategoryId = args.subCategoryId,
+                subCategoryName = args.subCategoryName,
             )
 
         }
