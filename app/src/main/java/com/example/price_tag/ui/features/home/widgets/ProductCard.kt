@@ -116,7 +116,7 @@ fun ProductCard(
 
                 Row {
                     Text(
-                        text = product.price.toString(),
+                        text = product.basePrice.toString(),
                         fontSize = 14.sp,
                         fontWeight = FontWeight.SemiBold,
                         color = Color.Red,
@@ -124,7 +124,7 @@ fun ProductCard(
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
-                        text = product.discountedPrice?.toString() ?: product.price.toString(),
+                        text = product.discountedPrice.toString(),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.W600,
                     )

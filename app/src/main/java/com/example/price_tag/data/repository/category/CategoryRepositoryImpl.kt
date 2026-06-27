@@ -8,8 +8,6 @@ import com.example.price_tag.domain.model.category.Category
 import com.example.price_tag.domain.model.category.SubCategory
 import com.example.price_tag.domain.repository.category.CategoryRepository
 import com.example.utilites.ResourceState
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,13 +16,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.retryWhen
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class CategoryRepositoryImpl @Inject constructor(
     private val categoryDataSource: CategoryDataSource,
-    private val moshi: Moshi,
+    private val json: Json,
 ) : CategoryRepository {
     // Shared State Implementation
     private val _selectedCategoryName = MutableStateFlow<String?>(null)
@@ -34,8 +33,8 @@ class CategoryRepositoryImpl @Inject constructor(
         _selectedCategoryName.value = name
     }
 
-    private val jsonErrorAdapter: JsonAdapter<CommonErrorResponse> =
-        moshi.adapter(CommonErrorResponse::class.java)
+    //    private val jsonErrorAdapter: JsonAdapter<CommonErrorResponse> =
+    //        moshi.adapter(CommonErrorResponse::class.java)
 
     // Cache management
     private var categoriesCache: List<Category>? = null
@@ -101,8 +100,7 @@ class CategoryRepositoryImpl @Inject constructor(
                 emit(ResourceState.Success(categoriesCache ?: emptyList()))
                 return@flow
             }
-
-            emit(ResourceState.Loading())
+            emit(ResourceState.Loading)
             val response = categoryDataSource.getAllCategories()
             if (response.isSuccessful && response.body() != null) {
                 val categories =
@@ -113,9 +111,8 @@ class CategoryRepositoryImpl @Inject constructor(
             } else {
                 val errorBody = response.errorBody()
                     ?.string()
-                val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
-                emit(ResourceState.Error(commonErrorResponse?.message
-                                         ?: "Failed to fetch categories"))
+                val message = parseError(errorBody) ?: "Failed to fetch categories"
+                emit(ResourceState.Error(message))
             }
         }.retryWhen { cause, attempt ->
             if (attempt < MAX_RETRY_ATTEMPTS && cause.isRetryable()) {
@@ -139,7 +136,7 @@ class CategoryRepositoryImpl @Inject constructor(
                 }
             }
 
-            emit(ResourceState.Loading())
+            emit(ResourceState.Loading)
             val response = categoryDataSource.getSubCategoriesWithSelectedCategory(categoryId)
             if (response.isSuccessful && response.body() != null) {
                 val subCategories = response.body()!!.data?.results?.map { it.toDomain() }
@@ -150,9 +147,8 @@ class CategoryRepositoryImpl @Inject constructor(
             } else {
                 val errorBody = response.errorBody()
                     ?.string()
-                val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
-                emit(ResourceState.Error(commonErrorResponse?.message
-                                         ?: "Failed to fetch sub-categories"))
+                val message = parseError(errorBody) ?: "Failed to fetch sub-categories"
+                emit(ResourceState.Error(message))
             }
         }.retryWhen { cause, attempt ->
             if (attempt < MAX_RETRY_ATTEMPTS && cause.isRetryable()) {
@@ -165,4 +161,12 @@ class CategoryRepositoryImpl @Inject constructor(
             .catch { e ->
                 emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
             }
+
+    private fun parseError(errorBody: String?): String? = errorBody?.let {
+        try {
+            json.decodeFromString<CommonErrorResponse>(it).message
+        } catch (_: Exception) {
+            null
+        }
+    }
 }

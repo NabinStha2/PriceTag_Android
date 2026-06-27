@@ -1,6 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application)
-//    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.android.application) //    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
@@ -28,10 +27,8 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"),
+                          "proguard-rules.pro")
         }
     }
 
@@ -104,6 +101,7 @@ dependencies {
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging)
     implementation(libs.moshi)
+    implementation(libs.retrofit.kotlinx.serialization)
 
     // ---------------- Coroutines ----------------
     implementation(libs.coroutines.core)
@@ -115,11 +113,12 @@ dependencies {
     androidTestImplementation(libs.espresso)
 
     // ---------------- Navigation 3 ---------------
-//    implementation(libs.androidx.navigation3.ui)
-//    implementation(libs.androidx.navigation3.runtime)
-//    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
-//    implementation(libs.androidx.material3.adaptive.navigation3)
+    //    implementation(libs.androidx.navigation3.ui)
+    //    implementation(libs.androidx.navigation3.runtime)
+    //    implementation(libs.androidx.lifecycle.viewmodel.navigation3)
+    //    implementation(libs.androidx.material3.adaptive.navigation3)
     implementation(libs.kotlinx.serialization.core)
+    implementation(libs.kotlinx.serialization.json)
 
     // ---------------- DataStore -------------------
     implementation(libs.datastore.preferences)

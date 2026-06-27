@@ -39,7 +39,7 @@ class SignUpViewModel @Inject constructor(
 
 
     private val _signupData: MutableStateFlow<ResourceState<User>> =
-        MutableStateFlow(ResourceState.Initial())
+        MutableStateFlow(ResourceState.Initial)
     val signUpData: StateFlow<ResourceState<User>> = _signupData
 
     fun register(signUpRequest: SignUpRequest) {
@@ -59,7 +59,7 @@ class SignUpViewModel @Inject constructor(
     }
 
     fun resetSignUpResponse() {
-        _signupData.value = ResourceState.Initial()
+        _signupData.value = ResourceState.Initial
     }
 
     companion object {

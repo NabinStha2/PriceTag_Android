@@ -62,12 +62,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.price_tag.R
-import com.example.price_tag.data.model.product_details.ProductDetailsResponse
-import com.example.price_tag.ui.components.CartIconWithBadge
-import com.example.price_tag.ui.components.SelectedCategoryViewModel
-import com.example.price_tag.ui.components.StarRating
-import com.example.price_tag.ui.features.home.CarouselItem
-import com.example.price_tag.ui.features.home.widgets.CarouselSlider
 import com.example.price_tag.core.theme.NeutralColor100
 import com.example.price_tag.core.theme.NeutralColor200
 import com.example.price_tag.core.theme.NeutralColor800
@@ -76,9 +70,16 @@ import com.example.price_tag.core.theme.PrimaryColor
 import com.example.price_tag.core.theme.PrimaryColor50
 import com.example.price_tag.core.theme.PrimaryColor600
 import com.example.price_tag.core.theme.WarningColor
+import com.example.price_tag.data.model.product_details.ProductDetailsResponse
+import com.example.price_tag.ui.components.CartIconWithBadge
+import com.example.price_tag.ui.components.SelectedCategoryViewModel
+import com.example.price_tag.ui.components.StarRating
+import com.example.price_tag.ui.features.home.CarouselItem
+import com.example.price_tag.ui.features.home.widgets.CarouselSlider
 import com.example.utilites.ResourceState
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class,
+       ExperimentalFoundationApi::class)
 @Composable
 fun ProductDetailsView(
     navController: NavController,
@@ -92,7 +93,10 @@ fun ProductDetailsView(
         CarouselItem(R.drawable.carousel2),
         CarouselItem(R.drawable.carousel3),
     )
-    val productSelectSize = listOf("S", "M", "L", "XL")
+    val productSelectSize = listOf("S",
+                                   "M",
+                                   "L",
+                                   "XL")
     val pagerState = rememberPagerState(pageCount = { images.size })
     val coroutineScope = rememberCoroutineScope()
     var productSize by rememberSaveable {
@@ -100,7 +104,8 @@ fun ProductDetailsView(
     }
 
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-    val tabs = listOf("Description", "Reviews")
+    val tabs = listOf("Description",
+                      "Reviews")
 
     val getSingleProductDetailsData =
         productDetailsViewModel.getSingleProductDetailsData.collectAsStateWithLifecycle()
@@ -111,106 +116,87 @@ fun ProductDetailsView(
         }
     }
 
-    Scaffold(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .systemBarsPadding(),
-        topBar = {
-            CenterAlignedTopAppBar(
-                navigationIcon = {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier
-                            .border(
-                                shape = CircleShape.copy(CornerSize(percent = 100)),
-                                border = BorderStroke(width = 1.dp, color = NeutralColor200)
-                            )
-                            .size(35.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
-                        )
-                    }
-                },
-                title = {
-                    Text(
-                        text = "Product Details",
-                        fontFamily = Poppins,
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.SemiBold,
-                    )
-                },
-                actions = {
-                    CartIconWithBadge()
-                }
-            )
-        },
+    Scaffold(modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .systemBarsPadding(),
+             topBar = {
+                 CenterAlignedTopAppBar(navigationIcon = {
+                     IconButton(onClick = { navController.popBackStack() },
+                                modifier = Modifier
+                                    .border(shape = CircleShape.copy(CornerSize(percent = 100)),
+                                            border = BorderStroke(width = 1.dp,
+                                                                  color = NeutralColor200))
+                                    .size(35.dp)) {
+                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                              contentDescription = "Back")
+                     }
+                 },
+                                        title = {
+                                            Text(
+                                                text = "Product Details",
+                                                fontFamily = Poppins,
+                                                fontSize = 22.sp,
+                                                fontWeight = FontWeight.SemiBold,
+                                            )
+                                        },
+                                        actions = {
+                                            CartIconWithBadge()
+                                        })
+             },
 
-        bottomBar = {
-            BottomAppBar(
-                modifier = Modifier
-                    .height(60.dp)
-                    .fillMaxWidth(),
-                containerColor = Color.Transparent,
-            ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    Button(
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonColors(
-                            containerColor = PrimaryColor,
-                            contentColor = Color.White,
-                            disabledContentColor = NeutralColor800,
-                            disabledContainerColor = NeutralColor100,
-                        )
-                    ) {
-                        Text(text = "Buy Now")
-                    }
-                    Button(
-                        onClick = { /*TODO*/ },
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonColors(
-                            containerColor = PrimaryColor,
-                            contentColor = Color.White,
-                            disabledContentColor = NeutralColor800,
-                            disabledContainerColor = NeutralColor100,
-                        )
-                    ) {
-                        Text(text = "Add to Cart")
-                    }
+             bottomBar = {
+                 BottomAppBar(
+                     modifier = Modifier
+                         .height(60.dp)
+                         .fillMaxWidth(),
+                     containerColor = Color.Transparent,
+                 ) {
+                     Row(modifier = Modifier.fillMaxWidth(),
+                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                         Button(onClick = { /*TODO*/ },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonColors(
+                                    containerColor = PrimaryColor,
+                                    contentColor = Color.White,
+                                    disabledContentColor = NeutralColor800,
+                                    disabledContainerColor = NeutralColor100,
+                                )) {
+                             Text(text = "Buy Now")
+                         }
+                         Button(onClick = { /*TODO*/ },
+                                modifier = Modifier.weight(1f),
+                                colors = ButtonColors(
+                                    containerColor = PrimaryColor,
+                                    contentColor = Color.White,
+                                    disabledContentColor = NeutralColor800,
+                                    disabledContainerColor = NeutralColor100,
+                                )) {
+                             Text(text = "Add to Cart")
+                         }
 
-                }
-            }
-        }
+                     }
+                 }
+             }
 
     ) { innerPadding ->
 
         when (getSingleProductDetailsData.value) {
             is ResourceState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .padding(paddingValues)
-                    )
+                Box(modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator(modifier = Modifier.padding(paddingValues))
                 }
             }
 
             is ResourceState.Success -> {
                 val productDetails =
-                    (getSingleProductDetailsData.value as ResourceState.Success<ProductDetailsResponse>).data
-                        .data?.results
+                    (getSingleProductDetailsData.value as ResourceState.Success<ProductDetailsResponse>).data.data?.results
 
                 if (productDetails != null) {
-                    LazyColumn(
-                        modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize(),
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
+                    LazyColumn(modifier = Modifier
+                        .padding(innerPadding)
+                        .fillMaxSize(),
+                               verticalArrangement = Arrangement.spacedBy(8.dp)) {
                         item {
                             CarouselSlider(
                                 images = images,
@@ -224,54 +210,41 @@ fun ProductDetailsView(
                             Row {
                                 StarRating(rating = 4)
                                 Spacer(modifier = Modifier.width(10.dp))
-                                Text(text = "20 Reviews", fontSize = 12.sp)
+                                Text(text = "20 Reviews",
+                                     fontSize = 12.sp)
                             }
                         }
 
                         item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth(),
+                            Row(modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = productDetails.name ?: "",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.SemiBold
-                                )
+                                verticalAlignment = Alignment.CenterVertically) {
+                                Text(text = productDetails.name ?: "",
+                                     fontSize = 18.sp,
+                                     fontWeight = FontWeight.SemiBold)
                                 Spacer(modifier = Modifier.width(10.dp))
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.End
-                                ) {
-                                    IconButton(
-                                        onClick = { /*TODO*/ },
-                                        modifier = Modifier
-                                            .clip(shape = CircleShape)
-                                            .size(36.dp)
-                                            .background(color = PrimaryColor50)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Outlined.FavoriteBorder,
-                                            contentDescription = "Favorite",
-                                            tint = PrimaryColor600
-                                        )
+                                Row(verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.End) {
+                                    IconButton(onClick = { /*TODO*/ },
+                                               modifier = Modifier
+                                                   .clip(shape = CircleShape)
+                                                   .size(36.dp)
+                                                   .background(color = PrimaryColor50)) {
+                                        Icon(imageVector = Icons.Outlined.FavoriteBorder,
+                                             contentDescription = "Favorite",
+                                             tint = PrimaryColor600)
                                     }
 
                                     Spacer(modifier = Modifier.width(10.dp))
 
-                                    IconButton(
-                                        onClick = { /*TODO*/ }, modifier = Modifier
-                                            .clip(shape = CircleShape)
-                                            .size(36.dp)
-                                            .background(color = PrimaryColor50)
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Outlined.Share,
-                                            contentDescription = "Share",
-                                            tint = PrimaryColor600
-                                        )
+                                    IconButton(onClick = { /*TODO*/ },
+                                               modifier = Modifier
+                                                   .clip(shape = CircleShape)
+                                                   .size(36.dp)
+                                                   .background(color = PrimaryColor50)) {
+                                        Icon(imageVector = Icons.Outlined.Share,
+                                             contentDescription = "Share",
+                                             tint = PrimaryColor600)
                                     }
 
                                 }
@@ -279,11 +252,9 @@ fun ProductDetailsView(
                         }
 
                         item {
-                            Text(
-                                text = productDetails.description ?: "Short Description",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
+                            Text(text = productDetails.description ?: "Short Description",
+                                 fontSize = 18.sp,
+                                 fontWeight = FontWeight.SemiBold)
                         }
 
                         item {
@@ -293,18 +264,18 @@ fun ProductDetailsView(
 
 
                         item {
-                            Text(text = "Select Color", fontSize = 18.sp)
+                            Text(text = "Select Color",
+                                 fontSize = 18.sp)
 
                             Spacer(modifier = Modifier.height(10.dp))
 
                             Row {
-                                productDetails.variants?.forEachIndexed { _, productVariant ->
-                                    Box(
-                                        modifier = Modifier
-                                            .size(30.dp)
-                                            .clip(CircleShape)
-                                            .background(WarningColor)
-                                    )
+                                val variants = productDetails.variants ?: emptyList()
+                                for (productVariant in variants) {
+                                    Box(modifier = Modifier
+                                        .size(30.dp)
+                                        .clip(CircleShape)
+                                        .background(WarningColor))
                                     Spacer(modifier = Modifier.width(10.dp))
                                 }
                             }
@@ -312,13 +283,16 @@ fun ProductDetailsView(
                         }
 
                         item {
-                            Text(text = "Select Size", fontSize = 18.sp)
+                            Text(text = "Select Size",
+                                 fontSize = 18.sp)
 
                             Spacer(modifier = Modifier.height(10.dp))
 
                             Row {
-                                productDetails.variants?.forEachIndexed { _, productVariant ->
-                                    productVariant.size?.forEachIndexed { _, s ->
+                                val variants = productDetails.variants ?: emptyList()
+                                for (productVariant in variants) {
+                                    val sizes = productVariant.size ?: emptyList()
+                                    for (s in sizes) {
                                         Box(
                                             modifier = Modifier
                                                 .clip(shape = RoundedCornerShape(percent = 15))
@@ -326,21 +300,17 @@ fun ProductDetailsView(
                                                     productSize = s
                                                 }
                                                 .background(color = if (productSize == s) PrimaryColor else Color.Transparent)
-                                                .border(
-                                                    shape = RoundedCornerShape(percent = 15),
-                                                    width = 1.dp,
-                                                    color = NeutralColor100
-                                                )
+                                                .border(shape = RoundedCornerShape(percent = 15),
+                                                        width = 1.dp,
+                                                        color = NeutralColor100)
                                                 .size(30.dp),
                                             contentAlignment = Alignment.Center,
 
                                             ) {
-                                            Text(
-                                                text = s,
-                                                fontSize = 14.sp,
-                                                fontWeight = FontWeight.SemiBold,
-                                                color = if (productSize == s) Color.White else NeutralColor800
-                                            )
+                                            Text(text = s,
+                                                 fontSize = 14.sp,
+                                                 fontWeight = FontWeight.SemiBold,
+                                                 color = if (productSize == s) Color.White else NeutralColor800)
                                         }
                                     }
                                     Spacer(modifier = Modifier.width(10.dp))
@@ -354,27 +324,22 @@ fun ProductDetailsView(
 
                         item { Spacer(modifier = Modifier.height(10.dp)) }
 
-                        stickyHeader {
-                            // Tab Row at the top
+                        stickyHeader { // Tab Row at the top
                             TabRow(
                                 selectedTabIndex = selectedTabIndex,
-                                modifier = Modifier
-                                    .fillMaxWidth(),
+                                modifier = Modifier.fillMaxWidth(),
                                 indicator = {},
                                 divider = {},
                             ) {
                                 tabs.forEachIndexed { index, title ->
-                                    Tab(
-                                        selected = selectedTabIndex == index,
+                                    Tab(selected = selectedTabIndex == index,
                                         onClick = { selectedTabIndex = index },
                                         text = { Text(title) },
                                         selectedContentColor = Color.White,
                                         unselectedContentColor = NeutralColor800,
-                                        modifier = Modifier
-//                                .size(40.dp)
+                                        modifier = Modifier //                                .size(40.dp)
                                             .clip(shape = RoundedCornerShape(8.dp))
-                                            .background(color = if (selectedTabIndex == index) PrimaryColor else Color.Transparent)
-                                    )
+                                            .background(color = if (selectedTabIndex == index) PrimaryColor else Color.Transparent))
                                 }
                             }
                         }
@@ -388,10 +353,8 @@ fun ProductDetailsView(
 
                     }
                 } else {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
+                    Box(modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center) {
                         Text(
                             text = "No Products Found",
                             color = Color.Black,
@@ -403,14 +366,13 @@ fun ProductDetailsView(
             }
 
             is ResourceState.Error -> {
-                val error =
-                    (getSingleProductDetailsData.value as ResourceState.Error<ProductDetailsResponse>).error
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding)
-                ) {
-                    Text(text = error.toString())
+                val error = (getSingleProductDetailsData.value as ResourceState.Error).error
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding)) {
+                    Text(text = error,
+                         color = Color.Red,
+                         fontSize = 18.sp)
                 }
             }
 
@@ -422,10 +384,8 @@ fun ProductDetailsView(
 
 @Composable
 fun DescriptionContent() {
-    Text(
-        text = "This is the product description. It explains the product details, features, and specifications.",
-        modifier = Modifier.padding(8.dp)
-    )
+    Text(text = "This is the product description. It explains the product details, features, and specifications.",
+         modifier = Modifier.padding(8.dp))
 }
 
 @Composable
@@ -434,18 +394,14 @@ fun ReviewContent() {
         Box(modifier = Modifier.padding(bottom = 8.dp)) {
             Column(
                 modifier = Modifier
-                    .border(
-                        width = 1.dp,
-                        color = NeutralColor200,
-                        shape = RoundedCornerShape(8.dp)
-                    )
+                    .border(width = 1.dp,
+                            color = NeutralColor200,
+                            shape = RoundedCornerShape(8.dp))
                     .padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalAlignment = Alignment.CenterVertically) {
                     Image(
                         painter = painterResource(id = R.drawable.carousel1),
                         contentDescription = "",

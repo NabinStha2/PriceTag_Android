@@ -1,47 +1,49 @@
 package com.example.price_tag.data.model.product
 
-data class ProductResponse (
-    val message: String?,
-    val data: ProductData?,
-    val success: Boolean?,
-    val status: Int?,
-)
+import com.example.price_tag.core.common.CommonPaginationModel
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-data class ProductData (
-    val results: List<ProductResult>? = null,
-    val pagination: Pagination? = null
-)
+@Serializable
+data class ProductResponse(val message: String? = null,
+                           val data: List<ProductData>? = null,
+                           val success: Boolean? = null,
+                           val status: Long? = null,
+                           val pagination: CommonPaginationModel? = null)
 
-data class Pagination (
-    val totalItems: Long? = null,
-    val totalPages: Long? = null,
-    val hasPrevious: Boolean? = null,
-    val currentPage: Long? = null,
-    val hasNext: Boolean? = null,
-    val itemsPerPage: Long? = null
-)
+@Serializable
+data class ProductData(val id: Long? = null,
+                       val name: String? = null,
+                       val slug: String? = null,
+                       val description: String? = null,
+                       val shortDescription: String? = null,
 
-data class ProductResult (
-    val id: Long? = null,
-    val name: String? = null,
-    val description: String? = null,
-    val images: List<Image?>? = null,
-    val variants: List<ProductVariant>? = null,
-    val createdAt: String? = null,
-    val updatedAt: String? = null
-)
+                       @SerialName("primaryImageUrl") val primaryImageURL: String? = null,
 
-data class Image (
-    val id: Long,
-    val url: String,
-    val publicId: String
-)
+                       val basePrice: Long? = null,
+                       val discountedPrice: Double? = null,
+                       val brand: String? = null,
+                       val totalRating: Double? = null,
+                       val totalReview: Long? = null,
+                       val createdAt: String? = null,
+                       val updatedAt: String? = null,
+                       val category: Category? = null,
+                       val subCategory: SubCategory? = null)
 
-data class ProductVariant (
-    val id: Long? = null,
-    val size: List<String>? = null,
-    val color: String? = null,
-    val quantity: Long? = null,
-    val actualPrice: Long? = null,
-    val discountedPrice: Long? = null
-)
+@Serializable
+data class Category(val id: Long? = null,
+                    val name: String? = null,
+
+                    @SerialName("imageUrl") val imageURL: String? = null,
+
+                    val createdAt: String? = null,
+                    val updatedAt: String? = null)
+
+@Serializable
+data class SubCategory(val id: Long? = null,
+                       val subCategoryName: String? = null,
+                       val createdAt: String? = null,
+                       val updatedAt: String? = null,
+
+                       @SerialName("categoryId") val categoryID: Long? = null)
+

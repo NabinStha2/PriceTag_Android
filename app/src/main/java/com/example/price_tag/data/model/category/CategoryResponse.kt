@@ -1,13 +1,16 @@
 package com.example.price_tag.data.model.category
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CategoryResponse(
     val message: String?,
     val data: List<CategoryData>?,
     val success: Boolean?,
-    val status: Int?,
-    //    val meta: Object?,
+    val status: Int?, //    val meta: Object?,
 )
 
+@Serializable
 data class CategoryData(
     val id: Long?,
     val name: String?,

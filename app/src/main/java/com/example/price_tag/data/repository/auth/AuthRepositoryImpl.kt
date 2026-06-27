@@ -10,21 +10,19 @@ import com.example.price_tag.data.remote.datasource.auth.AuthDataSource
 import com.example.price_tag.domain.model.auth.User
 import com.example.price_tag.domain.repository.auth.AuthRepository
 import com.example.utilites.ResourceState
-import com.squareup.moshi.JsonAdapter
-import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDataSource,
-                                             private val moshi: Moshi) : AuthRepository {
+                                             private val json: Json) : AuthRepository {
 
-    private val jsonErrorAdapter: JsonAdapter<CommonErrorResponse> =
-        moshi.adapter(CommonErrorResponse::class.java)
+    //    private val jsonErrorAdapter: JsonAdapter<CommonErrorResponse> =
+    //        moshi.adapter(CommonErrorResponse::class.java)
 
     override suspend fun login(loginRequest: LoginRequest): Flow<ResourceState<User>> = flow {
-        emit(ResourceState.Loading())
         val response = authDataSource.login(loginRequest)
         if (response.isSuccessful && response.body() != null) {
             Log.d("AuthRepositoryImpl",
@@ -34,11 +32,8 @@ class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDat
         } else {
             val errorBody = response.errorBody()
                 ?.string()
-            val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
-
-            Log.e("AuthRepositoryImpl",
-                  "login: ${commonErrorResponse?.message}")
-            emit(ResourceState.Error(commonErrorResponse?.message ?: "Login failed"))
+            val message = parseError(errorBody) ?: "Login failed"
+            emit(ResourceState.Error(message))
         }
     }.catch { e ->
         Log.e("AuthRepositoryImpl",
@@ -47,7 +42,7 @@ class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDat
     }
 
     override suspend fun register(signUpRequest: SignUpRequest): Flow<ResourceState<User>> = flow {
-        emit(ResourceState.Loading())
+        emit(ResourceState.Loading)
         val response = authDataSource.register(signUpRequest)
         if (response.isSuccessful && response.body() != null) {
             emit(ResourceState.Success(response.body()!!
@@ -55,15 +50,15 @@ class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDat
         } else {
             val errorBody = response.errorBody()
                 ?.string()
-            val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
-            emit(ResourceState.Error(commonErrorResponse?.message ?: "Registration failed"))
+            val message = parseError(errorBody) ?: "Registration failed"
+            emit(ResourceState.Error(message))
         }
     }.catch { e ->
         emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
     }
 
     override suspend fun verifyOtp(otpRequest: OtpRequest): Flow<ResourceState<User>> = flow {
-        emit(ResourceState.Loading())
+        emit(ResourceState.Loading)
         val response = authDataSource.verifyOtp(otpRequest)
         if (response.isSuccessful && response.body() != null) {
             emit(ResourceState.Success(response.body()!!
@@ -71,10 +66,18 @@ class AuthRepositoryImpl @Inject constructor(private val authDataSource: AuthDat
         } else {
             val errorBody = response.errorBody()
                 ?.string()
-            val commonErrorResponse = errorBody?.let { jsonErrorAdapter.fromJson(it) }
-            emit(ResourceState.Error(commonErrorResponse?.message ?: "OTP verification failed"))
+            val message = parseError(errorBody) ?: "OTP verification failed"
+            emit(ResourceState.Error(message))
         }
     }.catch { e ->
         emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
+    }
+
+    private fun parseError(errorBody: String?): String? = errorBody?.let {
+        try {
+            json.decodeFromString<CommonErrorResponse>(it).message
+        } catch (_: Exception) {
+            null
+        }
     }
 }

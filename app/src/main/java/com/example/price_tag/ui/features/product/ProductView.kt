@@ -213,7 +213,7 @@ fun ProductView(
                     Box(contentAlignment = Alignment.Center,
                         modifier = Modifier.fillMaxSize()) {
                         Text(
-                            text = "Error: ${(getAllSubCategoryProducts as ResourceState.Error<ProductList>).error}",
+                            text = "Error: ${(getAllSubCategoryProducts as ResourceState.Error).error}",
                             color = Color.Red,
                             textAlign = TextAlign.Center,
                             fontSize = 18.sp,

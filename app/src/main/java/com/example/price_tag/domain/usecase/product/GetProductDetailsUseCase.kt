@@ -1,5 +1,6 @@
 package com.example.price_tag.domain.usecase.product
 
+import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import com.example.price_tag.domain.model.product.Product
 import com.example.price_tag.domain.repository.product.ProductRepository
 import com.example.utilites.ResourceState
@@ -9,7 +10,7 @@ import javax.inject.Inject
 class GetProductDetailsUseCase @Inject constructor(
     private val repository: ProductRepository
 ) {
-    suspend operator fun invoke(productId: Long): Flow<ResourceState<Product>> {
+    suspend operator fun invoke(productId: Long): Flow<ResourceState<ProductDetailsResponse>> {
         return repository.getSingleProductDetails(productId)
     }
 }

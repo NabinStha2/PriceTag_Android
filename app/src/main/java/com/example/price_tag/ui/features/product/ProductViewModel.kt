@@ -39,12 +39,12 @@ class ProductViewModel @Inject constructor(
     val selectedCategoryName: StateFlow<String?> = getSelectedCategoryUseCase()
 
     private val _getAllSubCategoryProductsData =
-        MutableStateFlow<ResourceState<ProductList>>(ResourceState.Initial())
+        MutableStateFlow<ResourceState<ProductList>>(ResourceState.Initial)
     val getAllSubCategoryProductsData: StateFlow<ResourceState<ProductList>> =
         _getAllSubCategoryProductsData.asStateFlow()
 
     private val _getAllSubCategorySearchProductsData =
-        MutableStateFlow<ResourceState<ProductList>>(ResourceState.Initial())
+        MutableStateFlow<ResourceState<ProductList>>(ResourceState.Initial)
     val getAllSubCategorySearchProductsData: StateFlow<ResourceState<ProductList>> =
         _getAllSubCategorySearchProductsData.asStateFlow()
 

@@ -29,7 +29,7 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase,
     var emailError = mutableStateOf<String?>(null)
 
     private val _loginData: MutableStateFlow<ResourceState<User>> =
-        MutableStateFlow(ResourceState.Initial())
+        MutableStateFlow(ResourceState.Initial)
     val loginData: StateFlow<ResourceState<User>> = _loginData
 
     fun login(loginRequest: LoginRequest) {
@@ -55,7 +55,7 @@ class LoginViewModel @Inject constructor(private val loginUseCase: LoginUseCase,
     }
 
     fun resetLoginResponse() {
-        _loginData.value = ResourceState.Initial()
+        _loginData.value = ResourceState.Initial
     }
 
     companion object {

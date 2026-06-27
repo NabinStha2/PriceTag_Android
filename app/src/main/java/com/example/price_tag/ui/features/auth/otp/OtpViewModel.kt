@@ -25,7 +25,7 @@ class OtpViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _verifyOtpData: MutableStateFlow<ResourceState<User>> =
-        MutableStateFlow(ResourceState.Initial())
+        MutableStateFlow(ResourceState.Initial)
     val verifyOtpData: StateFlow<ResourceState<User>> = _verifyOtpData
 
     fun verifyOtp(otpRequest: OtpRequest) {
@@ -45,7 +45,7 @@ class OtpViewModel @Inject constructor(
     }
 
     fun resetVerifyOtpResponse() {
-        _verifyOtpData.value = ResourceState.Initial()
+        _verifyOtpData.value = ResourceState.Initial
     }
 
     companion object {

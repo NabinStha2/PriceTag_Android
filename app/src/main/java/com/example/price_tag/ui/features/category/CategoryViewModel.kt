@@ -28,9 +28,9 @@ class CategoryViewModel @Inject constructor(
     private val setSelectedCategoryUseCase: SetSelectedCategoryUseCase,
     private val getSelectedCategoryUseCase: GetSelectedCategoryUseCase,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow(CategoryContract.State())
     val uiState = _uiState.asStateFlow()
+
 
     private val _effect = Channel<CategoryContract.Effect>()
     val effect = _effect.receiveAsFlow()
@@ -68,6 +68,7 @@ class CategoryViewModel @Inject constructor(
             }
 
             is CategoryContract.Intent.RetryLastOperation -> retryLastOperation()
+
         }
     }
 
