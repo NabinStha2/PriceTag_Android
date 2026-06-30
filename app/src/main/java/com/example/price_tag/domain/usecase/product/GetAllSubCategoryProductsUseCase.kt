@@ -9,10 +9,10 @@ import javax.inject.Inject
 class GetAllSubCategoryProductsUseCase @Inject constructor(private val repository: ProductRepository) {
     suspend operator fun invoke(
         subCategoryId: Long,
-        page: Int? = null,
-        limit: Int? = null,
-        sortBy: String? = null,
-        order: String? = null,
+        page: Int? = 1,
+        limit: Int? = 5,
+        sortBy: String? = "created_at",
+        order: String? = "asc",
     ): Flow<ResourceState<Products>> {
         return repository.getAllSubCategoryProducts(
             subCategoryId,

@@ -1,5 +1,6 @@
 package com.example.price_tag.data.repository.product
 
+import android.util.Log
 import com.example.price_tag.core.datastore.DataStoreManager
 import com.example.price_tag.data.mapper.product.toDomain
 import com.example.price_tag.data.model.common.CommonErrorResponse
@@ -29,11 +30,13 @@ class ProductRepositoryImpl @Inject constructor(
         order: String?,
     ): Flow<ResourceState<Products>> = flow {
         emit(ResourceState.Loading)
-        val response = productDataSource.getAllSubCategoryProducts(subCategoryId,
-                                                                   page,
-                                                                   limit,
-                                                                   sortBy,
-                                                                   order)
+        val response = productDataSource.getAllSubCategoryProducts(
+            subCategoryId,
+            page,
+            limit,
+            sortBy,
+            order,
+        )
         if (response.isSuccessful && response.body() != null) {
             val responseBody: Products = response.body()!!
                 .toDomain()
@@ -51,6 +54,7 @@ class ProductRepositoryImpl @Inject constructor(
             emit(ResourceState.Error(message))
         }
     }.catch { e ->
+        Log.i("oeedaelnfljaen", e.message.toString())
         emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
     }
 

@@ -66,22 +66,18 @@ import com.example.utilites.ResourceState
 fun ProductView(
     navController: NavController = rememberNavController(),
     subCategoryId: Long?,
-    subCategoryName: String? = "",
     paddingValues: PaddingValues,
     productViewModel: ProductViewModel,
     selectedCategoryViewModel: SelectedCategoryViewModel,
 ) {
     val focusManager = LocalFocusManager.current
 
+    val productState: ProductContract.ProductState by productViewModel.productState.collectAsStateWithLifecycle()
+
     val categoryName by selectedCategoryViewModel.selectedCategoryName.collectAsStateWithLifecycle()
     var productSearchValue by rememberSaveable {
         mutableStateOf("")
     }
-    val getAllSubCategoryProducts by productViewModel.getAllSubCategoryProductsData.collectAsStateWithLifecycle()
-    val productsList = productViewModel.productsList
-    val isLoadingMore by productViewModel.isLoadingMore
-    val isLastPage by productViewModel.isLastPage
-    val currentPage by productViewModel.currentPage
     val lazyGridState = rememberLazyGridState()
 
     LaunchedEffect(lazyGridState) {
@@ -89,22 +85,27 @@ fun ProductView(
             lazyGridState.canScrollForward
         }.collect { canScrollForward ->
             Log.e("ProductView",
-                  "canScrollForward: $canScrollForward page: $currentPage lastPage: $isLastPage isLoadingMore: $isLoadingMore")
-            if (!canScrollForward && !isLoadingMore && !isLastPage) {
+                  "canScrollForward: $canScrollForward page: ${productState.currentPage} lastPage: ${productState.isLastPage} isLoadingMore: ${productState.isLoadingMore}")
+            if (!canScrollForward && !productState.isLoadingMore && !productState.isLastPage) {
                 if (productSearchValue.isEmpty()) {
                     subCategoryId?.let {
-                        productViewModel.getAllSubCategoryProducts(
-                            subCategoryId = it,
-                            page = productViewModel.currentPage.intValue,
-                            limit = 5,
+                        productViewModel.onIntent(
+                            ProductContract.ProductIntent.GetAllSubCategoryProducts(
+                                subCategoryId = it,
+                                page = productState.currentPage + 1,
+                                limit = 10,
+                            ),
                         )
+
                     }
                 } else {
-                    productViewModel.getAllSubCategorySearchProductsData(
-                        subCategoryId = subCategoryId!!,
-                        page = productViewModel.currentPage.intValue,
-                        limit = 5,
-                        name = productSearchValue,
+                    productViewModel.onIntent(
+                        ProductContract.ProductIntent.GetAllSubCategorySearchProducts(
+                            subCategoryId = subCategoryId!!,
+                            searchQuery = productSearchValue,
+                            page = productState.currentPage + 1,
+                            limit = 10,
+                        ),
                     )
                 }
             }
@@ -144,11 +145,15 @@ fun ProductView(
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = {
                         focusManager.clearFocus()
-                        if (!isLoadingMore) {
-                            productViewModel.getAllSubCategorySearchProductsData(subCategoryId = subCategoryId!!,
-                                                                                 page = 1,
-                                                                                 limit = 5,
-                                                                                 name = productSearchValue)
+                        if (!productState.isLoadingMore) {
+                            productViewModel.onIntent(
+                                ProductContract.ProductIntent.GetAllSubCategorySearchProducts(
+                                    subCategoryId = subCategoryId!!,
+                                    searchQuery = productSearchValue,
+                                    page = 1,
+                                    limit = 10,
+                                ),
+                            )
                         }
                     }),
                     shape = RoundedCornerShape(12.dp),
@@ -157,11 +162,15 @@ fun ProductView(
                         IconButton(
                             onClick = {
                                 focusManager.clearFocus()
-                                if (!isLoadingMore) {
-                                    productViewModel.getAllSubCategorySearchProductsData(subCategoryId = subCategoryId!!,
-                                                                                         page = 1,
-                                                                                         limit = 5,
-                                                                                         name = productSearchValue)
+                                if (!productState.isLoadingMore) {
+                                    productViewModel.onIntent(
+                                        ProductContract.ProductIntent.GetAllSubCategorySearchProducts(
+                                            subCategoryId = subCategoryId!!,
+                                            searchQuery = productSearchValue,
+                                            page = 1,
+                                            limit = 10,
+                                        ),
+                                    )
                                 }
                             },
                             modifier = Modifier
@@ -200,7 +209,7 @@ fun ProductView(
                 }
             }
 
-            when (getAllSubCategoryProducts) {
+            when (productState.getAllSubCategoryProductsData) {
                 is ResourceState.Loading -> {
                     Box(modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center) {
@@ -212,7 +221,7 @@ fun ProductView(
                     Box(contentAlignment = Alignment.Center,
                         modifier = Modifier.fillMaxSize()) {
                         Text(
-                            text = "Error: ${(getAllSubCategoryProducts as ResourceState.Error).error}",
+                            text = "Error: ${(productState.getAllSubCategoryProductsData as ResourceState.Error).error}",
                             color = Color.Red,
                             textAlign = TextAlign.Center,
                             fontSize = 18.sp,
@@ -221,7 +230,7 @@ fun ProductView(
                 }
 
                 is ResourceState.Success -> {
-                    if (productsList.isNotEmpty()) {
+                    if (productState.productListData.isNotEmpty()) {
                         LazyVerticalGrid(state = lazyGridState,
                                          columns = GridCells.Fixed(2),
                                          verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -229,13 +238,15 @@ fun ProductView(
                                          modifier = Modifier
                                              .fillMaxSize()
                                              .background(Color.White)) {
-                            itemsIndexed(items = productsList) { index, product ->
-                                ProductCard(index = index,
-                                            product = product,
-                                            categoryName = categoryName,
-                                            onClick = {
-                                                productViewModel.onProductClick(product.id)
-                                            })
+                            itemsIndexed(items = productState.productListData) { index, product ->
+                                ProductCard(
+                                    index = index,
+                                    product = product,
+                                    categoryName = categoryName,
+                                    onClick = {
+                                        productViewModel.onProductClick(product.id)
+                                    },
+                                )
                             }
 
                             item {
@@ -246,7 +257,7 @@ fun ProductView(
 
                             // Show loading indicator at the bottom
                             item(span = { GridItemSpan(maxLineSpan) }) {
-                                if (isLoadingMore) {
+                                if (productState.isLoadingMore) {
                                     Box(modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(bottom = 16.dp),

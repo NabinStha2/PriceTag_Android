@@ -23,7 +23,7 @@ data class ProductDataDto(
     val description: String? = null,
     val shortDescription: String? = null,
     @SerialName("primaryImageUrl") val primaryImageURL: String? = null,
-    val basePrice: Long? = null,
+    val basePrice: Double? = null,
     val discountedPrice: Double? = null,
     val brand: String? = null,
     val totalRating: Double? = null,

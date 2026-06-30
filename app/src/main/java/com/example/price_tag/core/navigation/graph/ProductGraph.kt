@@ -35,7 +35,7 @@ fun NavGraphBuilder.productGraph(navController: NavController) {
                 productViewModel = productViewModel,
                 selectedCategoryViewModel = selectedCategoryViewModel, //                subCategoryId = backStackEntry.arguments?.getLong("subCategoryId"),
                 subCategoryId = args.subCategoryId,
-                subCategoryName = args.subCategoryName,
+//                subCategoryName = args.subCategoryName,
             )
 
         }
