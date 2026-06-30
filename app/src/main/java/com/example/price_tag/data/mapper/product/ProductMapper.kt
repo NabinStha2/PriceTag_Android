@@ -1,22 +1,28 @@
 package com.example.price_tag.data.mapper.product
 
-import com.example.price_tag.data.model.product.ProductData
-import com.example.price_tag.data.model.product.ProductResponse
-import com.example.price_tag.domain.model.product.Product
-import com.example.price_tag.domain.model.product.ProductList
+import com.example.price_tag.data.mapper.common.toDomain
+import com.example.price_tag.data.model.product.ProductDataDto
+import com.example.price_tag.data.model.product.ProductResponseDto
+import com.example.price_tag.domain.model.common.PaginationModel
+import com.example.price_tag.domain.model.product.ProductData
+import com.example.price_tag.domain.model.product.Products
 
-fun ProductResponse.toDomain(): ProductList {
-    return ProductList(
+fun ProductResponseDto.toDomain(): Products {
+    return Products(
         products = data?.map { it.toDomain() } ?: emptyList(),
-        currentPage = pagination?.currentPage?.toInt() ?: 1,
-        totalPages = pagination?.totalPages?.toInt() ?: 1,
-        totalItems = pagination?.totalItems ?: 0,
-        hasNext = pagination?.hasNext ?: false,
+        pagination = pagination?.toDomain() ?: PaginationModel(
+            currentPage = 0,
+            pageSize = 0,
+            totalItems = 0L,
+            totalPages = 0,
+            hasNext = false,
+            hasPrevious = false,
+        ),
     )
 }
 
-fun ProductData.toDomain(): Product {
-    return Product(
+fun ProductDataDto.toDomain(): ProductData {
+    return ProductData(
         id = id ?: 0L,
         name = name.orEmpty(),
         slug = slug.orEmpty(),

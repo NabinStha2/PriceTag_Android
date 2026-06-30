@@ -30,47 +30,38 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import com.example.price_tag.domain.model.product.Product
+import com.example.price_tag.domain.model.product.ProductData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductCard(
     index: Int? = 0,
-    product: Product,
+    product: ProductData,
     width: Dp = 160.dp,
     categoryName: String? = "",
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier
             .width(width = width)
             .clip(shape = RoundedCornerShape(12.dp)),
         onClick = onClick,
-        colors = CardDefaults.cardColors(
-            Color.White
-        ),
+        colors = CardDefaults.cardColors(Color.White),
     ) {
-        Column(
-            modifier = Modifier
-                .padding(8.dp)
-        ) {
+        Column(modifier = Modifier.padding(8.dp)) {
             if (product.imageUrl != null) {
                 val painter = rememberAsyncImagePainter(model = product.imageUrl)
                 val state = painter.state
-                Box(
-                    modifier = Modifier
-                        .height(120.dp)
-                        .clip(RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Image(
-                        painter = painter,
-                        contentDescription = "Product Image",
-                        contentScale = ContentScale.Crop,
-                        modifier = Modifier
-                            .height(120.dp)
-                            .fillMaxWidth()
-                    )
+                Box(modifier = Modifier
+                    .height(120.dp)
+                    .clip(RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center) {
+                    Image(painter = painter,
+                          contentDescription = "Product Image",
+                          contentScale = ContentScale.Crop,
+                          modifier = Modifier
+                              .height(120.dp)
+                              .fillMaxWidth())
 
                     when (state) {
                         is AsyncImagePainter.State.Loading -> {
@@ -78,7 +69,8 @@ fun ProductCard(
                         }
 
                         is AsyncImagePainter.State.Error -> {
-                            Text("Image not found", fontSize = 12.sp)
+                            Text("Image not found",
+                                 fontSize = 12.sp)
                         }
 
                         else -> Unit

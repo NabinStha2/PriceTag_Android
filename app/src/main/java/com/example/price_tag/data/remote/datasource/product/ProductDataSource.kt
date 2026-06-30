@@ -1,6 +1,6 @@
 package com.example.price_tag.data.remote.datasource.product
 
-import com.example.price_tag.data.model.product.ProductResponse
+import com.example.price_tag.data.model.product.ProductResponseDto
 import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import retrofit2.Response
 
@@ -12,7 +12,7 @@ interface ProductDataSource {
         limit: Int?,
         sortBy: String?,
         order: String?,
-    ): Response<ProductResponse>
+    ): Response<ProductResponseDto>
 
     suspend fun getAllSubCategorySearchProducts(
         subCategoryId: Long,
@@ -21,7 +21,7 @@ interface ProductDataSource {
         sortBy: String?,
         order: String?,
         name: String?
-    ): Response<ProductResponse>
+    ): Response<ProductResponseDto>
 
     suspend fun getSingleProductDetails(productId: Long): Response<ProductDetailsResponse>
 

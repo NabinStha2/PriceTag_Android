@@ -1,9 +1,9 @@
-package com.example.price_tag.core.common
+package com.example.price_tag.data.model.common
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CommonPaginationModel(
+data class CommonPaginationResponseDto(
     val currentPage: Long? = null,
     val pageSize: Long? = null,
     val totalItems: Long? = null,

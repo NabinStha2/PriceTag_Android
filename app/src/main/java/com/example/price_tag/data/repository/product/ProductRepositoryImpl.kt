@@ -2,11 +2,11 @@ package com.example.price_tag.data.repository.product
 
 import com.example.price_tag.core.datastore.DataStoreManager
 import com.example.price_tag.data.mapper.product.toDomain
-import com.example.price_tag.data.model.CommonErrorResponse
-import com.example.price_tag.data.model.product.ProductResponse
+import com.example.price_tag.data.model.common.CommonErrorResponse
+import com.example.price_tag.data.model.product.ProductResponseDto
 import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import com.example.price_tag.data.remote.datasource.product.ProductDataSource
-import com.example.price_tag.domain.model.product.ProductList
+import com.example.price_tag.domain.model.product.Products
 import com.example.price_tag.domain.repository.product.ProductRepository
 import com.example.utilites.ResourceState
 import kotlinx.coroutines.flow.Flow
@@ -27,7 +27,7 @@ class ProductRepositoryImpl @Inject constructor(
         limit: Int?,
         sortBy: String?,
         order: String?,
-    ): Flow<ResourceState<ProductList>> = flow {
+    ): Flow<ResourceState<Products>> = flow {
         emit(ResourceState.Loading)
         val response = productDataSource.getAllSubCategoryProducts(subCategoryId,
                                                                    page,
@@ -35,9 +35,9 @@ class ProductRepositoryImpl @Inject constructor(
                                                                    sortBy,
                                                                    order)
         if (response.isSuccessful && response.body() != null) {
-            val responseBody: ProductResponse = response.body()!!
-            val productList: ProductList = responseBody.toDomain()
-            emit(ResourceState.Success(productList))
+            val responseBody: Products = response.body()!!
+                .toDomain()
+            emit(ResourceState.Success(responseBody))
         } else { // If the token is invalid/expired, clear stored auth tokens to trigger logout flow
             if (response.code() == 401) {
                 try {
@@ -61,7 +61,7 @@ class ProductRepositoryImpl @Inject constructor(
         sortBy: String?,
         order: String?,
         name: String?,
-    ): Flow<ResourceState<ProductList>> = flow {
+    ): Flow<ResourceState<Products>> = flow {
         emit(ResourceState.Loading)
         val response = productDataSource.getAllSubCategorySearchProducts(subCategoryId,
                                                                          page,
@@ -70,8 +70,8 @@ class ProductRepositoryImpl @Inject constructor(
                                                                          order,
                                                                          name)
         if (response.isSuccessful && response.body() != null) {
-            val responseBody: ProductResponse = response.body()!!
-            val productList: ProductList = responseBody.toDomain()
+            val responseBody: ProductResponseDto = response.body()!!
+            val productList: Products = responseBody.toDomain()
             emit(ResourceState.Success(productList))
         } else { // If token expired/unauthorized, clear auth tokens
             if (response.code() == 401) {

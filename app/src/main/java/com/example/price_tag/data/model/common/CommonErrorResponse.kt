@@ -1,4 +1,4 @@
-package com.example.price_tag.data.model
+package com.example.price_tag.data.model.common
 
 import kotlinx.serialization.Serializable
 

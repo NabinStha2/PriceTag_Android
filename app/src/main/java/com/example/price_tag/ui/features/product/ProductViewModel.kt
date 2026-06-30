@@ -5,13 +5,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.price_tag.domain.model.product.Product
-import com.example.price_tag.domain.model.product.ProductList
+import com.example.price_tag.core.navigation.NavigationCoordinator
+import com.example.price_tag.domain.model.product.ProductData
+import com.example.price_tag.domain.model.product.Products
 import com.example.price_tag.domain.usecase.category.GetSelectedCategoryUseCase
 import com.example.price_tag.domain.usecase.product.GetAllSubCategoryProductsUseCase
 import com.example.price_tag.domain.usecase.product.GetAllSubCategorySearchProductsUseCase
-import com.example.price_tag.core.navigation.NavigationCoordinator
-import com.example.price_tag.core.navigation.NavigationItem
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -23,15 +22,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductViewModel @Inject constructor(
-    private val getAllSubCategoryProductsUseCase: GetAllSubCategoryProductsUseCase,
-    private val getAllSubCategorySearchProductsUseCase: GetAllSubCategorySearchProductsUseCase,
-    private val getSelectedCategoryUseCase: GetSelectedCategoryUseCase,
-    private val navigationCoordinator: NavigationCoordinator
-) :
+class ProductViewModel @Inject constructor(private val getAllSubCategoryProductsUseCase: GetAllSubCategoryProductsUseCase,
+                                           private val getAllSubCategorySearchProductsUseCase: GetAllSubCategorySearchProductsUseCase,
+                                           private val getSelectedCategoryUseCase: GetSelectedCategoryUseCase,
+                                           private val navigationCoordinator: NavigationCoordinator) :
     ViewModel() {
 
-    val productsList = mutableStateListOf<Product>()
+    val productsList = mutableStateListOf<ProductData>()
     val isLoadingMore = mutableStateOf(false)
     var isLastPage = mutableStateOf(false)
     var currentPage = mutableIntStateOf(1)
@@ -39,54 +36,55 @@ class ProductViewModel @Inject constructor(
     val selectedCategoryName: StateFlow<String?> = getSelectedCategoryUseCase()
 
     private val _getAllSubCategoryProductsData =
-        MutableStateFlow<ResourceState<ProductList>>(ResourceState.Initial)
-    val getAllSubCategoryProductsData: StateFlow<ResourceState<ProductList>> =
+        MutableStateFlow<ResourceState<Products>>(ResourceState.Initial)
+    val getAllSubCategoryProductsData: StateFlow<ResourceState<Products>> =
         _getAllSubCategoryProductsData.asStateFlow()
 
     private val _getAllSubCategorySearchProductsData =
-        MutableStateFlow<ResourceState<ProductList>>(ResourceState.Initial)
-    val getAllSubCategorySearchProductsData: StateFlow<ResourceState<ProductList>> =
+        MutableStateFlow<ResourceState<Products>>(ResourceState.Initial)
+    val getAllSubCategorySearchProductsData: StateFlow<ResourceState<Products>> =
         _getAllSubCategorySearchProductsData.asStateFlow()
 
 
-    fun onProductClick(productId: Long) {
-//        navigationCoordinator.navigateTo(NavigationItem.ProductDetailsView(productId))
+    fun onProductClick(productId: Long) { //        navigationCoordinator.navigateTo(NavigationItem.ProductDetailsView(productId))
     }
 
-    fun getAllSubCategoryProducts(
-        subCategoryId: Long,
-        page: Int? = 1,
-        limit: Int? = 6,
-        sortBy: String? = "createdAt",
-        order: String? = "asc"
-    ) {
+    fun getAllSubCategoryProducts(subCategoryId: Long,
+                                  page: Int? = 1,
+                                  limit: Int? = 6,
+                                  sortBy: String? = "createdAt",
+                                  order: String? = "asc") {
         viewModelScope.launch(Dispatchers.IO) {
             if (isLoadingMore.value) return@launch
 
             isLoadingMore.value = true
             isLastPage.value = false
 
-            getAllSubCategoryProductsUseCase(subCategoryId, page, limit, sortBy, order)
-                .collectLatest { response ->
-                    when (response) {
-                        is ResourceState.Success -> {
-                            if (page == 1) {
-                                productsList.clear()
-                            }
-                            _getAllSubCategoryProductsData.value = response
-                            productsList.addAll(response.data.products)
-                            currentPage.intValue = response.data.currentPage.toInt() + 1
-                            isLastPage.value = currentPage.intValue > response.data.totalPages
+            getAllSubCategoryProductsUseCase(subCategoryId,
+                                             page,
+                                             limit,
+                                             sortBy,
+                                             order).collectLatest { response ->
+                when (response) {
+                    is ResourceState.Success -> {
+                        if (page == 1) {
+                            productsList.clear()
                         }
-
-                        is ResourceState.Error -> {
-                            _getAllSubCategoryProductsData.value = response
-                        }
-
-                        else -> {}
+                        _getAllSubCategoryProductsData.value = response
+                        productsList.addAll(response.data.products)
+                        currentPage.intValue = response.data.pagination.currentPage + 1
+                        isLastPage.value =
+                            currentPage.intValue > response.data.pagination.totalPages
                     }
-                    isLoadingMore.value = false
+
+                    is ResourceState.Error -> {
+                        _getAllSubCategoryProductsData.value = response
+                    }
+
+                    else -> {}
                 }
+                isLoadingMore.value = false
+            }
         }
     }
 
@@ -104,14 +102,12 @@ class ProductViewModel @Inject constructor(
             isLoadingMore.value = true
             isLastPage.value = false
 
-            getAllSubCategorySearchProductsUseCase(
-                subCategoryId,
-                page,
-                limit,
-                sortBy,
-                order,
-                name
-            ).collectLatest { response ->
+            getAllSubCategorySearchProductsUseCase(subCategoryId,
+                                                   page,
+                                                   limit,
+                                                   sortBy,
+                                                   order,
+                                                   name).collectLatest { response ->
                 when (response) {
                     is ResourceState.Success -> {
                         if (page == 1) {
@@ -119,8 +115,9 @@ class ProductViewModel @Inject constructor(
                         }
                         _getAllSubCategorySearchProductsData.value = response
                         productsList.addAll(response.data.products)
-                        currentPage.intValue = response.data.currentPage.toInt() + 1
-                        isLastPage.value = currentPage.intValue > response.data.totalPages
+                        currentPage.intValue = response.data.pagination.currentPage + 1
+                        isLastPage.value =
+                            currentPage.intValue > response.data.pagination.totalPages
                     }
 
                     is ResourceState.Error -> {

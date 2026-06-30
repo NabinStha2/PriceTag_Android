@@ -1,7 +1,7 @@
 package com.example.price_tag.domain.repository.product
 
 import com.example.price_tag.data.model.product_details.ProductDetailsResponse
-import com.example.price_tag.domain.model.product.ProductList
+import com.example.price_tag.domain.model.product.Products
 import com.example.utilites.ResourceState
 import kotlinx.coroutines.flow.Flow
 
@@ -11,8 +11,8 @@ interface ProductRepository {
         page: Int?,
         limit: Int?,
         sortBy: String?,
-        order: String?
-    ): Flow<ResourceState<ProductList>>
+        order: String?,
+    ): Flow<ResourceState<Products>>
 
     suspend fun getAllSubCategorySearchProducts(
         subCategoryId: Long,
@@ -20,8 +20,8 @@ interface ProductRepository {
         limit: Int?,
         sortBy: String?,
         order: String?,
-        name: String?
-    ): Flow<ResourceState<ProductList>>
+        name: String?,
+    ): Flow<ResourceState<Products>>
 
     suspend fun getSingleProductDetails(productId: Long): Flow<ResourceState<ProductDetailsResponse>>
 }

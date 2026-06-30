@@ -22,11 +22,13 @@ class CategoryContract {
         data object RetryLastOperation : Intent
     }
 
-    data class State(val categories: ResourceState<List<Category>> = ResourceState.Initial,
-                     val subCategories: ResourceState<List<SubCategory>> = ResourceState.Initial,
-                     val selectedIndex: Int = 0,
-                     val selectedCategoryId: Long? = null,
-                     val selectedCategoryName: String? = null)
+    data class State(
+        val categories: ResourceState<List<Category>> = ResourceState.Initial,
+        val subCategories: ResourceState<List<SubCategory>> = ResourceState.Initial,
+        val selectedIndex: Int = 0,
+        val selectedCategoryId: Long? = null,
+        val selectedCategoryName: String? = null,
+    )
 
     sealed interface Effect {
         data class NavigateToProducts(val subCategoryId: Long) : Effect

@@ -1,6 +1,6 @@
 package com.example.price_tag.domain.usecase.product
 
-import com.example.price_tag.domain.model.product.ProductList
+import com.example.price_tag.domain.model.product.Products
 import com.example.price_tag.domain.repository.product.ProductRepository
 import com.example.utilites.ResourceState
 import kotlinx.coroutines.flow.Flow
@@ -16,7 +16,7 @@ class GetAllSubCategorySearchProductsUseCase @Inject constructor(
         sortBy: String? = null,
         order: String? = null,
         name: String? = null
-    ): Flow<ResourceState<ProductList>> {
+    ): Flow<ResourceState<Products>> {
         return repository.getAllSubCategorySearchProducts(subCategoryId, page, limit, sortBy, order, name)
     }
 }

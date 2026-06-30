@@ -1,7 +1,7 @@
 package com.example.price_tag.data.remote.datasource.product
 
+import com.example.price_tag.data.model.product.ProductResponseDto
 import com.example.price_tag.data.remote.api.ApiService
-import com.example.price_tag.data.model.product.ProductResponse
 import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import retrofit2.Response
 import javax.inject.Inject
@@ -15,7 +15,7 @@ class ProductDataSourceImpl @Inject constructor(private val apiService: ApiServi
         limit: Int?,
         sortBy: String?,
         order: String?,
-    ): Response<ProductResponse> {
+    ): Response<ProductResponseDto> {
         return apiService.getAllSubCategoryProducts(
             subCategoryId,
             page,
@@ -32,7 +32,7 @@ class ProductDataSourceImpl @Inject constructor(private val apiService: ApiServi
         sortBy: String?,
         order: String?,
         name: String?
-    ): Response<ProductResponse> {
+    ): Response<ProductResponseDto> {
         return apiService.getAllSubCategorySearchProducts(
             subCategoryId,
             page,

@@ -6,7 +6,7 @@ import com.example.price_tag.data.model.auth.OtpRequest
 import com.example.price_tag.data.model.auth.SignUpRequest
 import com.example.price_tag.data.model.category.CategoryResponse
 import com.example.price_tag.data.model.category.SubCategoryResponse
-import com.example.price_tag.data.model.product.ProductResponse
+import com.example.price_tag.data.model.product.ProductResponseDto
 import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -39,7 +39,7 @@ interface ApiService {
         @Query("limit") limit: Int? = 10,
         @Query("sortBy") sortBy: String? = "name",
         @Query("order") order: String? = "asc",
-    ): Response<ProductResponse>
+    ): Response<ProductResponseDto>
 
 
     @GET(value = "product/subcategory/{subcategory_id}/search")
@@ -50,7 +50,7 @@ interface ApiService {
         @Query("sortBy") sortBy: String? = "name",
         @Query("order") order: String? = "asc",
         @Query("name") name: String? = "",
-    ): Response<ProductResponse>
+    ): Response<ProductResponseDto>
 
     @GET(value = "product/{product_id}")
     suspend fun getSingleProductDetails(

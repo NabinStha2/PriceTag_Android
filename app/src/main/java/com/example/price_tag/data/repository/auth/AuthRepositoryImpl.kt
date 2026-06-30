@@ -2,7 +2,7 @@ package com.example.price_tag.data.repository.auth
 
 import android.util.Log
 import com.example.price_tag.data.mapper.auth.toDomain
-import com.example.price_tag.data.model.CommonErrorResponse
+import com.example.price_tag.data.model.common.CommonErrorResponse
 import com.example.price_tag.data.model.auth.LoginRequest
 import com.example.price_tag.data.model.auth.OtpRequest
 import com.example.price_tag.data.model.auth.SignUpRequest

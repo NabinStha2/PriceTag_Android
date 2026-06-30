@@ -2,7 +2,7 @@ package com.example.price_tag.data.repository.category
 
 import android.util.Log
 import com.example.price_tag.data.mapper.category.toDomain
-import com.example.price_tag.data.model.CommonErrorResponse
+import com.example.price_tag.data.model.common.CommonErrorResponse
 import com.example.price_tag.data.remote.datasource.category.CategoryDataSource
 import com.example.price_tag.domain.model.category.Category
 import com.example.price_tag.domain.model.category.SubCategory
