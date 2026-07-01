@@ -1,6 +1,5 @@
 package com.example.price_tag.ui.features.product
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.domain.usecase.category.GetSelectedCategoryUseCase
@@ -80,7 +79,7 @@ class ProductViewModel @Inject constructor(
         order: String? = "asc",
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (_productState.value.isLoadingMore || _productState.value.isLastPage) return@launch
+            if (_productState.value.isLoadingMore) return@launch
 
             _productState.update {
                 it.copy(
@@ -137,7 +136,7 @@ class ProductViewModel @Inject constructor(
         name: String? = "",
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (_productState.value.isLoadingMore || _productState.value.isLastPage) return@launch
+            if (_productState.value.isLoadingMore) return@launch
             _productState.update {
                 it.copy(
                     isLoadingMore = true,
@@ -145,12 +144,14 @@ class ProductViewModel @Inject constructor(
                 )
             }
 
-            getAllSubCategorySearchProductsUseCase(subCategoryId,
-                                                   page,
-                                                   limit,
-                                                   sortBy,
-                                                   order,
-                                                   name).collectLatest { response ->
+            getAllSubCategorySearchProductsUseCase(
+                subCategoryId,
+                page,
+                limit,
+                sortBy,
+                order,
+                name,
+            ).collectLatest { response ->
                 when (response) {
                     is ResourceState.Success -> {
                         if (page == 1) {

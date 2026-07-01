@@ -94,6 +94,7 @@ fun ProductView(
                                 subCategoryId = it,
                                 page = productState.currentPage + 1,
                                 limit = 10,
+                                order = "desc",
                             ),
                         )
 
@@ -145,6 +146,8 @@ fun ProductView(
                     keyboardOptions = KeyboardOptions.Default.copy(imeAction = ImeAction.Search),
                     keyboardActions = KeyboardActions(onSearch = {
                         focusManager.clearFocus()
+                        Log.i("ProductView",
+                              "onSearch: $productSearchValue and ${productState.isLoadingMore}")
                         if (!productState.isLoadingMore) {
                             productViewModel.onIntent(
                                 ProductContract.ProductIntent.GetAllSubCategorySearchProducts(

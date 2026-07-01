@@ -52,16 +52,20 @@ fun ProductCard(
             if (product.imageUrl != null) {
                 val painter = rememberAsyncImagePainter(model = product.imageUrl)
                 val state = painter.state
-                Box(modifier = Modifier
-                    .height(120.dp)
-                    .clip(RoundedCornerShape(12.dp)),
-                    contentAlignment = Alignment.Center) {
-                    Image(painter = painter,
-                          contentDescription = "Product Image",
-                          contentScale = ContentScale.Crop,
-                          modifier = Modifier
-                              .height(120.dp)
-                              .fillMaxWidth())
+                Box(
+                    modifier = Modifier
+                        .height(120.dp)
+                        .clip(RoundedCornerShape(12.dp)),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Image(
+                        painter = painter,
+                        contentDescription = "Product Image",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .height(120.dp)
+                            .fillMaxWidth(),
+                    )
 
                     when (state) {
                         is AsyncImagePainter.State.Loading -> {
