@@ -18,9 +18,8 @@ import javax.inject.Singleton
 @Singleton
 class NavigationCoordinator @Inject constructor() {
 
-    private val _events = MutableSharedFlow<NavigationEvent>(
-        replay = 0,
-        extraBufferCapacity = 8   // prevents suspension on fast emitters
+    private val _events = MutableSharedFlow<NavigationEvent>(replay = 0,
+                                                             extraBufferCapacity = 8   // prevents suspension on fast emitters
     )
 
     /** UI layer collects this. */

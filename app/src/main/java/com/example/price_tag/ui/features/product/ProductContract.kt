@@ -23,6 +23,8 @@ class ProductContract {
             val sortBy: String? = "createdAt",
             val order: String? = "asc",
         ) : ProductIntent
+
+        data class onProductClicked(val productId: Long) : ProductIntent
     }
 
     data class ProductState(
@@ -33,5 +35,10 @@ class ProductContract {
         val currentPage: Int = 0,
         val isLastPage: Boolean = false,
     )
+
+
+    sealed interface ProductEffect {
+        data class NavigateToProductDetails(val productId: Long) : ProductEffect
+    }
 
 }

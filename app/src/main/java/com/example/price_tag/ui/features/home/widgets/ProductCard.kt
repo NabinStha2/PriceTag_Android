@@ -92,8 +92,8 @@ fun ProductCard(
                 )
             }
 
-
             Spacer(modifier = Modifier.height(8.dp))
+
             Column(modifier = Modifier.padding(horizontal = 8.dp)) {
                 Text(
                     text = product.name,
@@ -126,6 +126,7 @@ fun ProductCard(
                     )
                 }
             }
+
             Spacer(modifier = Modifier.height(2.dp))
         }
     }

@@ -13,6 +13,8 @@ import com.example.price_tag.core.utils.sharedViewModel
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.product.ProductView
 import com.example.price_tag.ui.features.product.ProductViewModel
+import com.example.price_tag.ui.features.productDetails.ProductDetailsView
+import com.example.price_tag.ui.features.productDetails.ProductDetailsViewModel
 
 fun NavGraphBuilder.productGraph(navController: NavController) {
     navigation<NavigationItem.ProductGraph>(
@@ -34,10 +36,25 @@ fun NavGraphBuilder.productGraph(navController: NavController) {
                 paddingValues = PaddingValues(0.dp),
                 productViewModel = productViewModel,
                 selectedCategoryViewModel = selectedCategoryViewModel, //                subCategoryId = backStackEntry.arguments?.getLong("subCategoryId"),
-                subCategoryId = args.subCategoryId,
-//                subCategoryName = args.subCategoryName,
+                subCategoryId = args.subCategoryId, //                subCategoryName = args.subCategoryName,
             )
+        }
 
+        animatedComposable<NavigationItem.ProductDetailsView> { backStackEntry ->
+            val productDetailsViewModel: ProductDetailsViewModel =
+                backStackEntry.sharedViewModel<ProductDetailsViewModel, NavigationItem.ProductGraph>(navController)
+            val selectedCategoryViewModel: SelectedCategoryViewModel =
+                backStackEntry.sharedViewModel<SelectedCategoryViewModel, NavigationItem.MainGraph>(navController)
+
+            val args = backStackEntry.toRoute<NavigationItem.ProductDetailsView>()
+
+            ProductDetailsView(
+                navController = navController,
+                paddingValues = PaddingValues(0.dp),
+                productDetailsViewModel = productDetailsViewModel,
+                productId = args.productId,
+                selectedCategoryViewModel = selectedCategoryViewModel,
+            )
         }
 
     }

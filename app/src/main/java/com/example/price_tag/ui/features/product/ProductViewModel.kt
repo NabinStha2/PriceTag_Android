@@ -2,14 +2,17 @@ package com.example.price_tag.ui.features.product
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.price_tag.domain.usecase.category.GetSelectedCategoryUseCase
+import com.example.price_tag.core.navigation.NavigationCoordinator
 import com.example.price_tag.domain.usecase.product.GetAllSubCategoryProductsUseCase
 import com.example.price_tag.domain.usecase.product.GetAllSubCategorySearchProductsUseCase
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -20,29 +23,17 @@ import javax.inject.Inject
 class ProductViewModel @Inject constructor(
     private val getAllSubCategoryProductsUseCase: GetAllSubCategoryProductsUseCase,
     private val getAllSubCategorySearchProductsUseCase: GetAllSubCategorySearchProductsUseCase,
-    private val getSelectedCategoryUseCase: GetSelectedCategoryUseCase,
+    private val navigationCoordinator: NavigationCoordinator,
 ) : ViewModel() {
 
     private val _productState: MutableStateFlow<ProductContract.ProductState> =
         MutableStateFlow(ProductContract.ProductState())
     val productState: StateFlow<ProductContract.ProductState> = _productState.asStateFlow()
 
-    //    val productsList = mutableStateListOf<ProductData>()
-    //    val isLoadingMore = mutableStateOf(false)
-    //    var isLastPage = mutableStateOf(false)
-    //    var currentPage = mutableIntStateOf(1)
+    private val _effect = MutableSharedFlow<ProductContract.ProductEffect>()
+    val effect = _effect.asSharedFlow()
 
-    //    val selectedCategoryName: StateFlow<String?> = getSelectedCategoryUseCase()
-
-    //    private val _getAllSubCategoryProductsData =
-    //        MutableStateFlow<ResourceState<Products>>(ResourceState.Initial)
-    //    val getAllSubCategoryProductsData: StateFlow<ResourceState<Products>> =
-    //        _getAllSubCategoryProductsData.asStateFlow()
-    //
-    //    private val _getAllSubCategorySearchProductsData =
-    //        MutableStateFlow<ResourceState<Products>>(ResourceState.Initial)
-    //    val getAllSubCategorySearchProductsData: StateFlow<ResourceState<Products>> =
-    //        _getAllSubCategorySearchProductsData.asStateFlow()
+    private var paginationJob: Job? = null
 
 
     fun onIntent(productIntent: ProductContract.ProductIntent) {
@@ -67,6 +58,10 @@ class ProductViewModel @Inject constructor(
                     name = productIntent.searchQuery,
                 )
             }
+
+            is ProductContract.ProductIntent.onProductClicked -> {
+                onProductClick(productIntent.productId)
+            }
         }
     }
 
@@ -78,15 +73,10 @@ class ProductViewModel @Inject constructor(
         sortBy: String? = "createdAt",
         order: String? = "asc",
     ) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (_productState.value.isLoadingMore) return@launch
+        paginationJob?.cancel()
 
-            _productState.update {
-                it.copy(
-                    isLoadingMore = true,
-                    isLastPage = false,
-                )
-            }
+        paginationJob = viewModelScope.launch(Dispatchers.IO) {
+            if (_productState.value.isLoadingMore) return@launch
 
             getAllSubCategoryProductsUseCase(
                 subCategoryId,
@@ -94,36 +84,56 @@ class ProductViewModel @Inject constructor(
                 limit,
                 sortBy,
                 order,
-            ).collectLatest { response ->
-                when (response) {
-                    is ResourceState.Success -> {
-                        if (page == 1) {
-                            _productState.update {
-                                it.copy(productListData = emptyList())
+            ) //                .onStart {
+                //                _productState.update {
+                //                    it.copy(
+                //                        isLoadingMore = true,
+                //                        isLastPage = false,
+                //                    )
+                //                }
+                //            }
+                .collectLatest { response ->
+                    _productState.update { state ->
+                        when (response) {
+                            is ResourceState.Loading -> {
+                                state.copy(
+                                    isLoadingMore = true,
+                                    isLastPage = false,
+                                )
+                            }
+
+                            is ResourceState.Success -> {
+                                val newList = if (page == 1) {
+                                    response.data.products
+                                } else { //                                    buildList {
+                                    //                                        addAll(state.productListData)
+                                    //                                        addAll(response.data.products)
+                                    //                                    }
+                                    state.productListData + response.data.products
+                                }
+                                state.copy(
+                                    isLoadingMore = false,
+                                    getAllSubCategoryProductsData = response,
+                                    productListData = newList.distinctBy { it.id }, // distinct by product id so while pagination there will be no duplicate products in the list
+                                    currentPage = response.data.pagination.currentPage,
+                                    isLastPage = !response.data.pagination.hasNext,
+                                )
+                            }
+
+                            is ResourceState.Error -> {
+                                state.copy(
+                                    isLoadingMore = false,
+                                    getAllSubCategoryProductsData = response,
+                                )
+                            }
+
+                            else -> {
+                                state.copy(isLoadingMore = false)
                             }
                         }
-                        _productState.update {
-                            it.copy(
-                                getAllSubCategoryProductsData = response,
-                                productListData = it.productListData + response.data.products,
-                                currentPage = response.data.pagination.currentPage,
-                                isLastPage = !response.data.pagination.hasNext,
-                            )
-                        }
-                    }
 
-                    is ResourceState.Error -> {
-                        _productState.update {
-                            it.copy(getAllSubCategoryProductsData = response)
-                        }
                     }
-
-                    else -> {}
                 }
-                _productState.update {
-                    it.copy(isLoadingMore = false)
-                }
-            }
         }
     }
 
@@ -137,12 +147,6 @@ class ProductViewModel @Inject constructor(
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             if (_productState.value.isLoadingMore) return@launch
-            _productState.update {
-                it.copy(
-                    isLoadingMore = true,
-                    isLastPage = false,
-                )
-            }
 
             getAllSubCategorySearchProductsUseCase(
                 subCategoryId,
@@ -152,41 +156,51 @@ class ProductViewModel @Inject constructor(
                 order,
                 name,
             ).collectLatest { response ->
-                when (response) {
-                    is ResourceState.Success -> {
-                        if (page == 1) {
-                            _productState.update {
-                                it.copy(productListData = emptyList())
-                            }
+                _productState.update { state ->
+                    when (response) {
+                        is ResourceState.Loading -> {
+                            state.copy(
+                                isLoadingMore = true,
+                                isLastPage = false,
+                            )
                         }
-                        _productState.update {
-                            it.copy(
+
+                        is ResourceState.Success -> {
+                            val newList = if (page == 1) {
+                                response.data.products
+                            } else {
+                                state.productListData + response.data.products
+                            }
+                            state.copy(
+                                isLoadingMore = false,
                                 getAllSubCategorySearchProductsData = response,
-                                productListData = it.productListData + response.data.products,
+                                productListData = newList.distinctBy { it.id },
                                 currentPage = response.data.pagination.currentPage,
                                 isLastPage = !response.data.pagination.hasNext,
                             )
                         }
 
-                    }
+                        is ResourceState.Error -> {
+                            state.copy(
+                                getAllSubCategorySearchProductsData = response,
+                                isLoadingMore = false,
+                            )
+                        }
 
-                    is ResourceState.Error -> {
-                        _productState.update {
-                            it.copy(getAllSubCategorySearchProductsData = response)
-                        } //                        _getAllSubCategorySearchProductsData.value = response
+                        else -> {
+                            state.copy(isLoadingMore = false)
+                        }
                     }
-
-                    else -> {}
-                }
-                _productState.update {
-                    it.copy(isLoadingMore = false)
                 }
             }
 
         }
     }
 
-    fun onProductClick(productId: Long) { //        navigationCoordinator.navigateTo(NavigationItem.ProductDetailsView(productId))
+    private fun onProductClick(productId: Long) {
+        viewModelScope.launch {
+            _effect.emit(ProductContract.ProductEffect.NavigateToProductDetails(productId))
+        }
     }
 
 

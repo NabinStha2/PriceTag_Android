@@ -55,6 +55,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.home.widgets.ProductCard
 import com.example.utilites.ResourceState
@@ -80,7 +81,19 @@ fun ProductView(
     }
     val lazyGridState = rememberLazyGridState()
 
-    LaunchedEffect(lazyGridState) {
+    LaunchedEffect(Unit) {
+        productViewModel.effect.collect { effect ->
+            when (effect) {
+                is ProductContract.ProductEffect.NavigateToProductDetails -> {
+                    navController.navigate(NavigationItem.ProductDetailsView(effect.productId))
+                }
+            }
+        }
+    }
+
+    LaunchedEffect(
+        lazyGridState,
+    ) {
         snapshotFlow {
             lazyGridState.canScrollForward
         }.collect { canScrollForward ->
@@ -247,7 +260,7 @@ fun ProductView(
                                     product = product,
                                     categoryName = categoryName,
                                     onClick = {
-                                        productViewModel.onProductClick(product.id)
+                                        productViewModel.onIntent(ProductContract.ProductIntent.onProductClicked(product.id))
                                     },
                                 )
                             }
