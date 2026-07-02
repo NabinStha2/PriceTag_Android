@@ -106,6 +106,7 @@ fun ProductDetailsView(
         productDetailsViewModel.getSingleProductDetailsData.collectAsStateWithLifecycle()
     val selectedColor = productDetailsViewModel.selectedColor.collectAsStateWithLifecycle()
     val selectedSize = productDetailsViewModel.selectedSize.collectAsStateWithLifecycle()
+    val selectedVariant = productDetailsViewModel.selectedVariant.collectAsStateWithLifecycle()
 
     LaunchedEffect(true) {
         if (productId != null) {
@@ -150,24 +151,30 @@ fun ProductDetailsView(
                  ) {
                      Row(modifier = Modifier.fillMaxWidth(),
                          horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                         Button(onClick = { /*TODO*/ },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonColors(
-                                    containerColor = PrimaryColor,
-                                    contentColor = Color.White,
-                                    disabledContentColor = NeutralColor800,
-                                    disabledContainerColor = NeutralColor100,
-                                )) {
+                         Button(
+                             onClick = { /*TODO*/ },
+                             modifier = Modifier.weight(1f),
+                             colors = ButtonColors(
+                                 containerColor = PrimaryColor,
+                                 contentColor = Color.White,
+                                 disabledContentColor = NeutralColor800,
+                                 disabledContainerColor = NeutralColor100,
+                             ),
+                             enabled = (selectedVariant.value?.stockQuantity ?: 0) > 0,
+                         ) {
                              Text(text = "Buy Now")
                          }
-                         Button(onClick = { /*TODO*/ },
-                                modifier = Modifier.weight(1f),
-                                colors = ButtonColors(
-                                    containerColor = PrimaryColor,
-                                    contentColor = Color.White,
-                                    disabledContentColor = NeutralColor800,
-                                    disabledContainerColor = NeutralColor100,
-                                )) {
+                         Button(
+                             onClick = { /*TODO*/ },
+                             modifier = Modifier.weight(1f),
+                             colors = ButtonColors(
+                                 containerColor = PrimaryColor,
+                                 contentColor = Color.White,
+                                 disabledContentColor = NeutralColor800,
+                                 disabledContainerColor = NeutralColor100,
+                             ),
+                             enabled = (selectedVariant.value?.stockQuantity ?: 0) > 0,
+                         ) {
                              Text(text = "Add to Cart")
                          }
 
@@ -341,6 +348,21 @@ fun ProductDetailsView(
                                     )
                                 }
                             }
+                        }
+                    }
+
+                    item {
+                        selectedVariant.value?.let {
+                            if (it.stockQuantity > 0) Text(
+                                "In Stock: ${it.stockQuantity}",
+                                fontSize = 14.sp,
+                                color = Color.Green,
+                            )
+                            else Text(
+                                "Out of Stock",
+                                fontSize = 14.sp,
+                                color = Color.Red,
+                            )
                         }
                     }
 
