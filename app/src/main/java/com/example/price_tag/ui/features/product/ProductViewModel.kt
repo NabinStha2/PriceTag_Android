@@ -59,7 +59,7 @@ class ProductViewModel @Inject constructor(
                 )
             }
 
-            is ProductContract.ProductIntent.onProductClicked -> {
+            is ProductContract.ProductIntent.OnProductClicked -> {
                 onProductClick(productIntent.productId)
             }
         }

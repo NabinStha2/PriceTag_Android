@@ -24,7 +24,7 @@ class ProductContract {
             val order: String? = "asc",
         ) : ProductIntent
 
-        data class onProductClicked(val productId: Long) : ProductIntent
+        data class OnProductClicked(val productId: Long) : ProductIntent
     }
 
     data class ProductState(

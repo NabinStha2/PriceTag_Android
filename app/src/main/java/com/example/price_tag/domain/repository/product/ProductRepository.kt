@@ -1,7 +1,8 @@
 package com.example.price_tag.domain.repository.product
 
-import com.example.price_tag.data.model.product_details.ProductDetailsResponse
+import com.example.price_tag.data.model.product_details.SingleProductDetailsResponseDto
 import com.example.price_tag.domain.model.product.Products
+import com.example.price_tag.domain.model.product.SingleProductDetails
 import com.example.utilites.ResourceState
 import kotlinx.coroutines.flow.Flow
 
@@ -23,5 +24,5 @@ interface ProductRepository {
         name: String?,
     ): Flow<ResourceState<Products>>
 
-    suspend fun getSingleProductDetails(productId: Long): Flow<ResourceState<ProductDetailsResponse>>
+    suspend fun getSingleProductDetails(productId: Long): Flow<ResourceState<SingleProductDetails>>
 }

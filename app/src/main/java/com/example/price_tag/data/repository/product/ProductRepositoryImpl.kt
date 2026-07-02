@@ -5,9 +5,9 @@ import com.example.price_tag.core.datastore.DataStoreManager
 import com.example.price_tag.data.mapper.product.toDomain
 import com.example.price_tag.data.model.common.CommonErrorResponse
 import com.example.price_tag.data.model.product.ProductResponseDto
-import com.example.price_tag.data.model.product_details.ProductDetailsResponse
 import com.example.price_tag.data.remote.datasource.product.ProductDataSource
 import com.example.price_tag.domain.model.product.Products
+import com.example.price_tag.domain.model.product.SingleProductDetails
 import com.example.price_tag.domain.repository.product.ProductRepository
 import com.example.utilites.ResourceState
 import kotlinx.coroutines.flow.Flow
@@ -54,7 +54,8 @@ class ProductRepositoryImpl @Inject constructor(
             emit(ResourceState.Error(message))
         }
     }.catch { e ->
-        Log.i("oeedaelnfljaen", e.message.toString())
+        Log.i("oeedaelnfljaen",
+              e.message.toString())
         emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
     }
 
@@ -93,13 +94,15 @@ class ProductRepositoryImpl @Inject constructor(
         emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
     }
 
-    override suspend fun getSingleProductDetails(productId: Long): Flow<ResourceState<ProductDetailsResponse>> =
+    override suspend fun getSingleProductDetails(productId: Long): Flow<ResourceState<SingleProductDetails>> =
         flow {
             emit(ResourceState.Loading)
             val response = productDataSource.getSingleProductDetails(productId)
             if (response.isSuccessful && response.body() != null) {
-                val detailsResponse: ProductDetailsResponse = response.body()!!
-                emit(ResourceState.Success(detailsResponse))
+                val singleProductDetails: SingleProductDetails = response.body()!!
+                    .toDomain()
+                Log.i("getSingleProductDetails", "Product Details: ${singleProductDetails.colorSizeVariantGroup}")
+                emit(ResourceState.Success(singleProductDetails))
             } else { // If unauthorized, clear tokens to force logout
                 if (response.code() == 401) {
                     try {

@@ -7,7 +7,7 @@ import com.example.price_tag.data.model.auth.SignUpRequest
 import com.example.price_tag.data.model.category.CategoryResponse
 import com.example.price_tag.data.model.category.SubCategoryResponse
 import com.example.price_tag.data.model.product.ProductResponseDto
-import com.example.price_tag.data.model.product_details.ProductDetailsResponse
+import com.example.price_tag.data.model.product_details.SingleProductDetailsResponseDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -53,8 +53,6 @@ interface ApiService {
     ): Response<ProductResponseDto>
 
     @GET(value = "product/{product_id}")
-    suspend fun getSingleProductDetails(
-        @Path("product_id") productId: Long
-    ) : Response<ProductDetailsResponse>
+    suspend fun getSingleProductDetails(@Path("product_id") productId: Long): Response<SingleProductDetailsResponseDto>
 
 }

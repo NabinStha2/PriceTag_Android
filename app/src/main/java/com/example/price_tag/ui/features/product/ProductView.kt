@@ -260,7 +260,7 @@ fun ProductView(
                                     product = product,
                                     categoryName = categoryName,
                                     onClick = {
-                                        productViewModel.onIntent(ProductContract.ProductIntent.onProductClicked(product.id))
+                                        productViewModel.onIntent(ProductContract.ProductIntent.OnProductClicked(product.id))
                                     },
                                 )
                             }

@@ -20,6 +20,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
@@ -45,7 +47,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -56,9 +57,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.example.price_tag.R
@@ -69,8 +70,8 @@ import com.example.price_tag.core.theme.Poppins
 import com.example.price_tag.core.theme.PrimaryColor
 import com.example.price_tag.core.theme.PrimaryColor50
 import com.example.price_tag.core.theme.PrimaryColor600
-import com.example.price_tag.core.theme.WarningColor
-import com.example.price_tag.data.model.product_details.ProductDetailsResponse
+import com.example.price_tag.domain.model.product.ColorSizeVariantGroup
+import com.example.price_tag.domain.model.product.SingleProductDetails
 import com.example.price_tag.ui.components.CartIconWithBadge
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.components.StarRating
@@ -85,7 +86,6 @@ fun ProductDetailsView(
     navController: NavController,
     paddingValues: PaddingValues,
     productDetailsViewModel: ProductDetailsViewModel,
-    selectedCategoryViewModel: SelectedCategoryViewModel,
     productId: Long?,
 ) {
     val images = listOf(
@@ -93,22 +93,20 @@ fun ProductDetailsView(
         CarouselItem(R.drawable.carousel2),
         CarouselItem(R.drawable.carousel3),
     )
-    val productSelectSize = listOf("S",
-                                   "M",
-                                   "L",
-                                   "XL")
     val pagerState = rememberPagerState(pageCount = { images.size })
     val coroutineScope = rememberCoroutineScope()
-    var productSize by rememberSaveable {
-        mutableStateOf("")
-    }
 
     var selectedTabIndex by rememberSaveable { mutableIntStateOf(0) }
-    val tabs = listOf("Description",
-                      "Reviews")
+    val tabs = listOf(
+        "Description",
+        "Reviews",
+    )
 
+    // Collect states from ViewModel
     val getSingleProductDetailsData =
         productDetailsViewModel.getSingleProductDetailsData.collectAsStateWithLifecycle()
+    val selectedColor = productDetailsViewModel.selectedColor.collectAsStateWithLifecycle()
+    val selectedSize = productDetailsViewModel.selectedSize.collectAsStateWithLifecycle()
 
     LaunchedEffect(true) {
         if (productId != null) {
@@ -189,179 +187,196 @@ fun ProductDetailsView(
             }
 
             is ResourceState.Success -> {
-                val productDetails =
-                    (getSingleProductDetailsData.value as ResourceState.Success<ProductDetailsResponse>).data.data?.results
+                val productDetails: SingleProductDetails =
+                    (getSingleProductDetailsData.value as ResourceState.Success<SingleProductDetails>).data
+                val colorSizeVariantGroup: List<ColorSizeVariantGroup> =
+                    productDetails.colorSizeVariantGroup ?: emptyList()
 
-                if (productDetails != null) {
-                    LazyColumn(modifier = Modifier
-                        .padding(innerPadding)
-                        .fillMaxSize(),
-                               verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        item {
-                            CarouselSlider(
-                                images = images,
-                                pageCount = images.size,
-                                pagerState = pagerState,
-                                coroutine = coroutineScope,
-                            )
-                        }
-
-                        item {
-                            Row {
-                                StarRating(rating = 4)
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Text(text = "20 Reviews",
-                                     fontSize = 12.sp)
-                            }
-                        }
-
-                        item {
-                            Row(modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically) {
-                                Text(text = productDetails.name ?: "",
-                                     fontSize = 18.sp,
-                                     fontWeight = FontWeight.SemiBold)
-                                Spacer(modifier = Modifier.width(10.dp))
-                                Row(verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.End) {
-                                    IconButton(onClick = { /*TODO*/ },
-                                               modifier = Modifier
-                                                   .clip(shape = CircleShape)
-                                                   .size(36.dp)
-                                                   .background(color = PrimaryColor50)) {
-                                        Icon(imageVector = Icons.Outlined.FavoriteBorder,
-                                             contentDescription = "Favorite",
-                                             tint = PrimaryColor600)
-                                    }
-
-                                    Spacer(modifier = Modifier.width(10.dp))
-
-                                    IconButton(onClick = { /*TODO*/ },
-                                               modifier = Modifier
-                                                   .clip(shape = CircleShape)
-                                                   .size(36.dp)
-                                                   .background(color = PrimaryColor50)) {
-                                        Icon(imageVector = Icons.Outlined.Share,
-                                             contentDescription = "Share",
-                                             tint = PrimaryColor600)
-                                    }
-
-                                }
-                            }
-                        }
-
-                        item {
-                            Text(text = productDetails.description ?: "Short Description",
-                                 fontSize = 18.sp,
-                                 fontWeight = FontWeight.SemiBold)
-                        }
-
-                        item {
-                            HorizontalDivider(color = NeutralColor200)
-                        }
-
-
-
-                        item {
-                            Text(text = "Select Color",
-                                 fontSize = 18.sp)
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            Row {
-                                val variants = productDetails.variants ?: emptyList()
-                                for (productVariant in variants) {
-                                    Box(modifier = Modifier
-                                        .size(30.dp)
-                                        .clip(CircleShape)
-                                        .background(WarningColor))
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                }
-                            }
-
-                        }
-
-                        item {
-                            Text(text = "Select Size",
-                                 fontSize = 18.sp)
-
-                            Spacer(modifier = Modifier.height(10.dp))
-
-                            Row {
-                                val variants = productDetails.variants ?: emptyList()
-                                for (productVariant in variants) {
-                                    val sizes = productVariant.size ?: emptyList()
-                                    for (s in sizes) {
-                                        Box(
-                                            modifier = Modifier
-                                                .clip(shape = RoundedCornerShape(percent = 15))
-                                                .clickable {
-                                                    productSize = s
-                                                }
-                                                .background(color = if (productSize == s) PrimaryColor else Color.Transparent)
-                                                .border(shape = RoundedCornerShape(percent = 15),
-                                                        width = 1.dp,
-                                                        color = NeutralColor100)
-                                                .size(30.dp),
-                                            contentAlignment = Alignment.Center,
-
-                                            ) {
-                                            Text(text = s,
-                                                 fontSize = 14.sp,
-                                                 fontWeight = FontWeight.SemiBold,
-                                                 color = if (productSize == s) Color.White else NeutralColor800)
-                                        }
-                                    }
-                                    Spacer(modifier = Modifier.width(10.dp))
-                                }
-
-                            }
-
-                        }
-
-                        item { Spacer(modifier = Modifier.height(10.dp)) }
-
-                        item { Spacer(modifier = Modifier.height(10.dp)) }
-
-                        stickyHeader { // Tab Row at the top
-                            TabRow(
-                                selectedTabIndex = selectedTabIndex,
-                                modifier = Modifier.fillMaxWidth(),
-                                indicator = {},
-                                divider = {},
-                            ) {
-                                tabs.forEachIndexed { index, title ->
-                                    Tab(selected = selectedTabIndex == index,
-                                        onClick = { selectedTabIndex = index },
-                                        text = { Text(title) },
-                                        selectedContentColor = Color.White,
-                                        unselectedContentColor = NeutralColor800,
-                                        modifier = Modifier //                                .size(40.dp)
-                                            .clip(shape = RoundedCornerShape(8.dp))
-                                            .background(color = if (selectedTabIndex == index) PrimaryColor else Color.Transparent))
-                                }
-                            }
-                        }
-
-                        item {
-                            when (selectedTabIndex) {
-                                0 -> DescriptionContent()
-                                1 -> ReviewContent()
-                            }
-                        }
-
-                    }
-                } else {
-                    Box(modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center) {
-                        Text(
-                            text = "No Products Found",
-                            color = Color.Black,
-                            textAlign = TextAlign.Center,
-                            fontSize = 18.sp,
+                LazyColumn(modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                           verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    item {
+                        CarouselSlider(
+                            images = images,
+                            pageCount = images.size,
+                            pagerState = pagerState,
+                            coroutine = coroutineScope,
                         )
                     }
+
+                    item {
+                        Row {
+                            StarRating(rating = 4)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(text = "20 Reviews",
+                                 fontSize = 12.sp)
+                        }
+                    }
+
+                    item {
+                        Row(modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = productDetails.name ?: "",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.SemiBold,
+                            )
+
+                            Spacer(modifier = Modifier.width(10.dp))
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End,
+                            ) {
+                                IconButton(
+                                    onClick = { /*TODO*/ },
+                                    modifier = Modifier
+                                        .clip(shape = CircleShape)
+                                        .size(36.dp)
+                                        .background(color = PrimaryColor50),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.FavoriteBorder,
+                                        contentDescription = "Favorite",
+                                        tint = PrimaryColor600,
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.width(10.dp))
+
+                                IconButton(
+                                    onClick = { /*TODO*/ },
+                                    modifier = Modifier
+                                        .clip(shape = CircleShape)
+                                        .size(36.dp)
+                                        .background(color = PrimaryColor50),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Share,
+                                        contentDescription = "Share",
+                                        tint = PrimaryColor600,
+                                    )
+                                }
+
+                            }
+                        }
+                    }
+
+                    item {
+                        Text(text = productDetails.description ?: "Short Description",
+                             fontSize = 18.sp,
+                             fontWeight = FontWeight.SemiBold)
+                    }
+
+                    item {
+                        HorizontalDivider(color = NeutralColor200)
+                    }
+
+                    item {
+                        Text(
+                            text = "Select Color",
+                            fontSize = 18.sp,
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            items(items = colorSizeVariantGroup) { data ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(data.colorHex.toColorInt()))
+                                        .border(
+                                            width = 2.dp,
+                                            color = if (data.colorHex == selectedColor.value) PrimaryColor else NeutralColor100,
+                                            shape = CircleShape,
+                                        )
+                                        .clickable {
+                                            productDetailsViewModel.onColorSelected(data.colorHex)
+                                        },
+                                )
+                            }
+                        }
+                    }
+
+
+                    if (selectedColor.value?.isNotEmpty() == true) item {
+                        Text(
+                            text = "Select Size",
+                            fontSize = 18.sp,
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        val selectedGroup: ColorSizeVariantGroup? =
+                            colorSizeVariantGroup.firstOrNull { it.colorHex == selectedColor.value }
+
+                        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            items(selectedGroup?.variants ?: emptyList()) { productVariant ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(30.dp)
+                                        .clip(shape = RoundedCornerShape(percent = 15))
+                                        .clickable {
+                                            productDetailsViewModel.onSizeSelected(
+                                                sizeId = productVariant.size?.id?.toInt() ?: -1,
+                                                productVariants = productVariant,
+                                                colorSizeVariantGroup = colorSizeVariantGroup
+                                            )
+                                        }
+                                        .background(color = if (selectedSize.value == productVariant.size?.id?.toInt()) PrimaryColor else Color.Transparent)
+                                        .border(
+                                            shape = RoundedCornerShape(percent = 15),
+                                            width = 2.dp,
+                                            color = NeutralColor100,
+                                        ),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Text(
+                                        text = productVariant.size?.name ?: "",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = if (selectedSize.value == productVariant.size?.id?.toInt()) Color.White else NeutralColor800,
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    item { Spacer(modifier = Modifier.height(10.dp)) }
+
+                    item { Spacer(modifier = Modifier.height(10.dp)) }
+
+                    stickyHeader { // Tab Row at the top
+                        TabRow(
+                            selectedTabIndex = selectedTabIndex,
+                            modifier = Modifier.fillMaxWidth(),
+                            indicator = {},
+                            divider = {},
+                        ) {
+                            tabs.forEachIndexed { index, title ->
+                                Tab(selected = selectedTabIndex == index,
+                                    onClick = { selectedTabIndex = index },
+                                    text = { Text(title) },
+                                    selectedContentColor = Color.White,
+                                    unselectedContentColor = NeutralColor800,
+                                    modifier = Modifier //                                .size(40.dp)
+                                        .clip(shape = RoundedCornerShape(8.dp))
+                                        .background(color = if (selectedTabIndex == index) PrimaryColor else Color.Transparent))
+                            }
+                        }
+                    }
+
+                    item {
+                        when (selectedTabIndex) {
+                            0 -> DescriptionContent()
+                            1 -> ReviewContent()
+                        }
+                    }
+
                 }
             }
 
