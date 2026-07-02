@@ -43,8 +43,6 @@ fun NavGraphBuilder.productGraph(navController: NavController) {
         animatedComposable<NavigationItem.ProductDetailsView> { backStackEntry ->
             val productDetailsViewModel: ProductDetailsViewModel =
                 backStackEntry.sharedViewModel<ProductDetailsViewModel, NavigationItem.ProductGraph>(navController)
-            val selectedCategoryViewModel: SelectedCategoryViewModel =
-                backStackEntry.sharedViewModel<SelectedCategoryViewModel, NavigationItem.MainGraph>(navController)
 
             val args = backStackEntry.toRoute<NavigationItem.ProductDetailsView>()
 
@@ -53,7 +51,6 @@ fun NavGraphBuilder.productGraph(navController: NavController) {
                 paddingValues = PaddingValues(0.dp),
                 productDetailsViewModel = productDetailsViewModel,
                 productId = args.productId,
-                selectedCategoryViewModel = selectedCategoryViewModel,
             )
         }
 

@@ -73,7 +73,6 @@ import com.example.price_tag.core.theme.PrimaryColor600
 import com.example.price_tag.domain.model.product.ColorSizeVariantGroup
 import com.example.price_tag.domain.model.product.SingleProductDetails
 import com.example.price_tag.ui.components.CartIconWithBadge
-import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.components.StarRating
 import com.example.price_tag.ui.features.home.CarouselItem
 import com.example.price_tag.ui.features.home.widgets.CarouselSlider
@@ -321,11 +320,10 @@ fun ProductDetailsView(
                                         .size(30.dp)
                                         .clip(shape = RoundedCornerShape(percent = 15))
                                         .clickable {
-                                            productDetailsViewModel.onSizeSelected(
-                                                sizeId = productVariant.size?.id?.toInt() ?: -1,
-                                                productVariants = productVariant,
-                                                colorSizeVariantGroup = colorSizeVariantGroup
-                                            )
+                                            productDetailsViewModel.onSizeSelected(sizeId = productVariant.size?.id?.toInt()
+                                                                                            ?: -1,
+                                                                                   productVariants = productVariant,
+                                                                                   colorSizeVariantGroup = colorSizeVariantGroup)
                                         }
                                         .background(color = if (selectedSize.value == productVariant.size?.id?.toInt()) PrimaryColor else Color.Transparent)
                                         .border(
