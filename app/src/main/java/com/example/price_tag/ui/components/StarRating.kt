@@ -17,7 +17,7 @@ import com.example.price_tag.core.theme.WarningColor
 @Composable
 fun StarRating(
     modifier: Modifier = Modifier,
-    rating: Int = 5
+    rating: Double = 0.0
 ) {
     Row {
         for (i in 1..5) {

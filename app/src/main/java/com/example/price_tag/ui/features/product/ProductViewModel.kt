@@ -187,7 +187,7 @@ class ProductViewModel @Inject constructor(
                             )
                         }
 
-                        else -> {
+                        else ->     {
                             state.copy(isLoadingMore = false)
                         }
                     }

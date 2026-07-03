@@ -97,8 +97,10 @@ class CategoryViewModel @Inject constructor(
         if (_uiState.value.selectedCategoryId == categoryId) return
 
         _uiState.update {
-            it.copy(selectedCategoryId = categoryId,
-                    selectedIndex = index)
+            it.copy(
+                selectedCategoryId = categoryId,
+                selectedIndex = index,
+            )
         }
         setSelectedCategory(name)
         viewModelScope.launch(Dispatchers.IO) {

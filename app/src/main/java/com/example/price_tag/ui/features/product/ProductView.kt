@@ -107,7 +107,7 @@ fun ProductView(
                                 subCategoryId = it,
                                 page = productState.currentPage + 1,
                                 limit = 10,
-                                order = "desc",
+                                order = "asc",
                             ),
                         )
 
