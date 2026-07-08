@@ -102,6 +102,12 @@ fun ProductDetailsView(
         }
     }
 
+    LaunchedEffect(selectedTabIndex) {
+        if (selectedTabIndex == 1 && productId != null && productDetailsState.getSingleProductDetailsData is ResourceState.Success) {
+            productDetailsViewModel.onIntent(ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews(productId))
+        }
+    }
+
     Scaffold(modifier = Modifier
         .padding(horizontal = 16.dp)
         .systemBarsPadding(),
@@ -184,7 +190,7 @@ fun ProductDetailsView(
 
             is ResourceState.Success -> {
                 val productDetails: SingleProductDetails =
-                    (productDetailsState.getSingleProductDetailsData as ResourceState.Success<SingleProductDetails>).data
+                    productDetailsState.getSingleProductDetailsData.data
                 val colorSizeVariantGroup: List<ColorSizeVariantGroup> =
                     productDetails.colorSizeVariantGroup ?: emptyList()
 
@@ -270,7 +276,10 @@ fun ProductDetailsView(
                     item {
                         when (selectedTabIndex) {
                             0 -> ProductDetailsDescriptionContent(productDetails = productDetails)
-                            1 -> ProductDetailsReviewContent(productDetails = productDetails)
+                            1 -> ProductDetailsReviewContent(
+                                productDetails = productDetails,
+                                productDetailsRatingReviews = productDetailsState.getSingleProductDetailsRatingReviews,
+                            )
                         }
                     }
 

@@ -3,6 +3,7 @@ package com.example.price_tag.ui.features.productDetails
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.domain.model.product.ProductVariants
+import com.example.price_tag.domain.usecase.product.GetProductDetailsRatingReviewsUseCase
 import com.example.price_tag.domain.usecase.product.GetProductDetailsUseCase
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,8 +17,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class ProductDetailsViewModel @Inject constructor(private val getProductDetailsUseCase: GetProductDetailsUseCase) :
-    ViewModel() {
+class ProductDetailsViewModel @Inject constructor(
+    private val getProductDetailsUseCase: GetProductDetailsUseCase,
+    private val productDetailsRatingReviewsUseCase: GetProductDetailsRatingReviewsUseCase,
+) : ViewModel() {
 
     private val _productDetailsState: MutableStateFlow<ProductDetailsContract.ProductDetailsState> =
         MutableStateFlow(ProductDetailsContract.ProductDetailsState())
@@ -28,6 +31,10 @@ class ProductDetailsViewModel @Inject constructor(private val getProductDetailsU
         when (productDetailsIntent) {
             is ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetails -> {
                 getSingleProductDetails(productDetailsIntent.productId)
+            }
+
+            is ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews -> {
+                getSingleProductDetailsRatingReviews(productDetailsIntent.productId)
             }
         }
     }
@@ -74,6 +81,29 @@ class ProductDetailsViewModel @Inject constructor(private val getProductDetailsU
                 }
             }
         }
+    }
+
+    private fun getSingleProductDetailsRatingReviews(productId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            productDetailsRatingReviewsUseCase(productId = productId).collectLatest { response ->
+                _productDetailsState.update { state ->
+                    when (response) {
+                        is ResourceState.Success -> {
+                            state.copy(
+                                getSingleProductDetailsRatingReviews = response,
+                            )
+                        }
+                        else -> {
+                            state.copy(
+                                getSingleProductDetailsRatingReviews = response,
+                            )
+                        }
+                    }
+                }
+
+            }
+        }
+
     }
 
     fun onColorSelected(colorHex: String) {

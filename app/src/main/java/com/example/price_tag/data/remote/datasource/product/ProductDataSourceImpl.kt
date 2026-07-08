@@ -1,6 +1,7 @@
 package com.example.price_tag.data.remote.datasource.product
 
 import com.example.price_tag.data.model.product.ProductResponseDto
+import com.example.price_tag.data.model.product_details.ProductDetailsRatingReviewsResponseDto
 import com.example.price_tag.data.model.product_details.SingleProductDetailsResponseDto
 import com.example.price_tag.data.remote.api.ApiService
 import retrofit2.Response
@@ -45,6 +46,10 @@ class ProductDataSourceImpl @Inject constructor(private val apiService: ApiServi
 
     override suspend fun getSingleProductDetails(productId: Long): Response<SingleProductDetailsResponseDto> {
         return apiService.getSingleProductDetails(productId)
+    }
+
+    override suspend fun getProductDetailsRatingReviews(productId: Long): Response<ProductDetailsRatingReviewsResponseDto> {
+        return apiService.getProductDetailsRatingReviews(productId)
     }
 
 }

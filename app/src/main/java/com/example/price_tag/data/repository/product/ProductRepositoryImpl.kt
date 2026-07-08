@@ -6,6 +6,7 @@ import com.example.price_tag.data.mapper.product.toDomain
 import com.example.price_tag.data.model.common.CommonErrorResponse
 import com.example.price_tag.data.model.product.ProductResponseDto
 import com.example.price_tag.data.remote.datasource.product.ProductDataSource
+import com.example.price_tag.domain.model.product.ProductDetailsRatingReviews
 import com.example.price_tag.domain.model.product.Products
 import com.example.price_tag.domain.model.product.SingleProductDetails
 import com.example.price_tag.domain.repository.product.ProductRepository
@@ -101,7 +102,8 @@ class ProductRepositoryImpl @Inject constructor(
             if (response.isSuccessful && response.body() != null) {
                 val singleProductDetails: SingleProductDetails = response.body()!!
                     .toDomain()
-                Log.i("getSingleProductDetails", "Product Details: ${singleProductDetails.colorSizeVariantGroup}")
+                Log.i("getSingleProductDetails",
+                      "Product Details: ${singleProductDetails.colorSizeVariantGroup}")
                 emit(ResourceState.Success(singleProductDetails))
             } else { // If unauthorized, clear tokens to force logout
                 if (response.code() == 401) {
@@ -118,6 +120,32 @@ class ProductRepositoryImpl @Inject constructor(
         }.catch { e ->
             emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
         }
+
+    override suspend fun getProductDetailsRatingReviews(productId: Long): Flow<ResourceState<ProductDetailsRatingReviews>> =
+        flow {
+            emit(ResourceState.Loading)
+            val response = productDataSource.getProductDetailsRatingReviews(productId)
+
+            if (response.isSuccessful && response.body() != null) {
+                val productDetailsRatingReviews: ProductDetailsRatingReviews = response.body()!!
+                    .toDomain();
+                emit(ResourceState.Success(productDetailsRatingReviews))
+            } else {
+                if (response.code() == 401) {
+                    try {
+                        dataStoreManager.clearAuthTokens()
+                    } catch (_: Exception) {
+                    }
+                }
+                val errorBody = response.errorBody()
+                    ?.string()
+                val message = parseError(errorBody) ?: "Failed to fetch product details"
+                emit(ResourceState.Error(message))
+            }
+        }.catch { e ->
+            emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
+        }
+
 
     private fun parseError(errorBody: String?): String? = errorBody?.let {
         try {
