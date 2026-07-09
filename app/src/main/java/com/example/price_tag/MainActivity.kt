@@ -5,8 +5,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Surface
@@ -20,6 +20,7 @@ import com.example.price_tag.core.navigation.NavigationCoordinator
 import com.example.price_tag.core.navigation.ObserveNavigationEvents
 import com.example.price_tag.core.navigation.RootNavHost
 import com.example.price_tag.core.state.AppState
+import com.example.price_tag.core.theme.PriceTagTheme
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -47,13 +48,16 @@ class MainActivity : ComponentActivity() {
                 navController = navController,
             )
 
-            Surface(modifier = Modifier
-                .fillMaxSize()
-                .background(color = Color.White)) { // Render the correct graph for the current session state.
-                RootNavHost(
-                    navController = navController,
-                    appState = appState,
-                )
+            PriceTagTheme {
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.onSurface,
+                ) { // Render the correct graph for the current session state.
+                    RootNavHost(
+                        navController = navController,
+                        appState = appState,
+                    )
+                }
             }
         }
     }

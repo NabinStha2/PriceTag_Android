@@ -2,7 +2,6 @@ package com.example.price_tag.ui.features.productDetails
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -14,12 +13,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.BottomAppBar
@@ -31,8 +28,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,7 +38,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -108,83 +102,83 @@ fun ProductDetailsView(
         }
     }
 
-    Scaffold(modifier = Modifier
-        .padding(horizontal = 16.dp)
-        .systemBarsPadding(),
-             topBar = {
-                 CenterAlignedTopAppBar(navigationIcon = {
-                     IconButton(onClick = { navController.popBackStack() },
-                                modifier = Modifier
-                                    .border(shape = CircleShape.copy(CornerSize(percent = 100)),
-                                            border = BorderStroke(width = 1.dp,
-                                                                  color = NeutralColor200))
-                                    .size(35.dp)) {
-                         Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                              contentDescription = "Back")
-                     }
-                 },
-                                        title = {
-                                            Text(
-                                                text = "Product Details",
-                                                fontFamily = Poppins,
-                                                fontSize = 22.sp,
-                                                fontWeight = FontWeight.SemiBold,
-                                            )
-                                        },
-                                        actions = {
-                                            CartIconWithBadge()
-                                        })
-             },
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            CenterAlignedTopAppBar(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                navigationIcon = {
+                IconButton(onClick = { navController.popBackStack() },
+                           modifier = Modifier
+                               .border(shape = CircleShape.copy(CornerSize(percent = 100)),
+                                       border = BorderStroke(width = 1.dp,
+                                                             color = NeutralColor200))
+                               .size(35.dp)) {
+                    Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                         contentDescription = "Back")
+                }
+            },
+                                   title = {
+                                       Text(
+                                           text = "Product Details",
+                                           fontFamily = Poppins,
+                                           fontSize = 22.sp,
+                                           fontWeight = FontWeight.SemiBold,
+                                       )
+                                   },
+                                   actions = {
+                                       CartIconWithBadge()
+                                   })
+        },
+        bottomBar = {
+            BottomAppBar(
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .height(60.dp)
+                    .fillMaxWidth(),
+                containerColor = Color.Transparent,
+            ) {
+                Row(modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Button(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonColors(
+                            containerColor = PrimaryColor,
+                            contentColor = Color.White,
+                            disabledContentColor = NeutralColor800,
+                            disabledContainerColor = NeutralColor100,
+                        ),
+                        enabled = (productDetailsState.selectedVariant?.stockQuantity ?: 0) > 0,
+                    ) {
+                        Text(text = "Buy Now")
+                    }
+                    Button(
+                        onClick = { /*TODO*/ },
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonColors(
+                            containerColor = PrimaryColor,
+                            contentColor = Color.White,
+                            disabledContentColor = NeutralColor800,
+                            disabledContainerColor = NeutralColor100,
+                        ),
+                        enabled = (productDetailsState.selectedVariant?.stockQuantity ?: 0) > 0,
+                    ) {
+                        Text(text = "Add to Cart")
+                    }
 
-             bottomBar = {
-                 BottomAppBar(
-                     modifier = Modifier
-                         .height(60.dp)
-                         .fillMaxWidth(),
-                     containerColor = Color.Transparent,
-                 ) {
-                     Row(modifier = Modifier.fillMaxWidth(),
-                         horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                         Button(
-                             onClick = { /*TODO*/ },
-                             modifier = Modifier.weight(1f),
-                             colors = ButtonColors(
-                                 containerColor = PrimaryColor,
-                                 contentColor = Color.White,
-                                 disabledContentColor = NeutralColor800,
-                                 disabledContainerColor = NeutralColor100,
-                             ),
-                             enabled = (productDetailsState.selectedVariant?.stockQuantity
-                                        ?: 0) > 0,
-                         ) {
-                             Text(text = "Buy Now")
-                         }
-                         Button(
-                             onClick = { /*TODO*/ },
-                             modifier = Modifier.weight(1f),
-                             colors = ButtonColors(
-                                 containerColor = PrimaryColor,
-                                 contentColor = Color.White,
-                                 disabledContentColor = NeutralColor800,
-                                 disabledContainerColor = NeutralColor100,
-                             ),
-                             enabled = (productDetailsState.selectedVariant?.stockQuantity
-                                        ?: 0) > 0,
-                         ) {
-                             Text(text = "Add to Cart")
-                         }
-
-                     }
-                 }
-             }
-
+                }
+            }
+        },
     ) { innerPadding ->
 
         when (productDetailsState.getSingleProductDetailsData) {
             is ResourceState.Loading -> {
-                Box(modifier = Modifier.fillMaxSize(),
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .padding(innerPadding),
                     contentAlignment = Alignment.Center) {
-                    CircularProgressIndicator(modifier = Modifier.padding(paddingValues))
+                    CircularProgressIndicator()
                 }
             }
 
@@ -194,10 +188,16 @@ fun ProductDetailsView(
                 val colorSizeVariantGroup: List<ColorSizeVariantGroup> =
                     productDetails.colorSizeVariantGroup ?: emptyList()
 
-                LazyColumn(modifier = Modifier
-                    .padding(innerPadding)
-                    .fillMaxSize(),
-                           verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding(),
+                        start = 16.dp,
+                        end = 16.dp
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
                     item {
                         CarouselSlider(
                             images = images,
@@ -251,37 +251,52 @@ fun ProductDetailsView(
 
                     item { Spacer(modifier = Modifier.height(15.dp)) }
 
-                    stickyHeader { // Tab Row at the top
-                        TabRow(
-                            selectedTabIndex = selectedTabIndex,
-                            modifier = Modifier.fillMaxWidth(),
-                            indicator = {},
-                            divider = {},
-                        ) {
-                            tabs.forEachIndexed { index, title ->
-                                Tab(
-                                    selected = selectedTabIndex == index,
-                                    onClick = { selectedTabIndex = index },
-                                    text = { Text(title) },
-                                    selectedContentColor = Color.White,
-                                    unselectedContentColor = NeutralColor800,
-                                    modifier = Modifier //                                .size(40.dp)
-                                        .clip(shape = RoundedCornerShape(8.dp))
-                                        .background(color = if (selectedTabIndex == index) PrimaryColor else Color.Transparent),
-                                )
-                            }
-                        }
-                    }
+                    //                    stickyHeader { // Tab Row at the top
+                    //                        TabRow(
+                    //                            selectedTabIndex = selectedTabIndex,
+                    //                            modifier = Modifier.fillMaxWidth(),
+                    //                            indicator = {},
+                    //                            divider = {},
+                    //                        ) {
+                    //                            tabs.forEachIndexed { index, title ->
+                    //                                Tab(
+                    //                                    selected = selectedTabIndex == index,
+                    //                                    onClick = { selectedTabIndex = index },
+                    //                                    text = { Text(title) },
+                    //                                    selectedContentColor = Color.White,
+                    //                                    unselectedContentColor = NeutralColor800,
+                    //                                    modifier = Modifier //                                .size(40.dp)
+                    //                                        .clip(shape = RoundedCornerShape(8.dp))
+                    //                                        .background(color = if (selectedTabIndex == index) PrimaryColor else Color.Transparent),
+                    //                                )
+                    //                            }
+                    //                        }
+                    //                    }
+                    //
+                    //                    item { Spacer(modifier = Modifier.height(15.dp)) }
 
                     item {
-                        when (selectedTabIndex) {
-                            0 -> ProductDetailsDescriptionContent(productDetails = productDetails)
-                            1 -> ProductDetailsReviewContent(
-                                productDetails = productDetails,
-                                productDetailsRatingReviews = productDetailsState.getSingleProductDetailsRatingReviews,
-                            )
-                        }
+                        ProductDetailsDescriptionContent(productDetails = productDetails)
                     }
+
+                    item { Spacer(modifier = Modifier.height(15.dp)) }
+
+                    item {
+                        ProductDetailsReviewContent(
+                            productDetails = productDetails,
+                            productDetailsRatingReviews = productDetailsState.getSingleProductDetailsRatingReviews,
+                        )
+                    }
+
+                    //                    item {
+                    //                        when (selectedTabIndex) {
+                    //                            0 -> ProductDetailsDescriptionContent(productDetails = productDetails)
+                    //                            1 -> ProductDetailsReviewContent(
+                    //                                productDetails = productDetails,
+                    //                                productDetailsRatingReviews = productDetailsState.getSingleProductDetailsRatingReviews,
+                    //                            )
+                    //                        }
+                    //                    }
 
                 }
             }
@@ -290,7 +305,8 @@ fun ProductDetailsView(
                 val error = productDetailsState.getSingleProductDetailsData.error
                 Box(modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)) {
+                    .padding(innerPadding)
+                    .padding(horizontal = 16.dp)) {
                     Text(text = error,
                          color = Color.Red,
                          fontSize = 18.sp)

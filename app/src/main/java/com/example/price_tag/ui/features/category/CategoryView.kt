@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.price_tag.core.theme.Price_tagTheme
+import com.example.price_tag.core.theme.PriceTagTheme
 import com.example.price_tag.domain.model.category.Category
 import com.example.price_tag.domain.model.category.SubCategory
 import com.example.price_tag.ui.features.category.components.CategoryNavigationRail
@@ -150,7 +150,7 @@ private fun CategoriesSuccessState(
 @Preview(showBackground = true)
 @Composable
 fun CategoryViewPreview() {
-    Price_tagTheme {
+    PriceTagTheme {
         val sampleCategories = listOf(
             Category(id = 1,
                      name = "Electronics",

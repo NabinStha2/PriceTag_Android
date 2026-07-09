@@ -1,111 +1,100 @@
 package com.example.price_tag.core.theme
 
 import androidx.compose.material3.Typography
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import com.example.price_tag.R
 
-
 val Poppins = FontFamily(
-    Font(R.font.poppins_regular, FontWeight.Normal),
-    Font(R.font.poppins_medium, FontWeight.Medium),
-    Font(R.font.poppins_semibold, FontWeight.SemiBold),
-    Font(R.font.poppins_bold, FontWeight.Bold),
+    Font(
+        R.font.poppins_regular,
+        FontWeight.Normal,
+    ),
+    Font(
+        R.font.poppins_medium,
+        FontWeight.Medium,
+    ),
+    Font(
+        R.font.poppins_semibold,
+        FontWeight.SemiBold,
+    ),
+    Font(
+        R.font.poppins_bold,
+        FontWeight.Bold,
+    ),
 )
 
-// Set of Material typography styles to start with
-val PoppinsTypography = Typography(
-    displayLarge = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Normal,
-        fontSize = 57.sp,
-        letterSpacing = (-0.25).sp
-    ),
-    displayMedium = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Normal,
-        fontSize = 45.sp,
-        letterSpacing = 0.sp
-    ),
-    displaySmall = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Normal,
-        fontSize = 36.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineLarge = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 32.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineMedium = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineSmall = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 24.sp,
-        letterSpacing = 0.sp
-    ),
-    titleLarge = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Medium,
-        fontSize = 22.sp,
-        letterSpacing = 0.sp
-    ),
-    titleMedium = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        letterSpacing = 0.15.sp
-    ),
-    titleSmall = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        letterSpacing = 0.1.sp
-    ),
-    bodyLarge = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        letterSpacing = 0.5.sp
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        letterSpacing = 0.25.sp
-    ),
-    bodySmall = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
-        letterSpacing = 0.4.sp
-    ),
-    labelLarge = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        letterSpacing = 0.1.sp
-    ),
-    labelMedium = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        letterSpacing = 0.5.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = Poppins,
-        fontWeight = FontWeight.Medium,
-        fontSize = 11.sp,
-        letterSpacing = 0.5.sp
+/**
+ * App typography built on top of Material3's default type scale.
+ * We keep Material's default sizes / line heights / letter spacing
+ * and only swap in the Poppins font family + matching weights.
+ */
+val PoppinsTypography: Typography = Typography().let { base ->
+    Typography(
+        displayLarge = base.displayLarge.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Normal,
+        ),
+        displayMedium = base.displayMedium.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Normal,
+        ),
+        displaySmall = base.displaySmall.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Normal,
+        ),
+
+        headlineLarge = base.headlineLarge.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.SemiBold,
+        ),
+        headlineMedium = base.headlineMedium.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.SemiBold,
+        ),
+        headlineSmall = base.headlineSmall.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.SemiBold,
+        ),
+
+        titleLarge = base.titleLarge.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Medium,
+        ),
+        titleMedium = base.titleMedium.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Medium,
+        ),
+        titleSmall = base.titleSmall.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Medium,
+        ),
+
+        bodyLarge = base.bodyLarge.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Normal,
+        ),
+        bodyMedium = base.bodyMedium.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Normal,
+        ),
+        bodySmall = base.bodySmall.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Normal,
+        ),
+
+        labelLarge = base.labelLarge.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Medium,
+        ),
+        labelMedium = base.labelMedium.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Medium,
+        ),
+        labelSmall = base.labelSmall.copy(
+            fontFamily = Poppins,
+            fontWeight = FontWeight.Medium,
+        ),
     )
-)
+}

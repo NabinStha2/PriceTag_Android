@@ -110,7 +110,6 @@ fun SubCategoryGrid(
                                     )
                                     Text(
                                         text = "Description of the categories",
-
                                         style = PoppinsTypography.bodyMedium,
                                     )
                                 }

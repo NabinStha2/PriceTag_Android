@@ -1,6 +1,7 @@
 package com.example.price_tag.ui.features.product
 
 import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -14,12 +15,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -27,14 +31,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -47,7 +52,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -56,6 +60,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.core.navigation.NavigationItem
+import com.example.price_tag.core.theme.NeutralColor200
+import com.example.price_tag.core.theme.PrimaryColor300
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.home.widgets.ProductCard
 import com.example.utilites.ResourceState
@@ -127,25 +133,44 @@ fun ProductView(
     }
 
 
-    Scaffold(modifier = Modifier.padding(horizontal = 16.dp),
-             topBar = {
-                 TopAppBar(title = {
-                     Text(
-                         text = "Products",
-                         fontSize = 22.sp,
-                         fontWeight = FontWeight.W800,
-                     )
-                 },
-                           navigationIcon = {
-                               IconButton(onClick = { navController.popBackStack() }) {
-                                   Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                        contentDescription = "Back")
-                               }
-                           })
-             }) { innerPadding ->
-        Column(modifier = Modifier
-            .padding(innerPadding)
-            .fillMaxSize()) {
+    Scaffold(
+        modifier = Modifier.background(
+            PrimaryColor300,
+        ),
+        topBar = {
+            CenterAlignedTopAppBar(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                navigationIcon = {
+                    IconButton(
+                        onClick = { navController.popBackStack() },
+                        modifier = Modifier
+                            .border(
+                                shape = CircleShape.copy(CornerSize(percent = 100)),
+                                border = BorderStroke(
+                                    width = 1.dp,
+                                    color = NeutralColor200,
+                                ),
+                            )
+                            .size(35.dp),
+                    ) {
+                        Icon(imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                             contentDescription = "Back")
+                    }
+                },
+                title = {
+                    Text(
+                        text = "Products",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                },
+            )
+        },
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+        ) {
             Row {
                 OutlinedTextField(
                     value = productSearchValue,
@@ -227,33 +252,46 @@ fun ProductView(
 
             when (productState.getAllSubCategoryProductsData) {
                 is ResourceState.Loading -> {
-                    Box(modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        contentAlignment = Alignment.Center,
+                    ) {
                         CircularProgressIndicator(modifier = Modifier.padding(paddingValues))
                     }
                 }
 
                 is ResourceState.Error -> {
-                    Box(contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize()) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                    ) {
                         Text(
                             text = "Error: ${(productState.getAllSubCategoryProductsData as ResourceState.Error).error}",
-                            color = Color.Red,
-                            textAlign = TextAlign.Center,
-                            fontSize = 18.sp,
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = MaterialTheme.colorScheme.error,
+                            ),
                         )
                     }
                 }
 
                 is ResourceState.Success -> {
                     if (productState.productListData.isNotEmpty()) {
-                        LazyVerticalGrid(state = lazyGridState,
-                                         columns = GridCells.Fixed(2),
-                                         verticalArrangement = Arrangement.spacedBy(12.dp),
-                                         horizontalArrangement = Arrangement.spacedBy(12.dp),
-                                         modifier = Modifier
-                                             .fillMaxSize()
-                                             .background(Color.White)) {
+                        LazyVerticalGrid(
+                            state = lazyGridState,
+                            columns = GridCells.Fixed(2),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.White),
+                            contentPadding = PaddingValues(
+                                horizontal = 16.dp,
+                            ),
+                        ) {
                             itemsIndexed(items = productState.productListData) { index, product ->
                                 ProductCard(
                                     index = index,
