@@ -1,6 +1,7 @@
 package com.example.price_tag.ui.features.home.widgets
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,6 +16,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,6 +32,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import com.example.price_tag.core.theme.NeutralColor100
+import com.example.price_tag.core.theme.NeutralColor50
 import com.example.price_tag.domain.model.product.ProductData
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -38,17 +42,20 @@ fun ProductCard(
     index: Int? = 0,
     product: ProductData,
     width: Dp = 160.dp,
-    categoryName: String? = "",
     onClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier
-            .width(width = width)
-            .clip(shape = RoundedCornerShape(12.dp)),
+
+            .border(
+                width = 1.dp,
+                color = NeutralColor50,
+                shape = RoundedCornerShape(12.dp),
+            ),
         onClick = onClick,
         colors = CardDefaults.cardColors(Color.White),
     ) {
-        Column(modifier = Modifier.padding(8.dp)) {
+        Column {
             if (product.imageUrl != null) {
                 val painter = rememberAsyncImagePainter(model = product.imageUrl)
                 val state = painter.state
@@ -94,35 +101,46 @@ fun ProductCard(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Column(modifier = Modifier.padding(horizontal = 8.dp)) {
-                Text(
-                    text = product.name,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                )
+            Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                Box(
+                    modifier = Modifier
+                        .border(
+                            width = 1.dp,
+                            color = NeutralColor100,
+                            shape = RoundedCornerShape(percent = 40),
+                        )
+                        .padding(4.dp),
+                ) {
+                    Text(
+                        text = product.brand ?: "",
+                        style = MaterialTheme.typography.labelMedium,
+                    )
+                }
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text = categoryName ?: "",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Gray,
+                    text = product.name,
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        fontWeight = FontWeight.W500,
+                    ),
                 )
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(6.dp))
+
 
                 Row {
                     Text(
                         text = product.basePrice.toString(),
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color.Red,
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = MaterialTheme.colorScheme.error,
+                        ),
                         textDecoration = TextDecoration.LineThrough,
                     )
                     Spacer(modifier = Modifier.width(2.dp))
                     Text(
                         text = product.discountedPrice.toString(),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.W600,
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.W600,
+                        ),
                     )
                 }
             }

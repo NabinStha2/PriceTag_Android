@@ -51,7 +51,7 @@ class MainActivity : ComponentActivity() {
             PriceTagTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.onSurface,
+                    color = MaterialTheme.colorScheme.background,
                 ) { // Render the correct graph for the current session state.
                     RootNavHost(
                         navController = navController,

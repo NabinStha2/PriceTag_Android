@@ -3,7 +3,6 @@ package com.example.price_tag.ui.features.product
 import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,7 +60,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.core.theme.NeutralColor200
-import com.example.price_tag.core.theme.PrimaryColor300
 import com.example.price_tag.ui.components.SelectedCategoryViewModel
 import com.example.price_tag.ui.features.home.widgets.ProductCard
 import com.example.utilites.ResourceState
@@ -134,9 +132,6 @@ fun ProductView(
 
 
     Scaffold(
-        modifier = Modifier.background(
-            PrimaryColor300,
-        ),
         topBar = {
             CenterAlignedTopAppBar(
                 modifier = Modifier.padding(horizontal = 16.dp),
@@ -171,7 +166,7 @@ fun ProductView(
                 .padding(innerPadding)
                 .fillMaxSize(),
         ) {
-            Row {
+            Row(modifier = Modifier.padding(horizontal = 16.dp)) {
                 OutlinedTextField(
                     value = productSearchValue,
                     onValueChange = { value ->
@@ -250,6 +245,8 @@ fun ProductView(
                 }
             }
 
+            Spacer(modifier = Modifier.height(20.dp))
+
             when (productState.getAllSubCategoryProductsData) {
                 is ResourceState.Loading -> {
                     Box(
@@ -285,18 +282,17 @@ fun ProductView(
                             columns = GridCells.Fixed(2),
                             verticalArrangement = Arrangement.spacedBy(12.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.White),
+                            modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(
                                 horizontal = 16.dp,
                             ),
                         ) {
+
+
                             itemsIndexed(items = productState.productListData) { index, product ->
                                 ProductCard(
                                     index = index,
                                     product = product,
-                                    categoryName = categoryName,
                                     onClick = {
                                         productViewModel.onIntent(ProductContract.ProductIntent.OnProductClicked(product.id))
                                     },
@@ -339,6 +335,4 @@ fun ProductView(
             }
         }
     }
-
-
 }
