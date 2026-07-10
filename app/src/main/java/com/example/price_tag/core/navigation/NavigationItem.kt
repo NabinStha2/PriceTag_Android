@@ -61,6 +61,9 @@ sealed interface NavigationItem {
     @Serializable
     data class ProductDetailsView(val productId: Long) : NavigationItem
 
+    @Serializable
+    data class RatingReviewView(val productId: Long) : NavigationItem
+
     // ── Graph roots (not real screens; used as nested graph start routes) ───
 
     @Serializable

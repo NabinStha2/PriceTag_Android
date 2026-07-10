@@ -8,8 +8,10 @@ import com.example.price_tag.domain.usecase.product.GetProductDetailsUseCase
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
@@ -21,11 +23,13 @@ class ProductDetailsViewModel @Inject constructor(
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
     private val productDetailsRatingReviewsUseCase: GetProductDetailsRatingReviewsUseCase,
 ) : ViewModel() {
-
     private val _productDetailsState: MutableStateFlow<ProductDetailsContract.ProductDetailsState> =
         MutableStateFlow(ProductDetailsContract.ProductDetailsState())
     val productDetailsState: StateFlow<ProductDetailsContract.ProductDetailsState> =
         _productDetailsState.asStateFlow()
+
+    private val _effect = MutableSharedFlow<ProductDetailsContract.ProductDetailsEffect>()
+    val effect = _effect.asSharedFlow()
 
     fun onIntent(productDetailsIntent: ProductDetailsContract.ProductDetailsIntent) {
         when (productDetailsIntent) {
@@ -35,6 +39,10 @@ class ProductDetailsViewModel @Inject constructor(
 
             is ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews -> {
                 getSingleProductDetailsRatingReviews(productDetailsIntent.productId)
+            }
+
+            is ProductDetailsContract.ProductDetailsIntent.NavigationToRatingReview -> {
+                navigationToRatingReview(productDetailsIntent.productId)
             }
         }
     }
@@ -93,6 +101,7 @@ class ProductDetailsViewModel @Inject constructor(
                                 getSingleProductDetailsRatingReviews = response,
                             )
                         }
+
                         else -> {
                             state.copy(
                                 getSingleProductDetailsRatingReviews = response,
@@ -104,6 +113,12 @@ class ProductDetailsViewModel @Inject constructor(
             }
         }
 
+    }
+
+    private fun navigationToRatingReview(productId: Long) {
+        viewModelScope.launch {
+            _effect.emit(ProductDetailsContract.ProductDetailsEffect.NavigateToRatingReviewView(productId))
+        }
     }
 
     fun onColorSelected(colorHex: String) {

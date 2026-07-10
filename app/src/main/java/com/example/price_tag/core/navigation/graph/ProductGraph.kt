@@ -15,6 +15,7 @@ import com.example.price_tag.ui.features.product.ProductView
 import com.example.price_tag.ui.features.product.ProductViewModel
 import com.example.price_tag.ui.features.productDetails.ProductDetailsView
 import com.example.price_tag.ui.features.productDetails.ProductDetailsViewModel
+import com.example.price_tag.ui.features.rating_review.RatingReviewView
 
 fun NavGraphBuilder.productGraph(navController: NavController) {
     navigation<NavigationItem.ProductGraph>(
@@ -49,6 +50,19 @@ fun NavGraphBuilder.productGraph(navController: NavController) {
             ProductDetailsView(
                 navController = navController,
                 paddingValues = PaddingValues(0.dp),
+                productDetailsViewModel = productDetailsViewModel,
+                productId = args.productId,
+            )
+        }
+
+        animatedComposable<NavigationItem.RatingReviewView> { backStackEntry ->
+            val productDetailsViewModel: ProductDetailsViewModel =
+                backStackEntry.sharedViewModel<ProductDetailsViewModel, NavigationItem.ProductGraph>(navController)
+
+            val args = backStackEntry.toRoute<NavigationItem.RatingReviewView>()
+
+            RatingReviewView(
+                navController = navController,
                 productDetailsViewModel = productDetailsViewModel,
                 productId = args.productId,
             )

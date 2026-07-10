@@ -27,15 +27,14 @@ import androidx.compose.ui.unit.sp
 import com.example.price_tag.R
 import com.example.price_tag.core.theme.NeutralColor200
 import com.example.price_tag.domain.model.product.ProductDetailsRatingReviews
-import com.example.price_tag.domain.model.product.SingleProductDetails
+import com.example.price_tag.domain.model.product.ProductDetailsRatingReviewsData
 import com.example.utilites.ResourceState
 
 @Composable
 fun ProductDetailsReviewContent(
-    productDetails: SingleProductDetails,
     productDetailsRatingReviews: ResourceState<ProductDetailsRatingReviews>,
+    showAll: Boolean = false,
 ) {
-
     when (productDetailsRatingReviews) {
         is ResourceState.Loading -> {
             Box(
@@ -62,48 +61,62 @@ fun ProductDetailsReviewContent(
         is ResourceState.Success -> {
             val ratingReviews: ProductDetailsRatingReviews = productDetailsRatingReviews.data
 
-            ratingReviews.productDetailsRatingReviewsData.forEach { ratingReviewData ->
-                Box(modifier = Modifier.padding(bottom = 8.dp)) {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .border(
-                                width = 1.dp,
-                                color = NeutralColor200,
-                                shape = RoundedCornerShape(8.dp),
-                            )
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically) {
-                            Image(
-                                painter = painterResource(id = R.drawable.carousel1),
-                                contentDescription = "",
-                                contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .clip(CircleShape),
-                            )
-                            Column(
-                                verticalArrangement = Arrangement.spacedBy(4.dp),
-                                horizontalAlignment = Alignment.Start,
-                            ) {
-                                Text(text = ratingReviewData.userName)
-                                Text(text = "⭐".repeat(ratingReviewData.rating.toInt()))
-                            }
-                        }
-                        Text(
-                            text = ratingReviewData.reviews,
-                            fontStyle = FontStyle.Italic,
-                        )
-
-                    }
-                }
+            if (showAll) ratingReviews.productDetailsRatingReviewsData.forEach { ratingReviewData ->
+                RatingReviewCard(
+                    productDetailsRatingReviewsData = ratingReviewData,
+                )
             }
+            else ratingReviews.productDetailsRatingReviewsData.take(3)
+                .forEach { ratingReviewData ->
+                    RatingReviewCard(
+                        productDetailsRatingReviewsData = ratingReviewData,
+                    )
+                }
 
         }
 
         else -> {}
+    }
+}
+
+@Composable
+fun RatingReviewCard(
+    productDetailsRatingReviewsData: ProductDetailsRatingReviewsData,
+) {
+    Box(modifier = Modifier.padding(bottom = 8.dp)) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .border(
+                    width = 1.dp,
+                    color = NeutralColor200,
+                    shape = RoundedCornerShape(8.dp),
+                )
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically) {
+                Image(
+                    painter = painterResource(id = R.drawable.carousel1),
+                    contentDescription = "",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(50.dp)
+                        .clip(CircleShape),
+                )
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(4.dp),
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    Text(text = productDetailsRatingReviewsData.userName)
+                    Text(text = "⭐".repeat(productDetailsRatingReviewsData.rating.toInt()))
+                }
+            }
+            Text(
+                text = productDetailsRatingReviewsData.reviews,
+                fontStyle = FontStyle.Italic,
+            )
+        }
     }
 }

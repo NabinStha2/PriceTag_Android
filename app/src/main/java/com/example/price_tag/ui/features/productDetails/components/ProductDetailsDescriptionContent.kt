@@ -19,8 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.price_tag.core.theme.NeutralColor400
-import com.example.price_tag.core.theme.NeutralColor50
+import com.example.price_tag.core.theme.PrimaryColor100
 import com.example.price_tag.domain.model.product.SingleProductDetails
 
 @Composable
@@ -33,13 +32,13 @@ fun ProductDetailsDescriptionContent(
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(percent = 20))
+            .background(
+                color = PrimaryColor100,
+            )
             .border(
-                color = MaterialTheme.colorScheme.background,
+                color = PrimaryColor100,
                 width = 1.dp,
                 shape = RoundedCornerShape(percent = 20),
-            )
-            .background(
-                color = MaterialTheme.colorScheme.background,
             ),
     ) {
         Column(
@@ -49,28 +48,25 @@ fun ProductDetailsDescriptionContent(
         ) {
             Text(
                 text = "The Description",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
             )
             Spacer(modifier = Modifier.height(15.dp))
             Text(
-                text = if (readMore.value) productDetails.description
-                                           ?: "" else productDetails.description?.take(80) ?: "",
+                text = productDetails.description ?: "",
                 style = MaterialTheme.typography.bodyMedium,
                 overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
+                maxLines = if (!readMore.value) 1 else Int.MAX_VALUE,
             )
-            Spacer(modifier = Modifier.height(15.dp))
-            if ((productDetails.description?.length ?: 0) > 50) {
-                TextButton(
-                    onClick = {
-                        readMore.value = !readMore.value
-                    },
-                ) {
-                    Text(
-                        if (readMore.value) "Read less" else "Read more",
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
-                }
+            Spacer(modifier = Modifier.height(5.dp))
+            TextButton(
+                onClick = {
+                    readMore.value = !readMore.value
+                },
+            ) {
+                Text(
+                    if (readMore.value) "Read less" else "Read more",
+                    style = MaterialTheme.typography.bodyMedium,
+                )
             }
         }
     }

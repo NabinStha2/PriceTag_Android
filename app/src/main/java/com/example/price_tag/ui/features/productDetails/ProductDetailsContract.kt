@@ -10,6 +10,8 @@ class ProductDetailsContract {
         data class GetSingleProductDetails(val productId: Long) : ProductDetailsIntent
 
         data class GetSingleProductDetailsRatingReviews(val productId: Long) : ProductDetailsIntent
+
+        data class NavigationToRatingReview(val productId: Long) : ProductDetailsIntent
     }
 
     data class ProductDetailsState(
@@ -20,6 +22,7 @@ class ProductDetailsContract {
         val selectedVariant: ProductVariants? = null,
     )
 
-    sealed interface ProductDetailsEffect { //        data class ShowErrorMessage(val message: String) : ProductDetailsEffect
+    sealed interface ProductDetailsEffect {
+        data class NavigateToRatingReviewView(val productId: Long) : ProductDetailsEffect
     }
 }
