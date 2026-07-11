@@ -57,6 +57,12 @@ interface ApiService {
     suspend fun getSingleProductDetails(@Path("product_id") productId: Long): Response<SingleProductDetailsResponseDto>
 
     @GET(value = "rating-review/product/{product_id}")
-    suspend fun getProductDetailsRatingReviews(@Path(value = "product_id") productId: Long): Response<ProductDetailsRatingReviewsResponseDto>
+    suspend fun getProductDetailsRatingReviews(
+        @Path(value = "product_id") productId: Long,
+        @Query("page") page: Int? = 1,
+        @Query("limit") limit: Int? = 10,
+        @Query("sortBy") sortBy: String? = "createdAt",
+        @Query("order") order: String? = "desc",
+    ): Response<ProductDetailsRatingReviewsResponseDto>
 
 }

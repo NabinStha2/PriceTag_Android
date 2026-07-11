@@ -1,6 +1,5 @@
 package com.example.price_tag.domain.repository.product
 
-import com.example.price_tag.data.model.product_details.SingleProductDetailsResponseDto
 import com.example.price_tag.domain.model.product.ProductDetailsRatingReviews
 import com.example.price_tag.domain.model.product.Products
 import com.example.price_tag.domain.model.product.SingleProductDetails
@@ -27,5 +26,11 @@ interface ProductRepository {
 
     suspend fun getSingleProductDetails(productId: Long): Flow<ResourceState<SingleProductDetails>>
 
-    suspend fun getProductDetailsRatingReviews(productId: Long): Flow<ResourceState<ProductDetailsRatingReviews>>
+    suspend fun getProductDetailsRatingReviews(
+        productId: Long,
+        page: Int?,
+        limit: Int?,
+        sortBy: String?,
+        order: String?,
+    ): Flow<ResourceState<ProductDetailsRatingReviews>>
 }

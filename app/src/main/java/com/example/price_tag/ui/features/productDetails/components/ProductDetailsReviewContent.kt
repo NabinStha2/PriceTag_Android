@@ -33,46 +33,50 @@ import com.example.utilites.ResourceState
 @Composable
 fun ProductDetailsReviewContent(
     productDetailsRatingReviews: ResourceState<ProductDetailsRatingReviews>,
+    reviewListData: List<ProductDetailsRatingReviewsData> = emptyList(),
     showAll: Boolean = false,
 ) {
     when (productDetailsRatingReviews) {
         is ResourceState.Loading -> {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center,
-            ) {
-                CircularProgressIndicator()
+            if (reviewListData.isEmpty()) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    CircularProgressIndicator()
+                }
             }
         }
 
         is ResourceState.Error -> {
-            val error = productDetailsRatingReviews.error
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(),
-            ) {
-                Text(text = error,
-                     color = Color.Red,
-                     fontSize = 18.sp)
+            if (reviewListData.isEmpty()) {
+                val error = productDetailsRatingReviews.error
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(),
+                ) {
+                    Text(text = error,
+                         color = Color.Red,
+                         fontSize = 18.sp)
+                }
             }
         }
 
         is ResourceState.Success -> {
-            val ratingReviews: ProductDetailsRatingReviews = productDetailsRatingReviews.data
-
-            if (showAll) ratingReviews.productDetailsRatingReviewsData.forEach { ratingReviewData ->
-                RatingReviewCard(
-                    productDetailsRatingReviewsData = ratingReviewData,
-                )
+            val listToDisplay = if (showAll) {
+                reviewListData.ifEmpty { productDetailsRatingReviews.data.productDetailsRatingReviewsData }
+            } else {
+                productDetailsRatingReviews.data.productDetailsRatingReviewsData.take(3)
             }
-            else ratingReviews.productDetailsRatingReviewsData.take(3)
-                .forEach { ratingReviewData ->
+
+            Column {
+                listToDisplay.forEach { ratingReviewData ->
                     RatingReviewCard(
                         productDetailsRatingReviewsData = ratingReviewData,
                     )
                 }
-
+            }
         }
 
         else -> {}

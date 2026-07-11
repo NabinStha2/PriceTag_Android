@@ -121,30 +121,41 @@ class ProductRepositoryImpl @Inject constructor(
             emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
         }
 
-    override suspend fun getProductDetailsRatingReviews(productId: Long): Flow<ResourceState<ProductDetailsRatingReviews>> =
-        flow {
-            emit(ResourceState.Loading)
-            val response = productDataSource.getProductDetailsRatingReviews(productId)
+    override suspend fun getProductDetailsRatingReviews(
+        productId: Long,
+        page: Int?,
+        limit: Int?,
+        sortBy: String?,
+        order: String?,
+    ): Flow<ResourceState<ProductDetailsRatingReviews>> = flow {
+        emit(ResourceState.Loading)
+        val response = productDataSource.getProductDetailsRatingReviews(
+            productId,
+            page,
+            limit,
+            sortBy,
+            order,
+        )
 
-            if (response.isSuccessful && response.body() != null) {
-                val productDetailsRatingReviews: ProductDetailsRatingReviews = response.body()!!
-                    .toDomain();
-                emit(ResourceState.Success(productDetailsRatingReviews))
-            } else {
-                if (response.code() == 401) {
-                    try {
-                        dataStoreManager.clearAuthTokens()
-                    } catch (_: Exception) {
-                    }
+        if (response.isSuccessful && response.body() != null) {
+            val productDetailsRatingReviews: ProductDetailsRatingReviews = response.body()!!
+                .toDomain();
+            emit(ResourceState.Success(productDetailsRatingReviews))
+        } else {
+            if (response.code() == 401) {
+                try {
+                    dataStoreManager.clearAuthTokens()
+                } catch (_: Exception) {
                 }
-                val errorBody = response.errorBody()
-                    ?.string()
-                val message = parseError(errorBody) ?: "Failed to fetch product details"
-                emit(ResourceState.Error(message))
             }
-        }.catch { e ->
-            emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
+            val errorBody = response.errorBody()
+                ?.string()
+            val message = parseError(errorBody) ?: "Failed to fetch product details"
+            emit(ResourceState.Error(message))
         }
+    }.catch { e ->
+        emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
+    }
 
 
     private fun parseError(errorBody: String?): String? = errorBody?.let {

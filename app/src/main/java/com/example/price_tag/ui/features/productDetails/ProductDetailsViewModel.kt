@@ -38,7 +38,14 @@ class ProductDetailsViewModel @Inject constructor(
             }
 
             is ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews -> {
-                getSingleProductDetailsRatingReviews(productDetailsIntent.productId)
+                getSingleProductDetailsRatingReviews(
+                    productDetailsIntent.productId,
+                    productDetailsIntent.page,
+                    productDetailsIntent.limit,
+                    productDetailsIntent.sortBy,
+                    productDetailsIntent.order,
+                    productDetailsIntent.showLimited,
+                )
             }
 
             is ProductDetailsContract.ProductDetailsIntent.NavigationToRatingReview -> {
@@ -91,28 +98,74 @@ class ProductDetailsViewModel @Inject constructor(
         }
     }
 
-    private fun getSingleProductDetailsRatingReviews(productId: Long) {
+    private fun getSingleProductDetailsRatingReviews(
+        productId: Long,
+        page: Int?,
+        limit: Int?,
+        sortBy: String?,
+        order: String?,
+        showLimited: Boolean?,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
-            productDetailsRatingReviewsUseCase(productId = productId).collectLatest { response ->
+            if (_productDetailsState.value.isLoadingMoreReviews) return@launch
+
+            productDetailsRatingReviewsUseCase(
+                productId,
+                page,
+                limit,
+                sortBy,
+                order,
+            ).collectLatest { response ->
                 _productDetailsState.update { state ->
                     when (response) {
+                        is ResourceState.Loading -> {
+                            state.copy(
+                                isLoadingMoreReviews = true,
+                                isLastReviewPage = false,
+                            )
+                        }
+
                         is ResourceState.Success -> {
+                            val newList = if (page == 1 || showLimited == true) {
+                                response.data.productDetailsRatingReviewsData
+                            } else {
+                                state.reviewListData + response.data.productDetailsRatingReviewsData
+                            }
+
+                            if (showLimited == true) {
+                                state.copy(
+                                    isLoadingMoreReviews = false,
+                                    getSingleProductDetailsRatingReviews = response,
+                                    reviewListData = emptyList(),
+                                    limitedReviewListData = newList,
+                                    isLastReviewPage = !response.data.pagination.hasNext,
+                                )
+                            } else {
+                                state.copy(
+                                    isLoadingMoreReviews = false,
+                                    getSingleProductDetailsRatingReviews = response,
+                                    reviewListData = newList.distinctBy { it.id },
+                                    currentReviewPage = response.data.pagination.currentPage,
+                                    isLastReviewPage = !response.data.pagination.hasNext,
+                                )
+                            }
+
+                        }
+
+                        is ResourceState.Error -> {
                             state.copy(
                                 getSingleProductDetailsRatingReviews = response,
+                                isLoadingMoreReviews = false,
                             )
                         }
 
                         else -> {
-                            state.copy(
-                                getSingleProductDetailsRatingReviews = response,
-                            )
+                            state.copy(isLoadingMoreReviews = false)
                         }
                     }
                 }
-
             }
         }
-
     }
 
     private fun navigationToRatingReview(productId: Long) {

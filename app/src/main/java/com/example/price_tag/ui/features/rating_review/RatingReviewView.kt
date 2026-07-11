@@ -1,12 +1,17 @@
 package com.example.price_tag.ui.features.rating_review
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.icons.Icons
@@ -20,6 +25,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,7 +40,7 @@ import com.example.price_tag.core.theme.NeutralColor200
 import com.example.price_tag.core.theme.Poppins
 import com.example.price_tag.ui.features.productDetails.ProductDetailsContract
 import com.example.price_tag.ui.features.productDetails.ProductDetailsViewModel
-import com.example.price_tag.ui.features.productDetails.components.ProductDetailsReviewContent
+import com.example.price_tag.ui.features.productDetails.components.RatingReviewCard
 import com.example.utilites.ResourceState
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,9 +53,48 @@ fun RatingReviewView(
     val productDetailsState: ProductDetailsContract.ProductDetailsState =
         productDetailsViewModel.productDetailsState.collectAsStateWithLifecycle().value
 
+    val lazyListState = rememberLazyListState()
+
+    val isNearBottom by remember {
+        derivedStateOf {
+            val totalItemsCount = lazyListState.layoutInfo.totalItemsCount
+            Log.d("IsNearBottom",
+                  "Total items count: $totalItemsCount")
+            val lastVisibleItemIndex =
+                lazyListState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            Log.d("IsNearBottom",
+                  "Last visible item index: $lastVisibleItemIndex")
+            totalItemsCount > 0 && lastVisibleItemIndex >= totalItemsCount - 1
+        }
+    }
+
+    LaunchedEffect(isNearBottom,
+                   productDetailsState.isLastReviewPage,
+                   productDetailsState.isLoadingMoreReviews) {
+        Log.i("Outside RatingReviewView",
+              "isNearBottom: $isNearBottom, isLastReviewPage: ${productDetailsState.isLastReviewPage}, isLoadingMoreReviews: ${productDetailsState.isLoadingMoreReviews}")
+        if (isNearBottom && productId != null && productDetailsState.reviewListData.isNotEmpty() && !productDetailsState.isLastReviewPage && !productDetailsState.isLoadingMoreReviews) {
+            Log.d("Inside RatingReviewView",
+                  "isNearBottom: $isNearBottom, isLastReviewPage: ${productDetailsState.isLastReviewPage}, isLoadingMoreReviews: ${productDetailsState.isLoadingMoreReviews}")
+            productDetailsViewModel.onIntent(
+                ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews(
+                    productId = productId,
+                    page = productDetailsState.currentReviewPage + 1,
+                    limit = 4,
+                ),
+            )
+        }
+    }
+
     LaunchedEffect(true) {
-        if (productId != null) {
-            productDetailsViewModel.onIntent(ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews(productId))
+        if (productId != null && productDetailsState.reviewListData.isEmpty()) {
+            productDetailsViewModel.onIntent(
+                ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews(
+                    productId = productId,
+                    page = 1,
+                    limit = 4,
+                ),
+            )
         }
     }
 
@@ -86,50 +133,47 @@ fun RatingReviewView(
             )
         },
     ) { innerPadding ->
-        when (productDetailsState.getSingleProductDetailsRatingReviews) {
-            is ResourceState.Success -> {
-                LazyColumn(
-                    modifier = Modifier.padding(
-                        top = innerPadding.calculateTopPadding(),
-                        bottom = innerPadding.calculateBottomPadding(),
-                        start = 16.dp,
-                        end = 16.dp,
-                    ),
-                ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(horizontal = 16.dp),
+        ) {
+            LazyColumn(
+                state = lazyListState,
+                modifier = Modifier.height(330.dp),
+            ) {
+                items(productDetailsState.reviewListData) { ratingReviewData ->
+                    RatingReviewCard(productDetailsRatingReviewsData = ratingReviewData)
+                }
+
+                if (productDetailsState.isLoadingMoreReviews) {
                     item {
-                        ProductDetailsReviewContent(
-                            productDetailsRatingReviews = productDetailsState.getSingleProductDetailsRatingReviews,
-                            showAll = true,
-                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
                 }
             }
 
-            is ResourceState.Loading -> {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    CircularProgressIndicator()
-                }
+            if (productDetailsState.reviewListData.isEmpty() && productDetailsState.getSingleProductDetailsRatingReviews is ResourceState.Loading) {
+                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
             }
 
-            is ResourceState.Error -> {
+            if (productDetailsState.reviewListData.isEmpty() && productDetailsState.getSingleProductDetailsRatingReviews is ResourceState.Error) {
                 val error = productDetailsState.getSingleProductDetailsRatingReviews.error
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(),
-                ) {
-                    Text(
-                        text = error,
-                        color = Color.Red,
-                        fontSize = 18.sp,
-                    )
-                }
+                Text(
+                    text = error,
+                    color = Color.Red,
+                    fontSize = 18.sp,
+                    modifier = Modifier.align(Alignment.Center),
+                )
             }
-
-            else -> {}
         }
     }
 }

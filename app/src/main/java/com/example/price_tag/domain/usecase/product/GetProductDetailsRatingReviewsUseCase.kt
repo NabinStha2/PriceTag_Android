@@ -7,7 +7,19 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class GetProductDetailsRatingReviewsUseCase @Inject constructor(private val repository: ProductRepository) {
-    suspend operator fun invoke(productId: Long): Flow<ResourceState<ProductDetailsRatingReviews>> {
-        return repository.getProductDetailsRatingReviews(productId)
+    suspend operator fun invoke(
+        productId: Long,
+        page: Int?,
+        limit: Int?,
+        sortBy: String?,
+        order: String?,
+    ): Flow<ResourceState<ProductDetailsRatingReviews>> {
+        return repository.getProductDetailsRatingReviews(
+            productId,
+            page,
+            limit,
+            sortBy,
+            order,
+        )
     }
 }

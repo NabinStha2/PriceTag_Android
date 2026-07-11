@@ -110,7 +110,7 @@ fun ProductView(
                             ProductContract.ProductIntent.GetAllSubCategoryProducts(
                                 subCategoryId = it,
                                 page = productState.currentPage + 1,
-                                limit = 10,
+                                limit = 7,
                                 order = "asc",
                             ),
                         )

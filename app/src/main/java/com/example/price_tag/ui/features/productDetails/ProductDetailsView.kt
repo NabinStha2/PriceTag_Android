@@ -96,7 +96,14 @@ fun ProductDetailsView(
             productDetailsViewModel.onIntent(
                 ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetails(productId = productId),
             )
-            productDetailsViewModel.onIntent(ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews(productId))
+            productDetailsViewModel.onIntent(
+                ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews(
+                    productId,
+                    1,
+                    2,
+                    showLimited = true,
+                ),
+            )
         }
     }
 
@@ -278,6 +285,7 @@ fun ProductDetailsView(
                     item {
                         ProductDetailsReviewContent(
                             productDetailsRatingReviews = productDetailsState.getSingleProductDetailsRatingReviews,
+                            reviewListData = productDetailsState.limitedReviewListData,
                         )
                     }
                 }

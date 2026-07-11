@@ -48,8 +48,20 @@ class ProductDataSourceImpl @Inject constructor(private val apiService: ApiServi
         return apiService.getSingleProductDetails(productId)
     }
 
-    override suspend fun getProductDetailsRatingReviews(productId: Long): Response<ProductDetailsRatingReviewsResponseDto> {
-        return apiService.getProductDetailsRatingReviews(productId)
+    override suspend fun getProductDetailsRatingReviews(
+        productId: Long,
+        page: Int?,
+        limit: Int?,
+        sortBy: String?,
+        order: String?,
+    ): Response<ProductDetailsRatingReviewsResponseDto> {
+        return apiService.getProductDetailsRatingReviews(
+            productId,
+            page,
+            limit,
+            sortBy,
+            order,
+        )
     }
 
 }
