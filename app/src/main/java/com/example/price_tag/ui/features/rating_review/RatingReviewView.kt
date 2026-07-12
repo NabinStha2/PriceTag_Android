@@ -6,7 +6,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -80,7 +79,6 @@ fun RatingReviewView(
                 ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews(
                     productId = productId,
                     page = productDetailsState.currentReviewPage + 1,
-                    limit = 4,
                 ),
             )
         }
@@ -92,7 +90,6 @@ fun RatingReviewView(
                 ProductDetailsContract.ProductDetailsIntent.GetSingleProductDetailsRatingReviews(
                     productId = productId,
                     page = 1,
-                    limit = 4,
                 ),
             )
         }
@@ -141,7 +138,7 @@ fun RatingReviewView(
         ) {
             LazyColumn(
                 state = lazyListState,
-                modifier = Modifier.height(330.dp),
+                modifier = Modifier.fillMaxSize(),
             ) {
                 items(productDetailsState.reviewListData) { ratingReviewData ->
                     RatingReviewCard(productDetailsRatingReviewsData = ratingReviewData)
@@ -177,10 +174,3 @@ fun RatingReviewView(
         }
     }
 }
-
-
-//@Composable
-//@Preview
-//fun RatingReviewViewPreview{
-//
-//}
