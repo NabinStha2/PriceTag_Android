@@ -36,7 +36,6 @@ fun NavGraphBuilder.mainGraph(
 
             MainView(navController = navController as NavHostController,
                      viewModel = mainVm,
-                     selectedCategoryViewModel = selectedCategoryViewModel,
                      categoryViewModel = categoryVm)
         }
     }

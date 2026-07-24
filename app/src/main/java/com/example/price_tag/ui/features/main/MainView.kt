@@ -3,25 +3,21 @@ package com.example.price_tag.ui.features.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.price_tag.ui.components.BottomNavigationBar
-import com.example.price_tag.ui.components.SelectedCategoryViewModel
+import com.example.price_tag.ui.features.cart.CartView
 import com.example.price_tag.ui.features.category.CategoryView
 import com.example.price_tag.ui.features.category.CategoryViewModel
 import com.example.price_tag.ui.features.home.HomeView
 import com.example.price_tag.ui.features.profile.ProfileView
-import com.example.price_tag.ui.features.wishlist.WishlistView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,7 +25,6 @@ fun MainView(
     navController: NavHostController,
     viewModel: MainViewModel,
     categoryViewModel: CategoryViewModel,
-    selectedCategoryViewModel: SelectedCategoryViewModel,
 ) {
     val selectedIndex by viewModel.selectedMainBottomBarIndex.collectAsStateWithLifecycle()
 
@@ -46,18 +41,15 @@ fun MainView(
         contentWindowInsets = WindowInsets.statusBars,
     ) { paddingValues ->
         when (selectedIndex) {
-            1 -> HomeView(
-                navController = navController,
-                padding = paddingValues
-            )
+            0 -> HomeView(navController = navController,
+                          padding = paddingValues)
 
-            0 -> CategoryView(
-//                navController = navController,
+            1 -> CategoryView(
                 padding = paddingValues,
                 categoryViewModel = categoryViewModel,
             )
 
-            2 -> WishlistView(paddingValues)
+            2 -> CartView(navController = navController)
 
             3 -> ProfileView(
                 padding = paddingValues,

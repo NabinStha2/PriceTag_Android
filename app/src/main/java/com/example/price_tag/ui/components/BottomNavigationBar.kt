@@ -5,6 +5,7 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -49,11 +50,11 @@ fun BottomNavigationBar(selectedIndex: Int, onChangeIndex: (Int) -> Unit) {
 
         NavigationBarItem(icon = {
             Icon(
-                Icons.Filled.Favorite,
-                contentDescription = "Wishlist"
+                Icons.Filled.ShoppingCart,
+                contentDescription = "Cart"
             )
         },
-            label = { Text("Wishlist") },
+            label = { Text("Cart") },
             colors = NavigationBarItemDefaults.colors(
                 unselectedIconColor = Color.Gray,
                 selectedIconColor = Color.Blue
