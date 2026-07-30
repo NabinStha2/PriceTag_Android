@@ -3,7 +3,7 @@ package com.example.price_tag.ui.features.main
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -38,7 +38,7 @@ fun MainView(
                 viewModel.changeSelectedMainBottomBarIndex(index)
             }
         },
-        contentWindowInsets = WindowInsets.statusBars,
+        contentWindowInsets = WindowInsets.systemBars,
     ) { paddingValues ->
         when (selectedIndex) {
             0 -> HomeView(navController = navController,
@@ -49,7 +49,7 @@ fun MainView(
                 categoryViewModel = categoryViewModel,
             )
 
-            2 -> CartView(navController = navController)
+            2 -> CartView(navController = navController, padding = paddingValues)
 
             3 -> ProfileView(
                 padding = paddingValues,
