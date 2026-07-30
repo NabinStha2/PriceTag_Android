@@ -24,6 +24,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,6 +47,7 @@ import com.example.price_tag.R
 import com.example.price_tag.core.theme.ErrorColor800
 import com.example.price_tag.core.theme.NeutralColor100
 import com.example.price_tag.core.theme.NeutralColor800
+import com.example.price_tag.core.theme.PrimaryColor
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -82,13 +85,13 @@ private fun CartView(parentPadding: PaddingValues = PaddingValues()) {
 
         LazyColumn(
             modifier = Modifier
-                .fillMaxSize()
-                .navigationBarsPadding(),
+                .weight(1f)
+                .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
             contentPadding = PaddingValues(top = 8.dp),
             state = rememberLazyListState(),
         ) {
-            items(10) {
+            items(13) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -247,6 +250,23 @@ private fun CartView(parentPadding: PaddingValues = PaddingValues()) {
                         }
                     }
                 }
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+        ) {
+            ElevatedButton(
+                onClick = {},
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = PrimaryColor,
+                    contentColor = NeutralColor100,
+                ),
+            ) {
+                Text(text = "Checkout")
             }
         }
     }
