@@ -9,13 +9,13 @@ import androidx.navigation.toRoute
 import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.core.utils.animatedComposable
 import com.example.price_tag.core.utils.sharedViewModel
-import com.example.price_tag.ui.components.SelectedCategoryViewModel
-import com.example.price_tag.ui.features.auth.login.LoginView
-import com.example.price_tag.ui.features.auth.login.LoginViewModel
-import com.example.price_tag.ui.features.auth.otp.OtpView
-import com.example.price_tag.ui.features.auth.otp.OtpViewModel
-import com.example.price_tag.ui.features.auth.signup.SignUpView
-import com.example.price_tag.ui.features.auth.signup.SignUpViewModel
+import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
+import com.example.price_tag.feature.auth.presentation.login.LoginView
+import com.example.price_tag.feature.auth.presentation.login.LoginViewModel
+import com.example.price_tag.feature.auth.presentation.otp.OtpView
+import com.example.price_tag.feature.auth.presentation.otp.OtpViewModel
+import com.example.price_tag.feature.auth.presentation.signup.SignUpView
+import com.example.price_tag.feature.auth.presentation.signup.SignUpViewModel
 
 
 /**

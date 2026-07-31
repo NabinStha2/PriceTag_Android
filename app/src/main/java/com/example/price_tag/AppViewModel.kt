@@ -3,7 +3,7 @@ package com.example.price_tag
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.core.state.AppState
-import com.example.price_tag.domain.repository.session.SessionRepository
+import com.example.price_tag.core.session.domain.repository.SessionRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow

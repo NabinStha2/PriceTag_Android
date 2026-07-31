@@ -7,10 +7,10 @@ import androidx.navigation.navigation
 import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.core.utils.animatedComposable
 import com.example.price_tag.core.utils.sharedViewModel
-import com.example.price_tag.ui.components.SelectedCategoryViewModel
-import com.example.price_tag.ui.features.category.CategoryViewModel
-import com.example.price_tag.ui.features.main.MainView
-import com.example.price_tag.ui.features.main.MainViewModel
+import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
+import com.example.price_tag.feature.category.presentation.CategoryViewModel
+import com.example.price_tag.feature.main.presentation.MainView
+import com.example.price_tag.feature.main.presentation.MainViewModel
 
 /**
  * Main app graph — accessible only after authentication.

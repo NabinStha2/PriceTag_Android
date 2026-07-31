@@ -1,18 +1,19 @@
 package com.example.price_tag.core.di
 
-import com.example.price_tag.domain.repository.auth.AuthRepository
-import com.example.price_tag.domain.repository.category.CategoryRepository
-import com.example.price_tag.domain.repository.product.ProductRepository
-import com.example.price_tag.domain.usecase.auth.LoginUseCase
-import com.example.price_tag.domain.usecase.auth.RegisterUseCase
-import com.example.price_tag.domain.usecase.auth.VerifyOtpUseCase
-import com.example.price_tag.domain.usecase.category.GetCategoriesUseCase
-import com.example.price_tag.domain.usecase.category.GetSelectedCategoryUseCase
-import com.example.price_tag.domain.usecase.category.GetSubCategoriesWithSelectedCategoryUseCase
-import com.example.price_tag.domain.usecase.category.SetSelectedCategoryUseCase
-import com.example.price_tag.domain.usecase.product.GetAllSubCategoryProductsUseCase
-import com.example.price_tag.domain.usecase.product.GetAllSubCategorySearchProductsUseCase
-import com.example.price_tag.domain.usecase.product.GetProductDetailsUseCase
+import com.example.price_tag.feature.auth.domain.repository.AuthRepository
+import com.example.price_tag.feature.category.domain.repository.CategoryRepository
+import com.example.price_tag.feature.product.domain.repository.ProductRepository
+import com.example.price_tag.feature.auth.domain.usecase.LoginUseCase
+import com.example.price_tag.feature.auth.domain.usecase.RegisterUseCase
+import com.example.price_tag.feature.auth.domain.usecase.VerifyOtpUseCase
+import com.example.price_tag.feature.category.domain.usecase.GetCategoriesUseCase
+import com.example.price_tag.feature.category.domain.usecase.GetSelectedCategoryUseCase
+import com.example.price_tag.feature.category.domain.usecase.GetSubCategoriesWithSelectedCategoryUseCase
+import com.example.price_tag.feature.category.domain.usecase.SetSelectedCategoryUseCase
+import com.example.price_tag.feature.product.domain.usecase.GetAllSubCategoryProductsUseCase
+import com.example.price_tag.feature.product.domain.usecase.GetAllSubCategorySearchProductsUseCase
+import com.example.price_tag.feature.product.domain.usecase.GetProductDetailsUseCase
+import com.example.price_tag.feature.product.domain.usecase.GetProductDetailsRatingReviewsUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -81,5 +82,11 @@ object DomainModule {
     @Singleton
     fun provideGetProductDetailsUseCase(repository: ProductRepository): GetProductDetailsUseCase {
         return GetProductDetailsUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetProductDetailsRatingReviewsUseCase(repository: ProductRepository): GetProductDetailsRatingReviewsUseCase {
+        return GetProductDetailsRatingReviewsUseCase(repository)
     }
 }

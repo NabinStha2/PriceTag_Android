@@ -1,0 +1,36 @@
+package com.example.price_tag.feature.category.presentation
+
+import com.example.price_tag.feature.category.domain.model.Category
+import com.example.price_tag.feature.category.domain.model.SubCategory
+import com.example.utilites.ResourceState
+
+class CategoryContract {
+
+    sealed interface Intent {
+        data object GetAllCategories : Intent
+        data object RefreshCategories : Intent
+        data class GetSubCategoriesWithSelectedCategory(
+            val category: Category,
+            val index: Int,
+        ) : Intent
+
+        data class OnSubCategoryClick(
+            val subCategoryId: Long,
+            val subCategoryName: String,
+        ) : Intent
+
+        data object RetryLastOperation : Intent
+    }
+
+    data class State(
+        val categories: ResourceState<List<Category>> = ResourceState.Initial,
+        val subCategories: ResourceState<List<SubCategory>> = ResourceState.Initial,
+        val selectedIndex: Int = 0,
+        val selectedCategoryId: Long? = null,
+        val selectedCategoryName: String? = null,
+    )
+
+    sealed interface Effect {
+        data class NavigateToProducts(val subCategoryId: Long) : Effect
+    }
+}

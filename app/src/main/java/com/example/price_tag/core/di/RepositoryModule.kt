@@ -1,13 +1,13 @@
 package com.example.price_tag.core.di
 
-import com.example.price_tag.data.repository.auth.AuthRepositoryImpl
-import com.example.price_tag.data.repository.category.CategoryRepositoryImpl
-import com.example.price_tag.data.repository.product.ProductRepositoryImpl
-import com.example.price_tag.data.repository.session.SessionRepositoryImpl
-import com.example.price_tag.domain.repository.auth.AuthRepository
-import com.example.price_tag.domain.repository.category.CategoryRepository
-import com.example.price_tag.domain.repository.product.ProductRepository
-import com.example.price_tag.domain.repository.session.SessionRepository
+import com.example.price_tag.feature.auth.data.repository.AuthRepositoryImpl
+import com.example.price_tag.feature.category.data.repository.CategoryRepositoryImpl
+import com.example.price_tag.feature.product.data.repository.ProductRepositoryImpl
+import com.example.price_tag.core.session.data.repository.SessionRepositoryImpl
+import com.example.price_tag.feature.auth.domain.repository.AuthRepository
+import com.example.price_tag.feature.category.domain.repository.CategoryRepository
+import com.example.price_tag.feature.product.domain.repository.ProductRepository
+import com.example.price_tag.core.session.domain.repository.SessionRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

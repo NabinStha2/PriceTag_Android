@@ -10,12 +10,12 @@ import androidx.navigation.toRoute
 import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.core.utils.animatedComposable
 import com.example.price_tag.core.utils.sharedViewModel
-import com.example.price_tag.ui.components.SelectedCategoryViewModel
-import com.example.price_tag.ui.features.product.ProductView
-import com.example.price_tag.ui.features.product.ProductViewModel
-import com.example.price_tag.ui.features.productDetails.ProductDetailsView
-import com.example.price_tag.ui.features.productDetails.ProductDetailsViewModel
-import com.example.price_tag.ui.features.rating_review.RatingReviewView
+import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
+import com.example.price_tag.feature.product.presentation.listing.ProductView
+import com.example.price_tag.feature.product.presentation.listing.ProductViewModel
+import com.example.price_tag.feature.product.presentation.details.ProductDetailsView
+import com.example.price_tag.feature.product.presentation.details.ProductDetailsViewModel
+import com.example.price_tag.feature.product.presentation.reviews.RatingReviewView
 
 fun NavGraphBuilder.productGraph(navController: NavController) {
     navigation<NavigationItem.ProductGraph>(

@@ -1,11 +1,11 @@
 package com.example.price_tag.core.di
 
-import com.example.price_tag.data.remote.datasource.auth.AuthDataSource
-import com.example.price_tag.data.remote.datasource.auth.AuthDataSourceImpl
-import com.example.price_tag.data.remote.datasource.category.CategoryDataSource
-import com.example.price_tag.data.remote.datasource.category.CategoryDataSourceImpl
-import com.example.price_tag.data.remote.datasource.product.ProductDataSource
-import com.example.price_tag.data.remote.datasource.product.ProductDataSourceImpl
+import com.example.price_tag.feature.auth.data.remote.AuthDataSource
+import com.example.price_tag.feature.auth.data.remote.AuthDataSourceImpl
+import com.example.price_tag.feature.category.data.remote.CategoryDataSource
+import com.example.price_tag.feature.category.data.remote.CategoryDataSourceImpl
+import com.example.price_tag.feature.product.data.remote.ProductDataSource
+import com.example.price_tag.feature.product.data.remote.ProductDataSourceImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

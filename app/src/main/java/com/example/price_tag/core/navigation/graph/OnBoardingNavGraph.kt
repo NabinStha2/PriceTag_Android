@@ -6,8 +6,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.core.utils.sharedViewModel
-import com.example.price_tag.ui.features.onboarding.OnboardingView
-import com.example.price_tag.ui.features.onboarding.OnboardingViewModel
+import com.example.price_tag.feature.onboarding.presentation.OnboardingView
+import com.example.price_tag.feature.onboarding.presentation.OnboardingViewModel
 
 /**
  * Single-screen graph.

@@ -1,7 +1,7 @@
 package com.example.price_tag.core.di
 
 import com.example.price_tag.core.common.AppConstants
-import com.example.price_tag.data.remote.api.ApiService
+import com.example.price_tag.core.network.ApiService
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
