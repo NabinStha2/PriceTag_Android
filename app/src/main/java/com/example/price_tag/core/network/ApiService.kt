@@ -4,10 +4,11 @@ import com.example.price_tag.feature.auth.data.model.LoginRequest
 import com.example.price_tag.feature.auth.data.model.LoginResponse
 import com.example.price_tag.feature.auth.data.model.OtpRequest
 import com.example.price_tag.feature.auth.data.model.SignUpRequest
+import com.example.price_tag.feature.cart.data.model.CartResponseDto
 import com.example.price_tag.feature.category.data.model.CategoryResponse
 import com.example.price_tag.feature.category.data.model.SubCategoryResponse
-import com.example.price_tag.feature.product.data.model.ProductResponseDto
 import com.example.price_tag.feature.product.data.model.ProductDetailsRatingReviewsResponseDto
+import com.example.price_tag.feature.product.data.model.ProductResponseDto
 import com.example.price_tag.feature.product.data.model.SingleProductDetailsResponseDto
 import retrofit2.Response
 import retrofit2.http.Body
@@ -64,5 +65,8 @@ interface ApiService {
         @Query("sortBy") sortBy: String? = "createdAt",
         @Query("order") order: String? = "desc",
     ): Response<ProductDetailsRatingReviewsResponseDto>
+
+    @GET(value = "cart")
+    suspend fun getAllCartItems(): Response<CartResponseDto>
 
 }

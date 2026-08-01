@@ -2,6 +2,8 @@ package com.example.price_tag.core.di
 
 import com.example.price_tag.feature.auth.data.remote.AuthDataSource
 import com.example.price_tag.feature.auth.data.remote.AuthDataSourceImpl
+import com.example.price_tag.feature.cart.data.remote.CartDataSource
+import com.example.price_tag.feature.cart.data.remote.CartDataSourceImpl
 import com.example.price_tag.feature.category.data.remote.CategoryDataSource
 import com.example.price_tag.feature.category.data.remote.CategoryDataSourceImpl
 import com.example.price_tag.feature.product.data.remote.ProductDataSource
@@ -18,19 +20,17 @@ abstract class DataSourceModule {
 
     @Binds
     @Singleton
-    abstract fun bindAuthDataSource(
-        authDataSourceImpl: AuthDataSourceImpl
-    ): AuthDataSource
+    abstract fun bindAuthDataSource(authDataSourceImpl: AuthDataSourceImpl): AuthDataSource
 
     @Binds
     @Singleton
-    abstract fun bindCategoryDataSource(
-        categoryDataSourceImpl: CategoryDataSourceImpl
-    ): CategoryDataSource
+    abstract fun bindCategoryDataSource(categoryDataSourceImpl: CategoryDataSourceImpl): CategoryDataSource
 
     @Binds
     @Singleton
-    abstract fun bindProductDataSource(
-        productDataSourceImpl: ProductDataSourceImpl
-    ): ProductDataSource
+    abstract fun bindProductDataSource(productDataSourceImpl: ProductDataSourceImpl): ProductDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindCartDataSource(cartDataSourceImpl: CartDataSourceImpl): CartDataSource
 }

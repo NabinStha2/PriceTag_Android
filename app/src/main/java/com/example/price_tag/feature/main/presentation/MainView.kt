@@ -14,6 +14,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import com.example.price_tag.core.ui.components.BottomNavigationBar
 import com.example.price_tag.feature.cart.presentation.CartView
+import com.example.price_tag.feature.cart.presentation.CartViewModel
 import com.example.price_tag.feature.category.presentation.CategoryView
 import com.example.price_tag.feature.category.presentation.CategoryViewModel
 import com.example.price_tag.feature.home.presentation.HomeView
@@ -25,6 +26,7 @@ fun MainView(
     navController: NavHostController,
     viewModel: MainViewModel,
     categoryViewModel: CategoryViewModel,
+    cartViewModel: CartViewModel,
 ) {
     val selectedIndex by viewModel.selectedMainBottomBarIndex.collectAsStateWithLifecycle()
 
@@ -41,15 +43,21 @@ fun MainView(
         contentWindowInsets = WindowInsets.systemBars,
     ) { paddingValues ->
         when (selectedIndex) {
-            0 -> HomeView(navController = navController,
-                          padding = paddingValues)
+            0 -> HomeView(
+                navController = navController,
+                padding = paddingValues,
+            )
 
             1 -> CategoryView(
                 padding = paddingValues,
                 categoryViewModel = categoryViewModel,
             )
 
-            2 -> CartView(navController = navController, padding = paddingValues)
+            2 -> CartView(
+                navController = navController,
+                padding = paddingValues,
+                cartViewModel = cartViewModel,
+            )
 
             3 -> ProfileView(
                 padding = paddingValues,

@@ -1,9 +1,9 @@
 package com.example.price_tag.feature.product.data.mapper
 
 import com.example.price_tag.core.common.data.mapper.toDomain
+import com.example.price_tag.core.common.domain.model.PaginationModel
 import com.example.price_tag.feature.product.data.model.ProductDataDto
 import com.example.price_tag.feature.product.data.model.ProductResponseDto
-import com.example.price_tag.core.common.domain.model.PaginationModel
 import com.example.price_tag.feature.product.domain.model.ProductData
 import com.example.price_tag.feature.product.domain.model.Products
 
@@ -26,12 +26,12 @@ fun ProductDataDto.toDomain(): ProductData {
         id = id ?: 0L,
         name = name.orEmpty(),
         slug = slug.orEmpty(),
-        description = description,
-        shortDescription = shortDescription,
-        imageUrl = primaryImageURL,
+        description = description ?: "",
+        shortDescription = shortDescription ?: "",
+        imageUrl = primaryImageURL ?: "",
         basePrice = basePrice ?: 0.0,
         discountedPrice = discountedPrice ?: basePrice ?: 0.0,
-        brand = brand,
+        brand = brand ?: "",
         rating = totalRating ?: 0.0,
         totalReview = totalReview ?: 0L,
     )

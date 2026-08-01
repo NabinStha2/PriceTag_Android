@@ -5,9 +5,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.navigation
 import com.example.price_tag.core.navigation.NavigationItem
+import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
 import com.example.price_tag.core.utils.animatedComposable
 import com.example.price_tag.core.utils.sharedViewModel
-import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
+import com.example.price_tag.feature.cart.presentation.CartViewModel
 import com.example.price_tag.feature.category.presentation.CategoryViewModel
 import com.example.price_tag.feature.main.presentation.MainView
 import com.example.price_tag.feature.main.presentation.MainViewModel
@@ -34,9 +35,15 @@ fun NavGraphBuilder.mainGraph(
             val selectedCategoryViewModel =
                 backStackEntry.sharedViewModel<SelectedCategoryViewModel, NavigationItem.MainGraph>(navController)
 
-            MainView(navController = navController as NavHostController,
-                     viewModel = mainVm,
-                     categoryViewModel = categoryVm)
+            val cartVm =
+                backStackEntry.sharedViewModel<CartViewModel, NavigationItem.MainGraph>(navController)
+
+            MainView(
+                navController = navController as NavHostController,
+                viewModel = mainVm,
+                categoryViewModel = categoryVm,
+                cartViewModel = cartVm,
+            )
         }
     }
 }

@@ -27,38 +27,48 @@ fun ErrorState(
     errorMessage: String = "Unknown error",
     onRetry: () -> Unit,
 ) {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .padding(16.dp),
-           horizontalAlignment = Alignment.CenterHorizontally,
-           verticalArrangement = Arrangement.Center) {
-        Icon(painter = painterResource(id = R.drawable.ic_launcher_foreground),
-             contentDescription = "Error",
-             tint = Color.Red,
-             modifier = Modifier.size(64.dp))
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Icon(
+            painter = painterResource(id = R.drawable.ic_launcher_foreground),
+            contentDescription = "Error",
+            tint = Color.Red,
+            modifier = Modifier.size(64.dp),
+        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        //        Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Oops! Something went wrong",
-             style = MaterialTheme.typography.headlineSmall,
-             color = Color.Red,
-             textAlign = TextAlign.Center)
+        //        Text(text = "Oops! Something went wrong",
+        //             style = MaterialTheme.typography.headlineSmall,
+        //             color = Color.Red,
+        //             textAlign = TextAlign.Center)
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        Text(text = errorMessage,
-             style = MaterialTheme.typography.bodyMedium,
-             color = Color.Gray,
-             textAlign = TextAlign.Center,
-             modifier = Modifier.padding(horizontal = 32.dp))
+        Text(
+            text = errorMessage,
+            style = MaterialTheme.typography.bodyMedium,
+            color = Color.Gray,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(horizontal = 32.dp),
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        Button(onClick = onRetry,
-               colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5))) {
-            Text(text = "Try Again",
-                 color = Color.White,
-                 fontWeight = FontWeight.Bold)
+        Button(
+            onClick = onRetry,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF3F51B5)),
+        ) {
+            Text(
+                text = "Try Again",
+                color = Color.White,
+                fontWeight = FontWeight.Bold,
+            )
         }
     }
 }
