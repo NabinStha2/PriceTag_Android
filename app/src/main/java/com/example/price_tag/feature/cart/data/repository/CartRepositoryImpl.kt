@@ -1,10 +1,11 @@
 package com.example.price_tag.feature.cart.data.repository
 
-import android.util.Log
 import com.example.price_tag.core.common.data.model.CommonErrorResponse
+import com.example.price_tag.core.common.data.model.CommonResponseDto
+import com.example.price_tag.core.common.domain.model.CommonSuccessResponse
 import com.example.price_tag.core.datastore.DataStoreManager
 import com.example.price_tag.feature.cart.data.mapper.toDomain
-import com.example.price_tag.feature.cart.data.model.CartResponseDto
+import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
 import com.example.price_tag.feature.cart.data.remote.CartDataSource
 import com.example.price_tag.feature.cart.domain.model.Cart
 import com.example.price_tag.feature.cart.domain.repository.CartRepository
@@ -21,18 +22,19 @@ class CartRepositoryImpl @Inject constructor(
     private val json: Json,
     private val dataStoreManager: DataStoreManager,
 ) : CartRepository {
+
     override suspend fun getAllCartItems(): Flow<ResourceState<Cart>> = flow {
         emit(ResourceState.Loading)
-        val response: Response<CartResponseDto> = cartDataSource.getAllCartItems()
+        val response = cartDataSource.getAllCartItems()
         if (response.isSuccessful && response.body() != null) {
-            val cart: Cart = response.body()!!
+            val cart = response.body()!!
                 .toDomain()
-
-            Log.i("getAllCartItems",
-                  "All Cart Details: $cart")
-
-            emit(ResourceState.Success(cart))
-        } else { // If unauthorized, clear tokens to force logout
+            if (cart != null) {
+                emit(ResourceState.Success(cart))
+            } else {
+                emit(ResourceState.Error("Cart data was empty or malformed"))
+            }
+        } else {
             if (response.code() == 401) {
                 try {
                     dataStoreManager.clearAuthTokens()
@@ -41,11 +43,29 @@ class CartRepositoryImpl @Inject constructor(
             }
             val errorBody = response.errorBody()
                 ?.string()
-            val message = parseError(errorBody) ?: "Failed to fetch product details"
+            val message = parseError(errorBody) ?: "Failed to fetch cart details"
             emit(ResourceState.Error(message))
         }
     }.catch { e ->
         emit(ResourceState.Error(e.localizedMessage ?: "An error occurred"))
+    }
+
+    override suspend fun addItemToCart(addCartItemRequestDto: AddCartItemRequestDto): Flow<ResourceState<CommonSuccessResponse>> {
+        return flow<ResourceState<CommonSuccessResponse>> {
+            emit(ResourceState.Loading)
+            val response: Response<CommonResponseDto> =
+                cartDataSource.addItemToCart(addCartItemRequestDto)
+            if (response.isSuccessful && response.body() != null) {
+                emit(ResourceState.Success(CommonSuccessResponse(message = response.body()!!.message)))
+            } else {
+                val errorBody = response.errorBody()
+                    ?.string()
+                val message = parseError(errorBody) ?: "Failed to add item to cart"
+                emit(ResourceState.Error(message))
+            }
+        }.catch { e ->
+            emit(ResourceState.Error(e.message ?: "An error occurred"))
+        }
     }
 
     private fun parseError(errorBody: String?): String? = errorBody?.let {

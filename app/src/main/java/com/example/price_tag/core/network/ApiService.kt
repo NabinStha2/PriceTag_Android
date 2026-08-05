@@ -1,9 +1,11 @@
 package com.example.price_tag.core.network
 
+import com.example.price_tag.core.common.data.model.CommonResponseDto
 import com.example.price_tag.feature.auth.data.model.LoginRequest
 import com.example.price_tag.feature.auth.data.model.LoginResponse
 import com.example.price_tag.feature.auth.data.model.OtpRequest
 import com.example.price_tag.feature.auth.data.model.SignUpRequest
+import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
 import com.example.price_tag.feature.cart.data.model.CartResponseDto
 import com.example.price_tag.feature.category.data.model.CategoryResponse
 import com.example.price_tag.feature.category.data.model.SubCategoryResponse
@@ -68,5 +70,8 @@ interface ApiService {
 
     @GET(value = "cart")
     suspend fun getAllCartItems(): Response<CartResponseDto>
+
+    @POST(value = "cart/items")
+    suspend fun addItemToCart(@Body addCartItemRequestDto: AddCartItemRequestDto): Response<CommonResponseDto>
 
 }
