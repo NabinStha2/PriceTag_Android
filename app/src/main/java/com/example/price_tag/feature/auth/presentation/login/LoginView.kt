@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeContentPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -56,9 +55,9 @@ import androidx.compose.ui.unit.sp
 import com.example.price_tag.CustomSnackbarVisuals
 import com.example.price_tag.R
 import com.example.price_tag.core.theme.PrimaryColor
+import com.example.price_tag.core.ui.components.Loader
 import com.example.price_tag.core.utils.Validations
 import com.example.price_tag.feature.auth.data.model.LoginRequest
-import com.example.price_tag.core.ui.components.Loader
 import com.example.utilites.ResourceState
 
 @Composable
@@ -101,25 +100,27 @@ fun LoginView(
 
 
 
-    Scaffold(modifier = Modifier
-        .fillMaxSize()
-        .safeContentPadding(),
-             containerColor = Color.White,
-             snackbarHost = {
-                 SnackbarHost(hostState = snackbarHostState,
-                              snackbar = { snackbarData ->
-                                  val customVisuals = snackbarData.visuals as? CustomSnackbarVisuals
-                                  if (customVisuals != null) {
-                                      Snackbar(
-                                          snackbarData = snackbarData,
-                                          contentColor = customVisuals.contentColor,
-                                          containerColor = customVisuals.containerColor,
-                                      )
-                                  } else {
-                                      Snackbar(snackbarData = snackbarData)
-                                  }
-                              })
-             }) { scaffoldPadding ->
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        containerColor = Color.White,
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { snackBarData ->
+                    val customVisuals = snackBarData.visuals as? CustomSnackbarVisuals
+                    if (customVisuals != null) {
+                        Snackbar(
+                            snackbarData = snackBarData,
+                            contentColor = customVisuals.contentColor,
+                            containerColor = customVisuals.containerColor,
+                        )
+                    } else {
+                        Snackbar(snackbarData = snackBarData)
+                    }
+                },
+            )
+        },
+    ) { scaffoldPadding ->
 
         when (loginResponse) {
             is ResourceState.Loading -> {
@@ -141,7 +142,6 @@ fun LoginView(
             verticalArrangement = Arrangement.Center,
 
             ) {
-
             Image(
                 painter = painterResource(id = R.drawable.logo),
                 contentDescription = "logo",
@@ -154,8 +154,7 @@ fun LoginView(
                 style = TextStyle(
                     fontSize = 20.sp,
                     fontWeight = FontWeight.W500,
-
-                    ),
+                ),
             )
             Spacer(modifier = Modifier.height(32.dp))
             OutlinedTextField(

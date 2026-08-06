@@ -1,5 +1,6 @@
 package com.example.price_tag.feature.cart.presentation
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
@@ -29,11 +30,12 @@ class CartViewModel @Inject constructor(
         MutableStateFlow(CartContract.CartState())
     val allCartItems: StateFlow<CartContract.CartState> = _allCartItems.asStateFlow()
 
-    private val _effect: Channel<CartContract.CartEffect> = Channel()
+    private val _effect: Channel<CartContract.CartEffect> = Channel(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
 
     init {
+        Log.d("CartViewModel", "init: Fetching cart items")
         onIntent(CartContract.CartIntent.GetAllCartItems)
     }
 
@@ -57,7 +59,9 @@ class CartViewModel @Inject constructor(
 
     private fun getAllCartItems() {
         viewModelScope.launch(Dispatchers.IO) {
+            Log.d("CartViewModel", "getAllCartItems: Starting fetch")
             getAllCartItemsUseCase().collectLatest { response ->
+                Log.d("CartViewModel", "getAllCartItems: Received response: $response")
                 _allCartItems.update { state ->
                     when (response) {
                         is ResourceState.Success -> {
@@ -81,11 +85,13 @@ class CartViewModel @Inject constructor(
                 }
                 when (response) {
                     is ResourceState.Success -> {
+                        Log.d("CartViewModel", "addItemsToCart: Success, refreshing cart")
                         _effect.send(CartContract.CartEffect.ShowSnackBar(response.data.message))
                         getAllCartItems()
                     }
 
                     is ResourceState.Error -> {
+                        Log.e("CartViewModel", "addItemsToCart: Error: ${response.error}")
                         _effect.send(CartContract.CartEffect.ShowSnackBar(response.error))
                     }
 

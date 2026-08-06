@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navigation
 import com.example.price_tag.core.navigation.graph.authNavGraph
 import com.example.price_tag.core.navigation.graph.mainGraph
 import com.example.price_tag.core.navigation.graph.onboardingNavGraph
@@ -36,7 +37,7 @@ fun RootNavHost(
         AppState.Loading         -> NavigationItem.SplashView
         AppState.OnBoarding      -> NavigationItem.OnboardingGraph
         AppState.Unauthenticated -> NavigationItem.AuthGraph
-        AppState.Authenticated   -> NavigationItem.MainGraph
+        AppState.Authenticated   -> NavigationItem.AuthenticatedGraph
     }
 
     NavHost(
@@ -51,7 +52,9 @@ fun RootNavHost(
         // Nested graphs
         onboardingNavGraph(navController)
         authNavGraph(navController)
-        mainGraph(navController)
-        productGraph(navController)
+        navigation<NavigationItem.AuthenticatedGraph>(startDestination = NavigationItem.MainGraph) {
+            mainGraph(navController)
+            productGraph(navController)
+        }
     }
 }

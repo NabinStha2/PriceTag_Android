@@ -67,6 +67,9 @@ sealed interface NavigationItem {
     // ── Graph roots (not real screens; used as nested graph start routes) ───
 
     @Serializable
+    data object AuthenticatedGraph : NavigationItem
+
+    @Serializable
     data object AuthGraph : NavigationItem
 
     @Serializable

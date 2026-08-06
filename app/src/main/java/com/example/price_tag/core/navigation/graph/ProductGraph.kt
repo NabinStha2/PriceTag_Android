@@ -8,13 +8,14 @@ import androidx.navigation.NavHostController
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.example.price_tag.core.navigation.NavigationItem
+import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
 import com.example.price_tag.core.utils.animatedComposable
 import com.example.price_tag.core.utils.sharedViewModel
-import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
-import com.example.price_tag.feature.product.presentation.listing.ProductView
-import com.example.price_tag.feature.product.presentation.listing.ProductViewModel
+import com.example.price_tag.feature.cart.presentation.CartViewModel
 import com.example.price_tag.feature.product.presentation.details.ProductDetailsView
 import com.example.price_tag.feature.product.presentation.details.ProductDetailsViewModel
+import com.example.price_tag.feature.product.presentation.listing.ProductView
+import com.example.price_tag.feature.product.presentation.listing.ProductViewModel
 import com.example.price_tag.feature.product.presentation.reviews.RatingReviewView
 
 fun NavGraphBuilder.productGraph(navController: NavController) {
@@ -44,6 +45,10 @@ fun NavGraphBuilder.productGraph(navController: NavController) {
         animatedComposable<NavigationItem.ProductDetailsView> { backStackEntry ->
             val productDetailsViewModel: ProductDetailsViewModel =
                 backStackEntry.sharedViewModel<ProductDetailsViewModel, NavigationItem.ProductGraph>(navController)
+            val cartViewModel: CartViewModel =
+                backStackEntry.sharedViewModel<CartViewModel, NavigationItem.AuthenticatedGraph>(navController)
+            val selectedCategoryViewModel =
+                backStackEntry.sharedViewModel<SelectedCategoryViewModel, NavigationItem.MainGraph>(navController)
 
             val args = backStackEntry.toRoute<NavigationItem.ProductDetailsView>()
 
@@ -52,6 +57,8 @@ fun NavGraphBuilder.productGraph(navController: NavController) {
                 paddingValues = PaddingValues(0.dp),
                 productDetailsViewModel = productDetailsViewModel,
                 productId = args.productId,
+                cartViewModel = cartViewModel,
+                selectedCategoryViewModel = selectedCategoryViewModel,
             )
         }
 

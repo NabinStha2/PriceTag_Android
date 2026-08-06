@@ -29,10 +29,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -42,6 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.example.price_tag.CustomSnackbarVisuals
 import com.example.price_tag.R
 import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.core.theme.NeutralColor100
@@ -49,11 +54,15 @@ import com.example.price_tag.core.theme.NeutralColor200
 import com.example.price_tag.core.theme.NeutralColor800
 import com.example.price_tag.core.theme.Poppins
 import com.example.price_tag.core.theme.PrimaryColor
-import com.example.price_tag.feature.product.domain.model.ColorSizeVariantGroup
-import com.example.price_tag.feature.product.domain.model.SingleProductDetails
 import com.example.price_tag.core.ui.components.CartIconWithBadge
+import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
+import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
+import com.example.price_tag.feature.cart.presentation.CartContract
+import com.example.price_tag.feature.cart.presentation.CartViewModel
 import com.example.price_tag.feature.home.presentation.CarouselItem
 import com.example.price_tag.feature.home.presentation.widgets.CarouselSlider
+import com.example.price_tag.feature.product.domain.model.ColorSizeVariantGroup
+import com.example.price_tag.feature.product.domain.model.SingleProductDetails
 import com.example.price_tag.feature.product.presentation.details.components.ProductDetailsDescriptionContent
 import com.example.price_tag.feature.product.presentation.details.components.ProductDetailsHeaderContent
 import com.example.price_tag.feature.product.presentation.details.components.ProductDetailsReviewContent
@@ -68,6 +77,8 @@ fun ProductDetailsView(
     navController: NavController,
     paddingValues: PaddingValues,
     productDetailsViewModel: ProductDetailsViewModel,
+    cartViewModel: CartViewModel,
+    selectedCategoryViewModel: SelectedCategoryViewModel,
     productId: Long?,
 ) {
     val images = listOf(
@@ -80,6 +91,8 @@ fun ProductDetailsView(
 
     val productDetailsState: ProductDetailsContract.ProductDetailsState =
         productDetailsViewModel.productDetailsState.collectAsStateWithLifecycle().value
+    val cartState by cartViewModel.allCartItems.collectAsStateWithLifecycle()
+    val snackbarHostState: SnackbarHostState = selectedCategoryViewModel.snackbarHostState
 
     LaunchedEffect(Unit) {
         productDetailsViewModel.effect.collect { effect ->
@@ -87,6 +100,20 @@ fun ProductDetailsView(
                 is ProductDetailsContract.ProductDetailsEffect.NavigateToRatingReviewView -> {
                     navController.navigate(NavigationItem.RatingReviewView(effect.productId))
                 }
+            }
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        cartViewModel.effect.collect { effect ->
+            when (effect) {
+                is CartContract.CartEffect.ShowSnackBar -> {
+                    snackbarHostState.showSnackbar(CustomSnackbarVisuals(message = effect.message,
+                                                                         containerColor = PrimaryColor,
+                                                                         contentColor = Color.White))
+                }
+
+                else -> {}
             }
         }
     }
@@ -109,6 +136,21 @@ fun ProductDetailsView(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState,
+                         snackbar = { snackbarData ->
+                             val customVisuals = snackbarData.visuals as? CustomSnackbarVisuals
+                             if (customVisuals != null) {
+                                 Snackbar(
+                                     snackbarData = snackbarData,
+                                     contentColor = customVisuals.contentColor,
+                                     containerColor = customVisuals.containerColor,
+                                 )
+                             } else {
+                                 Snackbar(snackbarData = snackbarData)
+                             }
+                         })
+        },
         topBar = {
             CenterAlignedTopAppBar(modifier = Modifier.padding(horizontal = 16.dp),
                                    navigationIcon = {
@@ -131,7 +173,12 @@ fun ProductDetailsView(
                                        )
                                    },
                                    actions = {
-                                       CartIconWithBadge()
+                                       val cartCount =
+                                           (cartState.getAllCartItems as? ResourceState.Success)?.data?.totalItemCount?.toInt()
+                                           ?: 0
+                                       CartIconWithBadge(count = cartCount) { // Navigate to Cart
+                                           navController.navigate(NavigationItem.MainGraph)
+                                       }
                                    })
         },
         bottomBar = {
@@ -158,7 +205,12 @@ fun ProductDetailsView(
                         Text(text = "Buy Now")
                     }
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = {
+                            cartViewModel.onIntent(CartContract.CartIntent.AddCartItemsToCart(AddCartItemRequestDto(
+                                variantId = productDetailsState.selectedVariant?.id ?: 0L,
+                                quantity = 1,
+                            )))
+                        },
                         modifier = Modifier.weight(1f),
                         colors = ButtonColors(
                             containerColor = PrimaryColor,
@@ -308,26 +360,3 @@ fun ProductDetailsView(
     }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

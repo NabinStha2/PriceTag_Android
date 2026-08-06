@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -51,14 +52,15 @@ import com.example.price_tag.core.theme.NeutralColor800
 import com.example.price_tag.core.theme.PrimaryColor
 import com.example.price_tag.core.ui.components.CircularLoadingState
 import com.example.price_tag.core.ui.components.ErrorState
+import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
 import com.example.utilites.ResourceState
 
 
 @Composable
 fun CartView(
-    navController: NavController?, //    cartViewModel: CartViewModel,
-    padding: PaddingValues = PaddingValues(),
+    navController: NavController?,
     cartViewModel: CartViewModel,
+    selectedCategoryViewModel: SelectedCategoryViewModel,
 ) {
     val uiState by cartViewModel.allCartItems.collectAsStateWithLifecycle()
 
@@ -67,19 +69,17 @@ fun CartView(
     }
 
     CartView(
-        parentPadding = padding,
         uiState = uiState,
     )
 }
 
 @Composable
 private fun CartView(
-    parentPadding: PaddingValues = PaddingValues(),
     uiState: CartContract.CartState,
 ) {
 
     when (val cartState = uiState.getAllCartItems) {
-        is ResourceState.Loading -> CircularLoadingState(padding = parentPadding)
+        is ResourceState.Loading -> CircularLoadingState(padding = PaddingValues())
 
         is ResourceState.Error -> ErrorState(
             errorMessage = cartState.error,
@@ -90,7 +90,7 @@ private fun CartView(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(parentPadding)
+                    .padding(top = 8.dp)
                     .padding(horizontal = 16.dp),
             ) {
                 Column(

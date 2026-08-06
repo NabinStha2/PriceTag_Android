@@ -36,13 +36,14 @@ fun NavGraphBuilder.mainGraph(
                 backStackEntry.sharedViewModel<SelectedCategoryViewModel, NavigationItem.MainGraph>(navController)
 
             val cartVm =
-                backStackEntry.sharedViewModel<CartViewModel, NavigationItem.MainGraph>(navController)
+                backStackEntry.sharedViewModel<CartViewModel, NavigationItem.AuthenticatedGraph>(navController)
 
             MainView(
                 navController = navController as NavHostController,
                 viewModel = mainVm,
                 categoryViewModel = categoryVm,
                 cartViewModel = cartVm,
+                selectedCategoryViewModel = selectedCategoryViewModel,
             )
         }
     }

@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.price_tag.core.theme.PriceTagTheme
+import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
+import com.example.price_tag.feature.cart.presentation.CartViewModel
 import com.example.price_tag.feature.category.domain.model.Category
 import com.example.price_tag.feature.category.domain.model.SubCategory
 import com.example.price_tag.feature.category.presentation.components.CategoryNavigationRail
@@ -29,14 +31,14 @@ import com.example.utilites.ResourceState
 
 @Composable
 fun CategoryView(
-    padding: PaddingValues,
     categoryViewModel: CategoryViewModel,
+    cartViewModel: CartViewModel,
+    selectedCategoryViewModel: SelectedCategoryViewModel,
 ) {
     val uiState by categoryViewModel.uiState.collectAsStateWithLifecycle()
 
     CategoryView(
         uiState = uiState,
-        padding = padding,
         onCategorySelected = { index, category ->
             categoryViewModel.onIntent(CategoryContract.Intent.GetSubCategoriesWithSelectedCategory(category = category,
                                                                                                     index = index))
@@ -59,14 +61,13 @@ fun CategoryView(
 @Composable
 private fun CategoryView(
     uiState: CategoryContract.State,
-    padding: PaddingValues,
     onCategorySelected: (Int, Category) -> Unit,
     onSubCategoryClick: (Long, String) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
 ) {
     when (val categoriesState = uiState.categories) {
-        is ResourceState.Loading -> CategoriesLoadingState(padding)
+        is ResourceState.Loading -> CategoriesLoadingState()
 
         is ResourceState.Error -> CategoriesErrorState(errorMessage = categoriesState.error.toString())
 
@@ -75,7 +76,6 @@ private fun CategoryView(
             subCategoriesState = uiState.subCategories,
             selectedCategoryName = uiState.selectedCategoryName,
             selectedIndex = uiState.selectedIndex,
-            padding = padding,
             onCategorySelected = onCategorySelected,
             onSubCategoryClick = onSubCategoryClick,
             onRefresh = onRefresh,
@@ -87,11 +87,10 @@ private fun CategoryView(
 }
 
 @Composable
-private fun CategoriesLoadingState(padding: PaddingValues) {
+private fun CategoriesLoadingState() {
     Box(
         modifier = Modifier
-            .fillMaxSize()
-            .padding(padding),
+            .fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()
@@ -117,15 +116,14 @@ private fun CategoriesSuccessState(
     subCategoriesState: ResourceState<List<SubCategory>>,
     selectedCategoryName: String?,
     selectedIndex: Int,
-    padding: PaddingValues,
     onCategorySelected: (Int, Category) -> Unit,
     onSubCategoryClick: (Long, String) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
 ) {
     Row(modifier = Modifier
-        .padding(padding)
-        .padding(top = 16.dp)) {
+        .fillMaxSize()
+        .padding(top = 8.dp)) {
         CategoryNavigationRail(
             categories = categories,
             selectedIndex = selectedIndex,
@@ -200,11 +198,7 @@ fun CategoryViewPreview() {
                                            subCategories = ResourceState.Success(sampleSubCategories),
                                            selectedIndex = 0)
 
-        CategoryView(uiState = state,
-                     padding = PaddingValues(0.dp),
-                     onCategorySelected = { _, _ -> },
-                     onSubCategoryClick = { _, _ -> },
-                     onRefresh = {},
-                     onRetry = {})
+        // Preview needs dummy viewmodels or updated signature
+        // CategoryView(uiState = state, ...)
     }
 }

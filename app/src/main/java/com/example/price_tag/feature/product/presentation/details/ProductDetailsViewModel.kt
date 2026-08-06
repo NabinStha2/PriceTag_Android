@@ -8,12 +8,12 @@ import com.example.price_tag.feature.product.domain.usecase.GetProductDetailsUse
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,8 +28,8 @@ class ProductDetailsViewModel @Inject constructor(
     val productDetailsState: StateFlow<ProductDetailsContract.ProductDetailsState> =
         _productDetailsState.asStateFlow()
 
-    private val _effect = MutableSharedFlow<ProductDetailsContract.ProductDetailsEffect>()
-    val effect = _effect.asSharedFlow()
+    private val _effect = Channel<ProductDetailsContract.ProductDetailsEffect>(Channel.BUFFERED)
+    val effect = _effect.receiveAsFlow()
 
     fun onIntent(productDetailsIntent: ProductDetailsContract.ProductDetailsIntent) {
         when (productDetailsIntent) {
@@ -170,7 +170,7 @@ class ProductDetailsViewModel @Inject constructor(
 
     private fun navigationToRatingReview(productId: Long) {
         viewModelScope.launch {
-            _effect.emit(ProductDetailsContract.ProductDetailsEffect.NavigateToRatingReviewView(productId))
+            _effect.send(ProductDetailsContract.ProductDetailsEffect.NavigateToRatingReviewView(productId))
         }
     }
 
