@@ -46,10 +46,6 @@ fun CartView(
 ) {
     val uiState by cartViewModel.cartState.collectAsStateWithLifecycle()
 
-    //    LaunchedEffect(Unit) {
-    //        cartViewModel.onIntent(CartContract.CartIntent.GetAllCartItems)
-    //    }
-
     CartView(
         uiState = uiState,
         onIntent = cartViewModel::onIntent,
@@ -112,7 +108,8 @@ fun CartSuccessState(
     cartItems: List<CartItem>,
     onIntent: (CartContract.CartIntent) -> Unit,
     isRefreshing: Boolean,
-) { //    val pullToRefreshState = rememberPullToRefreshState()
+) {
+    val pullToRefreshState = rememberPullToRefreshState()
 
     Column(
         modifier = Modifier
@@ -139,11 +136,12 @@ fun CartSuccessState(
         }
 
         PullToRefreshBox(
+            state = pullToRefreshState,
             indicator = {
                 PullToRefreshDefaults.Indicator(
                     modifier = Modifier.align(Alignment.TopCenter),
                     isRefreshing = isRefreshing,
-                    state = rememberPullToRefreshState(),
+                    state = pullToRefreshState,
                     containerColor = MaterialTheme.colorScheme.surface,
                     color = PrimaryColor,
                 )
@@ -155,7 +153,6 @@ fun CartSuccessState(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
-
             ) {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
