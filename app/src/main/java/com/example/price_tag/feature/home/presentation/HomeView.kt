@@ -101,7 +101,7 @@ fun HomeView(
     )
     val pagerState = rememberPagerState(pageCount = { images.size })
     val coroutineScope = rememberCoroutineScope()
-    val cartState by cartViewModel.allCartItems.collectAsStateWithLifecycle()
+    val cartState by cartViewModel.cartState.collectAsStateWithLifecycle()
 
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),

@@ -11,4 +11,6 @@ interface CartDataSource {
 
     suspend fun addItemToCart(addCartItemRequestDto: AddCartItemRequestDto): Response<CommonResponseDto>
 
+    suspend fun removeCartItem(cartItemId: Long): Response<CommonResponseDto>
+
 }

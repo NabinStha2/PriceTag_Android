@@ -14,6 +14,7 @@ import com.example.price_tag.feature.product.data.model.ProductResponseDto
 import com.example.price_tag.feature.product.data.model.SingleProductDetailsResponseDto
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -73,5 +74,8 @@ interface ApiService {
 
     @POST(value = "cart/items")
     suspend fun addItemToCart(@Body addCartItemRequestDto: AddCartItemRequestDto): Response<CommonResponseDto>
+
+    @DELETE(value = "cart/item/{item_id}")
+    suspend fun removeCartItem(@Path("item_id") cartItemId: Long): Response<CommonResponseDto>
 
 }

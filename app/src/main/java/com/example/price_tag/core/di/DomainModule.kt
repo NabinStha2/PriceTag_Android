@@ -6,6 +6,7 @@ import com.example.price_tag.feature.auth.domain.usecase.RegisterUseCase
 import com.example.price_tag.feature.auth.domain.usecase.VerifyOtpUseCase
 import com.example.price_tag.feature.cart.domain.repository.CartRepository
 import com.example.price_tag.feature.cart.domain.usecase.GetAllCartItemsUseCase
+import com.example.price_tag.feature.cart.domain.usecase.RemoveCartItemUseCase
 import com.example.price_tag.feature.category.domain.repository.CategoryRepository
 import com.example.price_tag.feature.category.domain.usecase.GetCategoriesUseCase
 import com.example.price_tag.feature.category.domain.usecase.GetSelectedCategoryUseCase
@@ -96,5 +97,11 @@ object DomainModule {
     @Singleton
     fun provideGetAllCartItemsUseCase(repository: CartRepository): GetAllCartItemsUseCase {
         return GetAllCartItemsUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideRemoveCartItemUseCase(repository: CartRepository): RemoveCartItemUseCase {
+        return RemoveCartItemUseCase(repository)
     }
 }

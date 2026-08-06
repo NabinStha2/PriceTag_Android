@@ -1,7 +1,6 @@
 package com.example.price_tag.feature.category.presentation
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -9,18 +8,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.price_tag.core.theme.PriceTagTheme
+import com.example.price_tag.core.ui.components.ErrorState
 import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
 import com.example.price_tag.feature.cart.presentation.CartViewModel
 import com.example.price_tag.feature.category.domain.model.Category
@@ -38,6 +34,10 @@ fun CategoryView(
     val uiState by categoryViewModel.uiState.collectAsStateWithLifecycle()
 
     CategoryView(
+        //        onIntent = {
+        //            categoryViewModel.onIntent(it)
+        //        },
+        onIntent = categoryViewModel::onIntent,
         uiState = uiState,
         onCategorySelected = { index, category ->
             categoryViewModel.onIntent(CategoryContract.Intent.GetSubCategoriesWithSelectedCategory(category = category,
@@ -65,11 +65,15 @@ private fun CategoryView(
     onSubCategoryClick: (Long, String) -> Unit,
     onRefresh: () -> Unit,
     onRetry: () -> Unit,
+    onIntent: (CategoryContract.Intent) -> Unit,
 ) {
     when (val categoriesState = uiState.categories) {
         is ResourceState.Loading -> CategoriesLoadingState()
 
-        is ResourceState.Error -> CategoriesErrorState(errorMessage = categoriesState.error.toString())
+        is ResourceState.Error -> CategoriesErrorState(
+            errorMessage = categoriesState.error,
+            onRetryAction = { onIntent(CategoryContract.Intent.RefreshCategories) },
+        )
 
         is ResourceState.Success -> CategoriesSuccessState(
             categories = categoriesState.data,
@@ -89,8 +93,7 @@ private fun CategoryView(
 @Composable
 private fun CategoriesLoadingState() {
     Box(
-        modifier = Modifier
-            .fillMaxSize(),
+        modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()
@@ -98,14 +101,15 @@ private fun CategoriesLoadingState() {
 }
 
 @Composable
-private fun CategoriesErrorState(errorMessage: String) {
+private fun CategoriesErrorState(
+    errorMessage: String,
+    onRetryAction: () -> Unit,
+) {
     Box(modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center) {
-        Text(
-            text = "Error: $errorMessage",
-            color = Color.Red,
-            textAlign = TextAlign.Center,
-            fontSize = 18.sp,
+        ErrorState(
+            errorMessage = errorMessage,
+            onRetry = onRetryAction,
         )
     }
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
 import com.example.price_tag.feature.cart.domain.usecase.AddItemToCartUseCase
 import com.example.price_tag.feature.cart.domain.usecase.GetAllCartItemsUseCase
+import com.example.price_tag.feature.cart.domain.usecase.RemoveCartItemUseCase
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -24,18 +25,20 @@ import javax.inject.Inject
 class CartViewModel @Inject constructor(
     private val getAllCartItemsUseCase: GetAllCartItemsUseCase,
     private val addItemToCartUseCase: AddItemToCartUseCase,
+    private val removeCartItemUseCase: RemoveCartItemUseCase,
 ) : ViewModel() {
 
-    private val _allCartItems: MutableStateFlow<CartContract.CartState> =
+    private val _cartState: MutableStateFlow<CartContract.CartState> =
         MutableStateFlow(CartContract.CartState())
-    val allCartItems: StateFlow<CartContract.CartState> = _allCartItems.asStateFlow()
+    val cartState: StateFlow<CartContract.CartState> = _cartState.asStateFlow()
 
     private val _effect: Channel<CartContract.CartEffect> = Channel(Channel.BUFFERED)
     val effect = _effect.receiveAsFlow()
 
 
     init {
-        Log.d("CartViewModel", "init: Fetching cart items")
+        Log.d("CartViewModel",
+              "init: Fetching cart items")
         onIntent(CartContract.CartIntent.GetAllCartItems)
     }
 
@@ -50,26 +53,57 @@ class CartViewModel @Inject constructor(
             }
 
             is CartContract.CartIntent.ResetAddItemToCartState -> {
-                _allCartItems.update { state ->
+                _cartState.update { state ->
                     state.copy(addItemToCartState = ResourceState.Initial)
                 }
+            }
+
+            is CartContract.CartIntent.RemoveCartItem -> {
+                removeCartItem(cartIntent.cartItemId)
+            }
+
+            is CartContract.CartIntent.RefreshCart -> {
+                getAllCartItems(isPullToRefresh = true)
             }
         }
     }
 
-    private fun getAllCartItems() {
+    private fun getAllCartItems(isPullToRefresh: Boolean = false) {
         viewModelScope.launch(Dispatchers.IO) {
-            Log.d("CartViewModel", "getAllCartItems: Starting fetch")
+            Log.d("CartViewModel",
+                  "getAllCartItems: Starting fetch")
             getAllCartItemsUseCase().collectLatest { response ->
-                Log.d("CartViewModel", "getAllCartItems: Received response: $response")
-                _allCartItems.update { state ->
+                Log.d("CartViewModel",
+                      "getAllCartItems: Received response: $response")
+                _cartState.update { state ->
                     when (response) {
+                        is ResourceState.Loading -> {
+                            if (isPullToRefresh) { // pull-to-refresh: keep existing list visible, just flip the flag
+                                state.copy(isRefreshing = true)
+                            } else { // normal/initial load: let the full-screen Loading UI show
+                                state.copy(getAllCartItems = response)
+                            }
+                        }
+
                         is ResourceState.Success -> {
-                            state.copy(getAllCartItems = response)
+                            state.copy(
+                                getAllCartItems = response,
+                                isRefreshing = false,
+                            )
+                        }
+
+
+                        is ResourceState.Error -> {
+                            state.copy(
+                                getAllCartItems = response,
+                                isRefreshing = false,
+                            )
                         }
 
                         else -> {
-                            state.copy(getAllCartItems = response)
+                            state.copy(
+                                isRefreshing = false,
+                            )
                         }
                     }
                 }
@@ -78,20 +112,25 @@ class CartViewModel @Inject constructor(
     }
 
     private fun addItemsToCart(addCartItemRequestDto: AddCartItemRequestDto) {
+        if (_cartState.value.addItemToCartState is ResourceState.Loading) return
+
         viewModelScope.launch(Dispatchers.IO) {
             addItemToCartUseCase(addCartItemRequestDto = addCartItemRequestDto).collectLatest { response ->
-                _allCartItems.update { state ->
+                _cartState.update { state ->
                     state.copy(addItemToCartState = response)
                 }
                 when (response) {
                     is ResourceState.Success -> {
-                        Log.d("CartViewModel", "addItemsToCart: Success, refreshing cart")
-                        _effect.send(CartContract.CartEffect.ShowSnackBar(response.data.message))
-                        getAllCartItems()
+                        Log.d("CartViewModel",
+                              "addItemsToCart: Success, refreshing cart")
+                        _effect.send(CartContract.CartEffect.ShowSnackBar(response.data.message
+                                                                          ?: ""))
+                        getAllCartItems(isPullToRefresh = true)
                     }
 
                     is ResourceState.Error -> {
-                        Log.e("CartViewModel", "addItemsToCart: Error: ${response.error}")
+                        Log.e("CartViewModel",
+                              "addItemsToCart: Error: ${response.error}")
                         _effect.send(CartContract.CartEffect.ShowSnackBar(response.error))
                     }
 
@@ -101,5 +140,36 @@ class CartViewModel @Inject constructor(
         }
     }
 
+    private fun removeCartItem(cartItemId: Long) {
+        if (cartItemId in _cartState.value.removingItemIds) return
+        viewModelScope.launch(Dispatchers.IO) {
+            _cartState.update { it.copy(removingItemIds = it.removingItemIds + cartItemId) }
+
+            removeCartItemUseCase(cartItemId = cartItemId).collectLatest { response ->
+                when (response) {
+                    is ResourceState.Success -> {
+                        Log.d("CartViewModel",
+                              "removeCartItem: Success, removed cart item")
+                        _effect.send(CartContract.CartEffect.ShowSnackBar(response.data.message
+                                                                          ?: ""))
+                        _cartState.update { it.copy(removingItemIds = it.removingItemIds - cartItemId) }
+
+                        getAllCartItems(isPullToRefresh = true)
+                    }
+
+                    is ResourceState.Error -> {
+                        Log.e("CartViewModel",
+                              "removeCartItem: Error: ${response.error}")
+                        _effect.send(CartContract.CartEffect.ShowSnackBar(response.error))
+                        _cartState.update { it.copy(removingItemIds = it.removingItemIds - cartItemId) }
+                    }
+
+                    else -> {
+                        _cartState.update { it.copy(removingItemIds = it.removingItemIds - cartItemId) }
+                    }
+                }
+            }
+        }
+    }
 
 }

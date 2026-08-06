@@ -16,4 +16,8 @@ class CartDataSourceImpl @Inject constructor(private val apiService: ApiService)
     override suspend fun addItemToCart(addCartItemRequestDto: AddCartItemRequestDto): Response<CommonResponseDto> {
         return apiService.addItemToCart(addCartItemRequestDto)
     }
+
+    override suspend fun removeCartItem(cartItemId: Long): Response<CommonResponseDto> {
+        return apiService.removeCartItem(cartItemId)
+    }
 }

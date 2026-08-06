@@ -91,7 +91,7 @@ fun ProductDetailsView(
 
     val productDetailsState: ProductDetailsContract.ProductDetailsState =
         productDetailsViewModel.productDetailsState.collectAsStateWithLifecycle().value
-    val cartState by cartViewModel.allCartItems.collectAsStateWithLifecycle()
+    val cartState by cartViewModel.cartState.collectAsStateWithLifecycle()
     val snackbarHostState: SnackbarHostState = selectedCategoryViewModel.snackbarHostState
 
     LaunchedEffect(Unit) {
