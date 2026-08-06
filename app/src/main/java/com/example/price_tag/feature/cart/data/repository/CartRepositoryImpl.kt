@@ -6,6 +6,7 @@ import com.example.price_tag.core.common.domain.model.CommonResponse
 import com.example.price_tag.core.datastore.DataStoreManager
 import com.example.price_tag.feature.cart.data.mapper.toDomain
 import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
+import com.example.price_tag.feature.cart.data.model.UpdateCartItemQuantityRequestDto
 import com.example.price_tag.feature.cart.data.remote.CartDataSource
 import com.example.price_tag.feature.cart.domain.model.Cart
 import com.example.price_tag.feature.cart.domain.repository.CartRepository
@@ -86,6 +87,28 @@ class CartRepositoryImpl @Inject constructor(
                 val errorBody = response.errorBody()
                     ?.string()
                 val message = parseError(errorBody) ?: "Failed to remove item from cart"
+                emit(ResourceState.Error(message))
+            }
+        }.catch { e ->
+            emit(ResourceState.Error(e.message ?: "An error occurred"))
+        }
+    }
+
+    override suspend fun updateCartItemQuantity(updateCartItemQuantityRequestDto: UpdateCartItemQuantityRequestDto): Flow<ResourceState<CommonResponse>> {
+        return flow {
+            emit(ResourceState.Loading)
+            val response: Response<CommonResponseDto> =
+                cartDataSource.updateCartItemQuantity(updateCartItemQuantityRequestDto)
+            if (response.isSuccessful && response.body() != null) {
+                emit(ResourceState.Success(CommonResponse(
+                    message = response.body()!!.message,
+                    statusCode = response.body()!!.statusCode,
+                    success = response.body()!!.success,
+                )))
+            } else {
+                val errorBody = response.errorBody()
+                    ?.string()
+                val message = parseError(errorBody) ?: "Failed to update cart item quantity"
                 emit(ResourceState.Error(message))
             }
         }.catch { e ->

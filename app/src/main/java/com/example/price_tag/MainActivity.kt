@@ -69,5 +69,5 @@ data class CustomSnackbarVisuals(
     val containerColor: Color = Color.White,
     val contentColor: Color = Color.Red,
     override val actionLabel: String? = null,
-    override val withDismissAction: Boolean = false,
+    override val withDismissAction: Boolean = true,
 ) : SnackbarVisuals

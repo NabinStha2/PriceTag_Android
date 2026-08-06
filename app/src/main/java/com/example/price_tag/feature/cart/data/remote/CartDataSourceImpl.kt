@@ -4,6 +4,7 @@ import com.example.price_tag.core.common.data.model.CommonResponseDto
 import com.example.price_tag.core.network.ApiService
 import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
 import com.example.price_tag.feature.cart.data.model.CartResponseDto
+import com.example.price_tag.feature.cart.data.model.UpdateCartItemQuantityRequestDto
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -19,5 +20,12 @@ class CartDataSourceImpl @Inject constructor(private val apiService: ApiService)
 
     override suspend fun removeCartItem(cartItemId: Long): Response<CommonResponseDto> {
         return apiService.removeCartItem(cartItemId)
+    }
+
+    override suspend fun updateCartItemQuantity(updateCartItemQuantityRequestDto: UpdateCartItemQuantityRequestDto): Response<CommonResponseDto> {
+        return apiService.updateCartItemQuantity(
+            updateCartItemQuantityRequestDto.cartItemId,
+            updateCartItemQuantityRequestDto,
+        )
     }
 }

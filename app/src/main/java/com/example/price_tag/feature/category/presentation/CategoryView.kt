@@ -203,6 +203,6 @@ fun CategoryViewPreview() {
                                            selectedIndex = 0)
 
         // Preview needs dummy viewmodels or updated signature
-        // CategoryView(uiState = state, ...)
+//         CategoryView(uiState = state, ...)
     }
 }

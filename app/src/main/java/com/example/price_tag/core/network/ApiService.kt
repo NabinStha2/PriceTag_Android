@@ -7,6 +7,7 @@ import com.example.price_tag.feature.auth.data.model.OtpRequest
 import com.example.price_tag.feature.auth.data.model.SignUpRequest
 import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
 import com.example.price_tag.feature.cart.data.model.CartResponseDto
+import com.example.price_tag.feature.cart.data.model.UpdateCartItemQuantityRequestDto
 import com.example.price_tag.feature.category.data.model.CategoryResponse
 import com.example.price_tag.feature.category.data.model.SubCategoryResponse
 import com.example.price_tag.feature.product.data.model.ProductDetailsRatingReviewsResponseDto
@@ -16,6 +17,7 @@ import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
@@ -78,4 +80,9 @@ interface ApiService {
     @DELETE(value = "cart/item/{item_id}")
     suspend fun removeCartItem(@Path("item_id") cartItemId: Long): Response<CommonResponseDto>
 
+    @PATCH(value = "cart/item/{item_id}")
+    suspend fun updateCartItemQuantity(
+        @Path("item_id") cartItemId: Long,
+        @Body updateCartItemQuantityRequestDto: UpdateCartItemQuantityRequestDto,
+    ): Response<CommonResponseDto>
 }

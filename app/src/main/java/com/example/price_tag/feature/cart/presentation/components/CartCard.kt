@@ -28,21 +28,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColorInt
 import com.example.price_tag.R
 import com.example.price_tag.core.theme.ErrorColor800
 import com.example.price_tag.core.theme.NeutralColor100
+import com.example.price_tag.core.theme.NeutralColor200
+import com.example.price_tag.core.theme.NeutralColor400
+import com.example.price_tag.core.theme.NeutralColor50
 import com.example.price_tag.core.theme.NeutralColor800
+import com.example.price_tag.core.theme.NeutralColor900
 import com.example.price_tag.feature.cart.domain.model.CartItem
 
 @Composable
 fun CartCard(
     cartItem: CartItem,
     onRemove: (cartItemId: Long) -> Unit,
+    onQuantityChange: (cartItemId: Long, quantity: Int) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -114,42 +122,79 @@ fun CartCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                Text(
-                    cartItem.variantId.toString(),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-
-                Spacer(modifier = Modifier.height(4.dp))
-
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Start,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(
-                        modifier = Modifier.weight(1f),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Start,
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = NeutralColor100,
+                                shape = RoundedCornerShape(percent = 20),
+                            )
+                            .background(
+                                color = NeutralColor50,
+                                shape = RoundedCornerShape(percent = 20),
+                            )
+                            .padding(
+                                horizontal = 6.dp,
+                                vertical = 4.dp,
+                            ),
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .width(12.dp)
-                                .height(12.dp)
-                                .background(
-                                    color = ErrorColor800,
-                                    shape = RoundedCornerShape(100),
-                                ),
-                        )
+                        Row(
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .width(12.dp)
+                                    .height(12.dp)
+                                    .background(
+                                        color = Color(cartItem.colorHex!!.toColorInt()),
+                                        shape = RoundedCornerShape(100),
+                                    ),
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                text = "${cartItem.colorName}",
+                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.W400),
+                            )
+                        }
+
+                    }
+
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = NeutralColor100,
+                                shape = RoundedCornerShape(percent = 20),
+                            )
+                            .background(
+                                color = NeutralColor50,
+                                shape = RoundedCornerShape(percent = 20),
+                            )
+                            .padding(
+                                horizontal = 6.dp,
+                                vertical = 4.dp,
+                            ),
+                    ) {
                         Text(
-                            text = " ${cartItem.colorName} / ${cartItem.sizeName}",
+                            text = "${cartItem.sizeName}",
                             style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.W400),
                         )
                     }
-
-                    Text(
-                        text = "SKU: ${cartItem.sku}",
-                        style = MaterialTheme.typography.bodySmall,
-                    )
                 }
+
+                Spacer(modifier = Modifier.height(4.dp))
+
+                Text(
+                    text = "SKU: ${cartItem.sku}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = NeutralColor400,
+                )
 
                 Box(
                     modifier = Modifier
@@ -167,7 +212,12 @@ fun CartCard(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         IconButton(
-                            onClick = {},
+                            onClick = {
+                                onQuantityChange(
+                                    cartItem.itemId,
+                                    cartItem.quantity.toInt() - 1,
+                                )
+                            },
                             modifier = Modifier.size(20.dp),
                         ) {
                             Icon(
@@ -184,7 +234,12 @@ fun CartCard(
                         )
 
                         IconButton(
-                            onClick = {},
+                            onClick = {
+                                onQuantityChange(
+                                    cartItem.itemId,
+                                    cartItem.quantity.toInt() + 1,
+                                )
+                            },
                             modifier = Modifier.size(20.dp),
                         ) {
                             Icon(
@@ -194,12 +249,32 @@ fun CartCard(
                             )
                         }
                     }
-
-
                 }
 
 
             }
         }
     }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun CartCardPreview() {
+    CartCard(
+        cartItem = CartItem(itemId = 1L,
+                            variantId = 101L,
+                            sku = "SKU12345",
+                            productName = "Sample Product Name that is quite long to test ellipsis and layout behavior",
+                            imageUrl = "",
+                            colorName = "Red",
+                            colorHex = "#FF0000",
+                            sizeName = "M",
+                            unitPrice = 29.99,
+                            quantity = 2,
+                            lineTotal = 59.98,
+                            stockAvailable = 10),
+        onRemove = {},
+        onQuantityChange = { _, _ -> },
+    )
 }

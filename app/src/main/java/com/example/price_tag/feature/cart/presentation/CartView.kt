@@ -33,6 +33,7 @@ import com.example.price_tag.core.theme.NeutralColor100
 import com.example.price_tag.core.theme.PrimaryColor
 import com.example.price_tag.core.ui.components.ErrorState
 import com.example.price_tag.core.ui.viewmodel.SelectedCategoryViewModel
+import com.example.price_tag.feature.cart.data.model.UpdateCartItemQuantityRequestDto
 import com.example.price_tag.feature.cart.domain.model.CartItem
 import com.example.price_tag.feature.cart.presentation.components.CartCard
 import com.example.utilites.ResourceState
@@ -153,7 +154,7 @@ fun CartSuccessState(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
-            ) {
+        ) {
             LazyColumn(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -165,6 +166,16 @@ fun CartSuccessState(
                         cartItem = cartItems[index],
                         onRemove = { cartItemId ->
                             onIntent(CartContract.CartIntent.RemoveCartItem(cartItemId))
+                        },
+                        onQuantityChange = { cartItemId, quantity ->
+                            onIntent(
+                                CartContract.CartIntent.UpdateCartItemQuantity(
+                                    UpdateCartItemQuantityRequestDto(
+                                        cartItemId = cartItemId,
+                                        quantity = quantity,
+                                    ),
+                                ),
+                            )
                         },
                     )
                 }

@@ -4,9 +4,11 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
+import com.example.price_tag.feature.cart.data.model.UpdateCartItemQuantityRequestDto
 import com.example.price_tag.feature.cart.domain.usecase.AddItemToCartUseCase
 import com.example.price_tag.feature.cart.domain.usecase.GetAllCartItemsUseCase
 import com.example.price_tag.feature.cart.domain.usecase.RemoveCartItemUseCase
+import com.example.price_tag.feature.cart.domain.usecase.UpdateCartItemQuantityUseCase
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +28,7 @@ class CartViewModel @Inject constructor(
     private val getAllCartItemsUseCase: GetAllCartItemsUseCase,
     private val addItemToCartUseCase: AddItemToCartUseCase,
     private val removeCartItemUseCase: RemoveCartItemUseCase,
+    private val updateCartItemQuantityUseCase: UpdateCartItemQuantityUseCase,
 ) : ViewModel() {
 
     private val _cartState: MutableStateFlow<CartContract.CartState> =
@@ -65,10 +68,17 @@ class CartViewModel @Inject constructor(
             is CartContract.CartIntent.RefreshCart -> {
                 getAllCartItems(isPullToRefresh = true)
             }
+
+            is CartContract.CartIntent.UpdateCartItemQuantity -> {
+                updateCartItemQuantity(cartIntent.updateCartItemQuantityRequestDto)
+            }
         }
     }
 
-    private fun getAllCartItems(isPullToRefresh: Boolean = false) {
+    private fun getAllCartItems(
+        isPullToRefresh: Boolean = false,
+        isUpdating: Boolean = false,
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             Log.d("CartViewModel",
                   "getAllCartItems: Starting fetch")
@@ -80,6 +90,8 @@ class CartViewModel @Inject constructor(
                         is ResourceState.Loading -> {
                             if (isPullToRefresh) { // pull-to-refresh: keep existing list visible, just flip the flag
                                 state.copy(isRefreshing = true)
+                            } else if (isUpdating) {
+                                state.copy(isUpdating = true)
                             } else { // normal/initial load: let the full-screen Loading UI show
                                 state.copy(getAllCartItems = response)
                             }
@@ -89,6 +101,7 @@ class CartViewModel @Inject constructor(
                             state.copy(
                                 getAllCartItems = response,
                                 isRefreshing = false,
+                                isUpdating = false,
                             )
                         }
 
@@ -97,12 +110,14 @@ class CartViewModel @Inject constructor(
                             state.copy(
                                 getAllCartItems = response,
                                 isRefreshing = false,
+                                isUpdating = false,
                             )
                         }
 
                         else -> {
                             state.copy(
                                 isRefreshing = false,
+                                isUpdating = false,
                             )
                         }
                     }
@@ -125,7 +140,7 @@ class CartViewModel @Inject constructor(
                               "addItemsToCart: Success, refreshing cart")
                         _effect.send(CartContract.CartEffect.ShowSnackBar(response.data.message
                                                                           ?: ""))
-                        getAllCartItems(isPullToRefresh = true)
+                        getAllCartItems(isUpdating = true)
                     }
 
                     is ResourceState.Error -> {
@@ -154,7 +169,7 @@ class CartViewModel @Inject constructor(
                                                                           ?: ""))
                         _cartState.update { it.copy(removingItemIds = it.removingItemIds - cartItemId) }
 
-                        getAllCartItems(isPullToRefresh = true)
+                        getAllCartItems(isUpdating = true)
                     }
 
                     is ResourceState.Error -> {
@@ -167,6 +182,36 @@ class CartViewModel @Inject constructor(
                     else -> {
                         _cartState.update { it.copy(removingItemIds = it.removingItemIds - cartItemId) }
                     }
+                }
+            }
+        }
+    }
+
+    private fun updateCartItemQuantity(updateCartItemQuantityRequestDto: UpdateCartItemQuantityRequestDto) {
+        if (_cartState.value.updateCartItemQuantityState is ResourceState.Loading) return
+
+        viewModelScope.launch(Dispatchers.IO) {
+            updateCartItemQuantityUseCase(updateCartItemQuantityRequestDto = updateCartItemQuantityRequestDto).collectLatest { response ->
+                _cartState.update { state ->
+                    state.copy(updateCartItemQuantityState = response)
+                }
+                when (response) {
+                    is ResourceState.Success -> {
+                        Log.d("CartViewModel",
+                              "updateCartItemQuantity: Success, updated cart item")
+                        _effect.send(CartContract.CartEffect.ShowSnackBar(response.data.message
+                                                                          ?: ""))
+
+                        getAllCartItems(isUpdating = true)
+                    }
+
+                    is ResourceState.Error -> {
+                        Log.e("CartViewModel",
+                              "updateCartItemQuantity: Error: ${response.error}")
+                        _effect.send(CartContract.CartEffect.ShowSnackBar(response.error))
+                    }
+
+                    else -> {}
                 }
             }
         }
