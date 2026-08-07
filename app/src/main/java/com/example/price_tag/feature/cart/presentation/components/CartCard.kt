@@ -261,20 +261,20 @@ fun CartCard(
 @Preview(showBackground = true)
 @Composable
 fun CartCardPreview() {
-    CartCard(
-        cartItem = CartItem(itemId = 1L,
-                            variantId = 101L,
-                            sku = "SKU12345",
-                            productName = "Sample Product Name that is quite long to test ellipsis and layout behavior",
-                            imageUrl = "",
-                            colorName = "Red",
-                            colorHex = "#FF0000",
-                            sizeName = "M",
-                            unitPrice = 29.99,
-                            quantity = 2,
-                            lineTotal = 59.98,
-                            stockAvailable = 10),
-        onRemove = {},
-        onQuantityChange = { _, _ -> },
-    )
+//    CartCard(
+//        cartItem = CartItem(itemId = 1L,
+//                            variantId = 101L,
+//                            sku = "SKU12345",
+//                            productName = "Sample Product Name that is quite long to test ellipsis and layout behavior",
+//                            imageUrl = "",
+//                            colorName = "Red",
+//                            colorHex = "#FF0000",
+//                            sizeName = "M",
+//                            unitPrice = 29.99,
+//                            quantity = 2,
+//                            lineTotal = 59.98,
+//                            stockAvailable = 10),
+//        onRemove = {},
+//        onQuantityChange = { _, _ -> },
+//    )
 }

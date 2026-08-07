@@ -30,7 +30,6 @@ class CartViewModel @Inject constructor(
     private val removeCartItemUseCase: RemoveCartItemUseCase,
     private val updateCartItemQuantityUseCase: UpdateCartItemQuantityUseCase,
 ) : ViewModel() {
-
     private val _cartState: MutableStateFlow<CartContract.CartState> =
         MutableStateFlow(CartContract.CartState())
     val cartState: StateFlow<CartContract.CartState> = _cartState.asStateFlow()
