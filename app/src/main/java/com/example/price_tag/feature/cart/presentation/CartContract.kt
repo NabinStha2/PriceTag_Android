@@ -17,10 +17,14 @@ class CartContract {
 
         data class RemoveCartItem(val cartItemId: Long) : CartIntent
 
-        data object RefreshCart : CartIntent
+        data class RefreshCart(val pullToRefresh: Boolean) : CartIntent
 
         data class UpdateCartItemQuantity(val updateCartItemQuantityRequestDto: UpdateCartItemQuantityRequestDto) :
             CartIntent
+
+        data class CheckoutClicked(
+            val cartId: Long,
+        ) : CartIntent
     }
 
     data class CartState(

@@ -45,14 +45,11 @@ fun MainView(
         cartViewModel.effect.collect { effect ->
             when (effect) {
                 is CartContract.CartEffect.ShowSnackBar -> {
-                    snackbarHostState.showSnackbar(
-                        CustomSnackbarVisuals(
-                            message = effect.message,
-                            containerColor = PrimaryColor,
-                            contentColor = Color.White
-                        )
-                    )
+                    snackbarHostState.showSnackbar(CustomSnackbarVisuals(message = effect.message,
+                                                                         containerColor = PrimaryColor,
+                                                                         contentColor = Color.White))
                 }
+
                 else -> {}
             }
         }
@@ -69,21 +66,19 @@ fun MainView(
             }
         },
         snackbarHost = {
-            SnackbarHost(
-                hostState = snackbarHostState,
-                snackbar = { snackbarData ->
-                    val customVisuals = snackbarData.visuals as? CustomSnackbarVisuals
-                    if (customVisuals != null) {
-                        Snackbar(
-                            snackbarData = snackbarData,
-                            contentColor = customVisuals.contentColor,
-                            containerColor = customVisuals.containerColor,
-                        )
-                    } else {
-                        Snackbar(snackbarData = snackbarData)
-                    }
-                }
-            )
+            SnackbarHost(hostState = snackbarHostState,
+                         snackbar = { snackbarData ->
+                             val customVisuals = snackbarData.visuals as? CustomSnackbarVisuals
+                             if (customVisuals != null) {
+                                 Snackbar(
+                                     snackbarData = snackbarData,
+                                     contentColor = customVisuals.contentColor,
+                                     containerColor = customVisuals.containerColor,
+                                 )
+                             } else {
+                                 Snackbar(snackbarData = snackbarData)
+                             }
+                         })
         },
     ) { paddingValues ->
         Box(modifier = Modifier.padding(paddingValues)) {
@@ -103,7 +98,6 @@ fun MainView(
                 2 -> CartView(
                     navController = navController,
                     cartViewModel = cartViewModel,
-                    selectedCategoryViewModel = selectedCategoryViewModel,
                 )
 
                 3 -> ProfileView(

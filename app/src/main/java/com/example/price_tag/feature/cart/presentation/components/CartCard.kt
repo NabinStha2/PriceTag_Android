@@ -1,6 +1,6 @@
 package com.example.price_tag.feature.cart.presentation.components
 
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -8,23 +8,25 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.Card
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -36,14 +38,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
+import coil.compose.AsyncImage
 import com.example.price_tag.R
-import com.example.price_tag.core.theme.ErrorColor800
-import com.example.price_tag.core.theme.NeutralColor100
-import com.example.price_tag.core.theme.NeutralColor200
-import com.example.price_tag.core.theme.NeutralColor400
-import com.example.price_tag.core.theme.NeutralColor50
-import com.example.price_tag.core.theme.NeutralColor800
-import com.example.price_tag.core.theme.NeutralColor900
+import com.example.price_tag.core.theme.PriceTagTheme
 import com.example.price_tag.feature.cart.domain.model.CartItem
 
 @Composable
@@ -51,230 +48,288 @@ fun CartCard(
     cartItem: CartItem,
     onRemove: (cartItemId: Long) -> Unit,
     onQuantityChange: (cartItemId: Long, quantity: Int) -> Unit,
+    isRemoving: Boolean = false,
+    isQuantityUpdating: Boolean = false,
 ) {
-    Box(
+    val color = remember(cartItem.colorHex) {
+        cartItem.colorHex?.let { colorHex ->
+            runCatching {
+                Color(colorHex.toColorInt())
+            }.getOrNull()
+        }
+    }
+
+    val controlsEnabled = !isRemoving && !isQuantityUpdating
+
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .clip(shape = RoundedCornerShape(corner = CornerSize(10)))
-            .border(
-                width = 1.dp,
-                color = NeutralColor100,
-                shape = RoundedCornerShape(percent = 10),
-            )
-            .padding(8.dp),
+            .padding(vertical = 8.dp),
+        shape = RoundedCornerShape(12.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant,
+        ),
     ) {
         Row(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.padding(12.dp),
             verticalAlignment = Alignment.Top,
-            horizontalArrangement = Arrangement.Start,
-
-            ) {
-            Image(
-                painter = painterResource(id = R.drawable.carousel1),
-                contentDescription = "Item Image",
-                contentScale = ContentScale.Fit,
+        ) {
+            AsyncImage(
+                model = cartItem.imageUrl,
+                contentDescription = cartItem.productName,
+                placeholder = painterResource(R.drawable.carousel1),
+                error = painterResource(R.drawable.carousel1),
+                fallback = painterResource(R.drawable.carousel1),
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
-                    .width(120.dp)
-                    .clip(shape = RoundedCornerShape(corner = CornerSize(10)))
-                    .border(
-                        width = 1.dp,
-                        color = NeutralColor100,
-                        shape = RoundedCornerShape(percent = 10),
-                    ),
+                    .size(100.dp)
+                    .clip(RoundedCornerShape(10.dp)),
             )
 
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
             Column(
-                verticalArrangement = Arrangement.Top,
-                horizontalAlignment = Alignment.Start,
+                modifier = Modifier.weight(1f),
             ) {
                 Row(
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        modifier = Modifier.weight(1f),
                         text = cartItem.productName,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.W500,
-                        ),
+                        modifier = Modifier.weight(1f),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
                     )
 
-                    Row() {
-                        IconButton(
+                    if (isRemoving) {
+                        CircularProgressIndicator(
                             modifier = Modifier
-                                .width(25.dp)
-                                .height(25.dp),
-                            onClick = { onRemove(cartItem.itemId) },
+                                .padding(12.dp)
+                                .size(20.dp),
+                            strokeWidth = 2.dp,
+                        )
+                    } else {
+                        IconButton(
+                            enabled = controlsEnabled,
+                            onClick = {
+                                onRemove(cartItem.itemId)
+                            },
                         ) {
                             Icon(
-                                imageVector = Icons.Filled.Delete,
-                                contentDescription = "Delete the cart item",
-                                tint = ErrorColor800,
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Remove ${cartItem.productName}",
+                                tint = MaterialTheme.colorScheme.error,
                             )
                         }
                     }
                 }
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                Row(
-                    horizontalArrangement = Arrangement.Start,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .border(
-                                width = 1.dp,
-                                color = NeutralColor100,
-                                shape = RoundedCornerShape(percent = 20),
-                            )
-                            .background(
-                                color = NeutralColor50,
-                                shape = RoundedCornerShape(percent = 20),
-                            )
-                            .padding(
-                                horizontal = 6.dp,
-                                vertical = 4.dp,
-                            ),
+                if (!cartItem.colorName.isNullOrBlank() || !cartItem.sizeName.isNullOrBlank()) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Row(
-                            horizontalArrangement = Arrangement.Start,
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Box(
-                                modifier = Modifier
-                                    .width(12.dp)
-                                    .height(12.dp)
-                                    .background(
-                                        color = Color(cartItem.colorHex!!.toColorInt()),
-                                        shape = RoundedCornerShape(100),
-                                    ),
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "${cartItem.colorName}",
-                                style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.W400),
-                            )
+                        cartItem.colorName?.takeIf { it.isNotBlank() }
+                            ?.let { colorName ->
+                                VariantChip {
+                                    if (color != null) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(12.dp)
+                                                .clip(CircleShape)
+                                                .background(color)
+                                                .border(
+                                                    width = 1.dp,
+                                                    color = MaterialTheme.colorScheme.outline,
+                                                    shape = CircleShape,
+                                                ),
+                                        )
+
+                                        Spacer(modifier = Modifier.width(4.dp))
+                                    }
+
+                                    Text(
+                                        text = colorName,
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                            }
+
+                        if (!cartItem.colorName.isNullOrBlank() && !cartItem.sizeName.isNullOrBlank()) {
+                            Spacer(modifier = Modifier.width(8.dp))
                         }
 
-                    }
-
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Box(
-                        modifier = Modifier
-                            .border(
-                                width = 1.dp,
-                                color = NeutralColor100,
-                                shape = RoundedCornerShape(percent = 20),
-                            )
-                            .background(
-                                color = NeutralColor50,
-                                shape = RoundedCornerShape(percent = 20),
-                            )
-                            .padding(
-                                horizontal = 6.dp,
-                                vertical = 4.dp,
-                            ),
-                    ) {
-                        Text(
-                            text = "${cartItem.sizeName}",
-                            style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.W400),
-                        )
+                        cartItem.sizeName?.takeIf { it.isNotBlank() }
+                            ?.let { sizeName ->
+                                VariantChip {
+                                    Text(
+                                        text = "Size $sizeName",
+                                        style = MaterialTheme.typography.bodySmall,
+                                    )
+                                }
+                            }
                     }
                 }
-
-                Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
                     text = "SKU: ${cartItem.sku}",
+                    modifier = Modifier.padding(top = 8.dp),
                     style = MaterialTheme.typography.bodySmall,
-                    color = NeutralColor400,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
                 )
 
-                Box(
+                Row(
                     modifier = Modifier
-                        .padding(vertical = 8.dp)
-                        .clip(RoundedCornerShape(percent = 30))
-                        .border(
-                            width = 1.dp,
-                            color = NeutralColor100,
-                            shape = RoundedCornerShape(percent = 30),
-                        ),
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    Row(
-                        modifier = Modifier.padding(8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        IconButton(
-                            onClick = {
-                                onQuantityChange(
-                                    cartItem.itemId,
-                                    cartItem.quantity.toInt() - 1,
-                                )
-                            },
-                            modifier = Modifier.size(20.dp),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Remove,
-                                contentDescription = "Remove item from cart",
-                                tint = NeutralColor800,
-                            )
-                        }
-
+                    Column {
                         Text(
-                            text = cartItem.quantity.toString(),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(horizontal = 14.dp),
+                            text = formatCartPrice(cartItem.lineTotal),
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary,
                         )
 
-                        IconButton(
-                            onClick = {
-                                onQuantityChange(
-                                    cartItem.itemId,
-                                    cartItem.quantity.toInt() + 1,
-                                )
-                            },
-                            modifier = Modifier.size(20.dp),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Add,
-                                contentDescription = "Add item to cart",
-                                tint = NeutralColor800,
+                        if (cartItem.quantity > 1) {
+                            Text(
+                                text = "${formatCartPrice(cartItem.unitPrice)} each",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
+
+                    QuantitySelector(
+                        quantity = cartItem.quantity,
+                        enabled = controlsEnabled,
+                        canDecrease = cartItem.quantity > 1,
+                        canIncrease = cartItem.quantity < cartItem.stockAvailable,
+                        onDecrease = {
+                            onQuantityChange(
+                                cartItem.itemId,
+                                cartItem.quantity.toInt() - 1,
+                            )
+                        },
+                        onIncrease = {
+                            onQuantityChange(
+                                cartItem.itemId,
+                                cartItem.quantity.toInt() + 1,
+                            )
+                        },
+                    )
                 }
+            }
+        }
+    }
+}
 
+@Composable
+private fun VariantChip(
+    content: @Composable () -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(6.dp),
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant,
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(
+                horizontal = 8.dp,
+                vertical = 4.dp,
+            ),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            content()
+        }
+    }
+}
 
+@Composable
+private fun QuantitySelector(
+    quantity: Long,
+    enabled: Boolean,
+    canDecrease: Boolean,
+    canIncrease: Boolean,
+    onDecrease: () -> Unit,
+    onIncrease: () -> Unit,
+) {
+    Surface(
+        shape = RoundedCornerShape(24.dp),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outlineVariant,
+        ),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            IconButton(
+                enabled = enabled && canDecrease,
+                onClick = onDecrease,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Remove,
+                    contentDescription = "Decrease quantity",
+                )
+            }
+
+            Text(
+                text = quantity.toString(),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+            )
+
+            IconButton(
+                enabled = enabled && canIncrease,
+                onClick = onIncrease,
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Increase quantity",
+                )
             }
         }
     }
 }
 
 
-@Preview(showBackground = true)
+@Preview(
+    name = "Cart Card - Populated",
+    showBackground = true,
+    widthDp = 360,
+    heightDp = 200,
+)
 @Composable
 fun CartCardPreview() {
-//    CartCard(
-//        cartItem = CartItem(itemId = 1L,
-//                            variantId = 101L,
-//                            sku = "SKU12345",
-//                            productName = "Sample Product Name that is quite long to test ellipsis and layout behavior",
-//                            imageUrl = "",
-//                            colorName = "Red",
-//                            colorHex = "#FF0000",
-//                            sizeName = "M",
-//                            unitPrice = 29.99,
-//                            quantity = 2,
-//                            lineTotal = 59.98,
-//                            stockAvailable = 10),
-//        onRemove = {},
-//        onQuantityChange = { _, _ -> },
-//    )
+    val previewCartItem: CartItem = CartItem(
+        itemId = 101L,
+        variantId = 1001L,
+        sku = "TSHIRT-BLK-M",
+        productName = "Classic Cotton T-Shirt",
+        imageUrl = null,
+        colorName = "Black",
+        colorHex = "#000000",
+        sizeName = "M",
+        unitPrice = 39.95,
+        quantity = 2L,
+        lineTotal = 79.90,
+        stockAvailable = 8L,
+    );
+    PriceTagTheme() {
+        CartCard(
+            cartItem = previewCartItem,
+            onRemove = {},
+            onQuantityChange = { _, _ -> },
+        )
+    }
 }

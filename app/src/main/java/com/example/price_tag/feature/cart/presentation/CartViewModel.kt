@@ -65,11 +65,15 @@ class CartViewModel @Inject constructor(
             }
 
             is CartContract.CartIntent.RefreshCart -> {
-                getAllCartItems(isPullToRefresh = true)
+                getAllCartItems(isPullToRefresh = cartIntent.pullToRefresh)
             }
 
             is CartContract.CartIntent.UpdateCartItemQuantity -> {
                 updateCartItemQuantity(cartIntent.updateCartItemQuantityRequestDto)
+            }
+
+            is CartContract.CartIntent.CheckoutClicked -> {
+                checkoutClicked(cartIntent.cartId)
             }
         }
     }
@@ -213,6 +217,12 @@ class CartViewModel @Inject constructor(
                     else -> {}
                 }
             }
+        }
+    }
+
+    private fun checkoutClicked(cartId: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            _effect.send(CartContract.CartEffect.NavigateToCheckout(cartId = cartId))
         }
     }
 
