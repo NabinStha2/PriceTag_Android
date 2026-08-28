@@ -6,6 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.example.price_tag.core.navigation.graph.authNavGraph
+import com.example.price_tag.core.navigation.graph.checkoutGraph
 import com.example.price_tag.core.navigation.graph.mainGraph
 import com.example.price_tag.core.navigation.graph.onboardingNavGraph
 import com.example.price_tag.core.navigation.graph.productGraph
@@ -29,24 +30,20 @@ import com.example.price_tag.core.state.AppState
  *    navigation() type parameter — fully type-safe, zero strings.
  */
 @Composable
-fun RootNavHost(
-    navController: NavHostController,
-    appState: AppState
-) {
+fun RootNavHost(navController: NavHostController,
+                appState: AppState) {
     val startDestination: NavigationItem = when (appState) {
-        AppState.Loading         -> NavigationItem.SplashView
-        AppState.OnBoarding      -> NavigationItem.OnboardingGraph
+        AppState.Loading -> NavigationItem.SplashView
+        AppState.OnBoarding -> NavigationItem.OnboardingGraph
         AppState.Unauthenticated -> NavigationItem.AuthGraph
-        AppState.Authenticated   -> NavigationItem.AuthenticatedGraph
+        AppState.Authenticated -> NavigationItem.AuthenticatedGraph
     }
 
     NavHost(
-        navController    = navController,
-        startDestination = startDestination
-    ) {
-        // Splash (shown while AppState == Loading)
-        composable<NavigationItem.SplashView> {
-//            SplashScreen()
+        navController = navController,
+        startDestination = startDestination,
+    ) { // Splash (shown while AppState == Loading)
+        composable<NavigationItem.SplashView> { //            SplashScreen()
         }
 
         // Nested graphs
@@ -55,6 +52,7 @@ fun RootNavHost(
         navigation<NavigationItem.AuthenticatedGraph>(startDestination = NavigationItem.MainGraph) {
             mainGraph(navController)
             productGraph(navController)
+            checkoutGraph(navController)
         }
     }
 }

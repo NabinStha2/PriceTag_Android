@@ -101,7 +101,7 @@ fun CartContent(
             cartTotal = cart.cartTotal,
             enabled = !isUpdating && removingItemIds.isEmpty(),
             onCheckoutClick = {
-                // Checkout navigation is implemented in the next cart task.
+                onIntent(CartContract.CartIntent.CheckoutClicked(cartId = cart.cartId))
             },
         )
     }

@@ -3,6 +3,8 @@ package com.example.price_tag.feature.cart.presentation
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.price_tag.core.navigation.NavigationCoordinator
+import com.example.price_tag.core.navigation.NavigationItem
 import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
 import com.example.price_tag.feature.cart.data.model.UpdateCartItemQuantityRequestDto
 import com.example.price_tag.feature.cart.domain.usecase.AddItemToCartUseCase
@@ -25,6 +27,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class CartViewModel @Inject constructor(
+    private val navigationCoordinator: NavigationCoordinator,
     private val getAllCartItemsUseCase: GetAllCartItemsUseCase,
     private val addItemToCartUseCase: AddItemToCartUseCase,
     private val removeCartItemUseCase: RemoveCartItemUseCase,
@@ -221,8 +224,17 @@ class CartViewModel @Inject constructor(
     }
 
     private fun checkoutClicked(cartId: Long) {
+        val cartState = _cartState.value.getAllCartItems
+        if (cartState !is ResourceState.Success) return
+
+        val cart = cartState.data
+        val isBusy =
+            _cartState.value.isUpdating || _cartState.value.updateCartItemQuantityState is ResourceState.Loading || _cartState.value.removingItemIds.isNotEmpty()
+
+        if (isBusy || cart.items.isEmpty() || cart.cartId != cartId) return
+
         viewModelScope.launch(Dispatchers.IO) {
-            _effect.send(CartContract.CartEffect.NavigateToCheckout(cartId = cartId))
+            navigationCoordinator.navigate(NavigationItem.CheckoutView(cartId = cartId))
         }
     }
 
