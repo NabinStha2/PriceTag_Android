@@ -1,5 +1,6 @@
 package com.example.price_tag.core.network
 
+import com.example.price_tag.core.common.data.model.ApiResponseDto
 import com.example.price_tag.core.common.data.model.CommonResponseDto
 import com.example.price_tag.feature.auth.data.model.LoginRequest
 import com.example.price_tag.feature.auth.data.model.LoginResponse
@@ -10,6 +11,11 @@ import com.example.price_tag.feature.cart.data.model.CartResponseDto
 import com.example.price_tag.feature.cart.data.model.UpdateCartItemQuantityRequestDto
 import com.example.price_tag.feature.category.data.model.CategoryResponse
 import com.example.price_tag.feature.category.data.model.SubCategoryResponse
+import com.example.price_tag.feature.checkout.data.model.request.CreateAddressRequestDto
+import com.example.price_tag.feature.checkout.data.model.request.CreateOrderRequestDto
+import com.example.price_tag.feature.checkout.data.model.response.AddressResponseDto
+import com.example.price_tag.feature.checkout.data.model.response.CreateOrderResponseDto
+import com.example.price_tag.feature.checkout.data.model.response.PaymentIntentResponseDto
 import com.example.price_tag.feature.product.data.model.ProductDetailsRatingReviewsResponseDto
 import com.example.price_tag.feature.product.data.model.ProductResponseDto
 import com.example.price_tag.feature.product.data.model.SingleProductDetailsResponseDto
@@ -85,4 +91,22 @@ interface ApiService {
         @Path("item_id") cartItemId: Long,
         @Body updateCartItemQuantityRequestDto: UpdateCartItemQuantityRequestDto,
     ): Response<CommonResponseDto>
+
+    @GET(value = "address")
+    suspend fun getAddresses(): Response<ApiResponseDto<List<AddressResponseDto>>>
+
+    @POST("address")
+    suspend fun createAddress(
+        @Body createAddressRequestDto: CreateAddressRequestDto,
+    ): Response<ApiResponseDto<List<AddressResponseDto>>>
+
+    @POST("orders")
+    suspend fun createOrder(
+        @Body createOrderRequestDto: CreateOrderRequestDto,
+    ): Response<ApiResponseDto<CreateOrderResponseDto>>
+
+    @POST("orders/{orderNumber}/payment-intent")
+    suspend fun initializePayment(
+        @Path("orderNumber") orderNumber: String,
+    ): Response<ApiResponseDto<PaymentIntentResponseDto>>
 }

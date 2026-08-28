@@ -6,6 +6,8 @@ import com.example.price_tag.feature.cart.data.remote.CartDataSource
 import com.example.price_tag.feature.cart.data.remote.CartDataSourceImpl
 import com.example.price_tag.feature.category.data.remote.CategoryDataSource
 import com.example.price_tag.feature.category.data.remote.CategoryDataSourceImpl
+import com.example.price_tag.feature.checkout.data.remote.CheckoutDataSource
+import com.example.price_tag.feature.checkout.data.remote.CheckoutDataSourceImpl
 import com.example.price_tag.feature.product.data.remote.ProductDataSource
 import com.example.price_tag.feature.product.data.remote.ProductDataSourceImpl
 import dagger.Binds
@@ -33,4 +35,8 @@ abstract class DataSourceModule {
     @Binds
     @Singleton
     abstract fun bindCartDataSource(cartDataSourceImpl: CartDataSourceImpl): CartDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindCheckoutDataSource(checkoutDataSourceImpl: CheckoutDataSourceImpl): CheckoutDataSource
 }

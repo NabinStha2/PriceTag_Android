@@ -22,7 +22,6 @@ fun CheckoutView(
     cartId: Long,
     onBackClick: () -> Unit,
 ) {
-
     Scaffold(
         topBar = {
             TopAppBar(
