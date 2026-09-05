@@ -1,15 +1,38 @@
+# IDE and editor files
 *.iml
-.gradle
+/.idea/
+/.fleet/
+/.vscode/
+
+# Local configuration and secrets
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+/secrets.properties
+/keystore.properties
+.env
+.env.*
+!.env.example
+
+# Gradle and Kotlin build output
+**/.gradle/
+**/.kotlin/
+**/build/
+**/out/
+
+# Android build tooling
+/captures/
+**/.externalNativeBuild/
+**/.cxx/
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Signing credentials
+*.jks
+*.keystore
+
+# Logs, heap dumps, and operating-system files
+*.hprof
+*.log
 .DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
-local.properties
+Thumbs.db
