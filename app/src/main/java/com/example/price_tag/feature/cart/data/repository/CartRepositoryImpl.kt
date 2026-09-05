@@ -4,6 +4,7 @@ import com.example.price_tag.core.common.data.model.CommonErrorResponse
 import com.example.price_tag.core.common.data.model.CommonResponseDto
 import com.example.price_tag.core.common.domain.model.CommonResponse
 import com.example.price_tag.core.datastore.DataStoreManager
+import com.example.price_tag.core.network.error.ApiErrorParser
 import com.example.price_tag.feature.cart.data.mapper.toDomain
 import com.example.price_tag.feature.cart.data.model.AddCartItemRequestDto
 import com.example.price_tag.feature.cart.data.model.UpdateCartItemQuantityRequestDto
@@ -22,6 +23,7 @@ class CartRepositoryImpl @Inject constructor(
     private val cartDataSource: CartDataSource,
     private val json: Json,
     private val dataStoreManager: DataStoreManager,
+    private val apiErrorParser: ApiErrorParser,
 ) : CartRepository {
 
     override suspend fun getAllCartItems(): Flow<ResourceState<Cart>> = flow {
@@ -36,15 +38,10 @@ class CartRepositoryImpl @Inject constructor(
                 emit(ResourceState.Error("Cart data was empty or malformed"))
             }
         } else {
-            if (response.code() == 401) {
-                try {
-                    dataStoreManager.clearAuthTokens()
-                } catch (_: Exception) {
-                }
-            }
             val errorBody = response.errorBody()
                 ?.string()
-            val message = parseError(errorBody) ?: "Failed to fetch cart details"
+            val message = apiErrorParser.parseMessage(errorBody) ?: response.body()?.message
+                          ?: "Failed to fetch cart details"
             emit(ResourceState.Error(message))
         }
     }.catch { e ->
