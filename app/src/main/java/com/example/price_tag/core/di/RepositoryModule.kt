@@ -8,6 +8,8 @@ import com.example.price_tag.feature.cart.data.repository.CartRepositoryImpl
 import com.example.price_tag.feature.cart.domain.repository.CartRepository
 import com.example.price_tag.feature.category.data.repository.CategoryRepositoryImpl
 import com.example.price_tag.feature.category.domain.repository.CategoryRepository
+import com.example.price_tag.feature.checkout.data.repository.CheckoutRepositoryImpl
+import com.example.price_tag.feature.checkout.domain.repository.CheckoutRepository
 import com.example.price_tag.feature.product.data.repository.ProductRepositoryImpl
 import com.example.price_tag.feature.product.domain.repository.ProductRepository
 import dagger.Binds
@@ -39,4 +41,8 @@ abstract class RepositoryModule {
     @Binds
     @Singleton
     abstract fun bindCartRepository(cartRepositoryImpl: CartRepositoryImpl): CartRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindCheckoutRepository(checkoutRepositoryImpl: CheckoutRepositoryImpl): CheckoutRepository
 }

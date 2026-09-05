@@ -6,7 +6,7 @@ import com.example.utilites.ResourceState
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class GetAddressUseCase @Inject constructor(private val checkoutRepository: CheckoutRepository) {
+class GetAddressesUseCase @Inject constructor(private val checkoutRepository: CheckoutRepository) {
     operator fun invoke(): Flow<ResourceState<List<Address>>> {
         return checkoutRepository.getAddresses()
     }

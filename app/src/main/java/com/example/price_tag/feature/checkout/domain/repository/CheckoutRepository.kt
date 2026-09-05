@@ -12,7 +12,7 @@ interface CheckoutRepository {
 
     fun getAddresses(): Flow<ResourceState<List<Address>>>
 
-    fun createAddress(newAddress: NewAddress): Flow<ResourceState<Address>>
+    fun createAddress(newAddress: NewAddress): Flow<ResourceState<List<Address>>>
 
     fun createOrder(createOrderParams: CreateOrderParams): Flow<ResourceState<CreatedOrder>>
 

@@ -13,6 +13,11 @@ import com.example.price_tag.feature.category.domain.usecase.GetCategoriesUseCas
 import com.example.price_tag.feature.category.domain.usecase.GetSelectedCategoryUseCase
 import com.example.price_tag.feature.category.domain.usecase.GetSubCategoriesWithSelectedCategoryUseCase
 import com.example.price_tag.feature.category.domain.usecase.SetSelectedCategoryUseCase
+import com.example.price_tag.feature.checkout.domain.repository.CheckoutRepository
+import com.example.price_tag.feature.checkout.domain.usecase.CreateAddressUseCase
+import com.example.price_tag.feature.checkout.domain.usecase.CreateOrderUseCase
+import com.example.price_tag.feature.checkout.domain.usecase.GetAddressesUseCase
+import com.example.price_tag.feature.checkout.domain.usecase.InitializePaymentUseCase
 import com.example.price_tag.feature.product.domain.repository.ProductRepository
 import com.example.price_tag.feature.product.domain.usecase.GetAllSubCategoryProductsUseCase
 import com.example.price_tag.feature.product.domain.usecase.GetAllSubCategorySearchProductsUseCase
@@ -110,5 +115,30 @@ object DomainModule {
     @Singleton
     fun provideUpdateCartItemQuantityUseCase(repository: CartRepository): UpdateCartItemQuantityUseCase {
         return UpdateCartItemQuantityUseCase(repository)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideCreateAddressUseCase(repository: CheckoutRepository): CreateAddressUseCase {
+        return CreateAddressUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetAddressesUseCase(repository: CheckoutRepository): GetAddressesUseCase {
+        return GetAddressesUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCreateOrderUseCase(repository: CheckoutRepository): CreateOrderUseCase {
+        return CreateOrderUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideInitializePaymentUseCase(repository: CheckoutRepository): InitializePaymentUseCase {
+        return InitializePaymentUseCase(repository)
     }
 }

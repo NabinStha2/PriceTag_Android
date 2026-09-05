@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 
-class PaymentInitializeUseCase @Inject constructor(private val checkoutRepository: CheckoutRepository) {
+class InitializePaymentUseCase @Inject constructor(private val checkoutRepository: CheckoutRepository) {
     operator fun invoke(orderNumber: String): Flow<ResourceState<PaymentIntentDetails>> {
         return checkoutRepository.initializePayment(orderNumber)
     }
