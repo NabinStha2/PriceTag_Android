@@ -6,6 +6,7 @@ import com.example.price_tag.feature.checkout.domain.model.CreateOrderParams
 import com.example.price_tag.feature.checkout.domain.model.CreatedOrder
 import com.example.price_tag.feature.checkout.domain.model.NewAddress
 import com.example.price_tag.feature.checkout.domain.model.PaymentIntentDetails
+import com.example.price_tag.feature.checkout.presentation.model.AddressFormState
 import com.example.utilites.ResourceState
 
 class CheckoutContract {
@@ -20,6 +21,9 @@ class CheckoutContract {
         data object AddAddressClicked : CheckoutIntent
         data class RecipientNameChanged(val recipientName: String) : CheckoutIntent
         data class PhoneNumberChanged(val phoneNumber: String) : CheckoutIntent
+        data class AddressFormChanged(val addressForm: AddressFormState) : CheckoutIntent
+        data object DismissAddressForm : CheckoutIntent
+        data object SubmitAddressForm : CheckoutIntent
     }
 
     data class CheckoutState(
@@ -35,6 +39,7 @@ class CheckoutContract {
         val isAddressFormVisible: Boolean = false,
         val recipientName: String = "",
         val phoneNumber: String = "",
+        val addressForm: AddressFormState = AddressFormState(),
     )
 
     sealed interface CheckoutEffect {

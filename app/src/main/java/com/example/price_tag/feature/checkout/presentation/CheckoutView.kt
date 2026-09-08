@@ -27,6 +27,7 @@ import com.example.price_tag.core.theme.PriceTagTheme
 import com.example.price_tag.feature.cart.domain.model.Cart
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutActionBar
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutAddressContent
+import com.example.price_tag.feature.checkout.presentation.components.CheckoutAddressFormSheet
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutContactDetailsSection
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutErrorState
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutLoadingState
@@ -161,6 +162,23 @@ internal fun CheckoutScreen(
 
             else -> Unit
         }
+    }
+
+    if (uiState.isAddressFormVisible) {
+        CheckoutAddressFormSheet(
+            form = uiState.addressForm,
+            isSaving = uiState.createAddressState is ResourceState.Loading,
+            onFormChange = { form ->
+                onIntent(CheckoutContract.CheckoutIntent.AddressFormChanged(form))
+            },
+            onDismiss = {
+                onIntent(CheckoutContract.CheckoutIntent.DismissAddressForm)
+            },
+            onSave = {
+                onIntent(CheckoutContract.CheckoutIntent.SubmitAddressForm)
+            },
+            errorMessage = (uiState.createAddressState as? ResourceState.Error)?.error,
+        )
     }
 }
 

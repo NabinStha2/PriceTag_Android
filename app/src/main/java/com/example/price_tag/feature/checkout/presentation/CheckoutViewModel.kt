@@ -4,7 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.price_tag.feature.cart.domain.usecase.GetAllCartItemsUseCase
 import com.example.price_tag.feature.checkout.domain.model.Address
+import com.example.price_tag.feature.checkout.domain.model.NewAddress
+import com.example.price_tag.feature.checkout.domain.usecase.CreateAddressUseCase
 import com.example.price_tag.feature.checkout.domain.usecase.GetAddressesUseCase
+import com.example.price_tag.feature.checkout.presentation.mapper.isValid
+import com.example.price_tag.feature.checkout.presentation.mapper.toNewAddress
+import com.example.price_tag.feature.checkout.presentation.model.AddressFormState
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -21,12 +26,14 @@ import javax.inject.Inject
 class CheckoutViewModel @Inject constructor(
     private val getAllCartItemsUseCase: GetAllCartItemsUseCase,
     private val getAllAddressesUseCase: GetAddressesUseCase,
+    private val createAddressUseCase: CreateAddressUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(CheckoutContract.CheckoutState())
     val state: StateFlow<CheckoutContract.CheckoutState> = _state.asStateFlow()
 
     private var cartJob: Job? = null
     private var addressJob: Job? = null
+    private var createAddressJob: Job? = null
 
     fun onIntent(intent: CheckoutContract.CheckoutIntent) {
         when (intent) {
@@ -56,6 +63,29 @@ class CheckoutViewModel @Inject constructor(
 
             is CheckoutContract.CheckoutIntent.PhoneNumberChanged -> {
                 _state.update { currentState -> currentState.copy(phoneNumber = intent.phoneNumber) }
+            }
+
+            is CheckoutContract.CheckoutIntent.AddressFormChanged -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        addressForm = intent.addressForm,
+                        createAddressState = ResourceState.Initial,
+                    )
+                }
+            }
+
+            is CheckoutContract.CheckoutIntent.DismissAddressForm -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        isAddressFormVisible = false,
+                        addressForm = AddressFormState(),
+                        createAddressState = ResourceState.Initial,
+                    )
+                }
+            }
+
+            is CheckoutContract.CheckoutIntent.SubmitAddressForm -> {
+                submitAddressForm()
             }
 
             else -> Unit
@@ -142,4 +172,43 @@ class CheckoutViewModel @Inject constructor(
             }
         }
     }
+
+    private fun submitAddressForm() {
+        val addressForm: AddressFormState = _state.value.addressForm
+        if (!_state.value.addressForm.isValid()) {
+            return
+        }
+
+        val newAddress: NewAddress = addressForm.toNewAddress()
+        if (createAddressJob?.isActive == true) {
+            return
+        }
+
+        createAddressJob = viewModelScope.launch {
+            createAddressUseCase(newAddress).collectLatest { response ->
+                _state.update { currentState ->
+                    when (response) {
+                        is ResourceState.Success -> {
+                            val createdAddress: Address? = response.data.firstOrNull { address ->
+                                address.street == newAddress.street && address.city == newAddress.city && address.state == newAddress.state && address.country == newAddress.country && address.postalCode == newAddress.postalCode
+                            }
+
+                            currentState.copy(
+                                createAddressState = response,
+                                addressesState = response,
+                                selectedAddressId = createdAddress?.id
+                                                    ?: currentState.selectedAddressId,
+                                isAddressFormVisible = false,
+                                addressForm = AddressFormState(),
+                            )
+                        }
+
+                        else -> currentState.copy(createAddressState = response)
+                    }
+                }
+            }
+        }
+    }
+
+
 }
