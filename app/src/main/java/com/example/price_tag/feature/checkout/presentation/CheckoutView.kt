@@ -3,6 +3,7 @@ package com.example.price_tag.feature.checkout.presentation
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -24,6 +25,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.price_tag.core.theme.PriceTagTheme
 import com.example.price_tag.feature.cart.domain.model.Cart
+import com.example.price_tag.feature.checkout.presentation.components.CheckoutActionBar
+import com.example.price_tag.feature.checkout.presentation.components.CheckoutAddressContent
+import com.example.price_tag.feature.checkout.presentation.components.CheckoutContactDetailsSection
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutErrorState
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutLoadingState
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutOrderSummaryCard
@@ -58,7 +62,9 @@ internal fun CheckoutScreen(
     onIntent: (CheckoutContract.CheckoutIntent) -> Unit,
 ) {
     Scaffold(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
         topBar = {
             TopAppBar(
@@ -74,6 +80,19 @@ internal fun CheckoutScreen(
                     }
                 },
             )
+        },
+        bottomBar = {
+            if (uiState.cartState is ResourceState.Success) {
+                val isProcessing =
+                    uiState.createOrderState is ResourceState.Loading || uiState.paymentIntentDetailsState is ResourceState.Loading
+                CheckoutActionBar(
+                    isLoading = isProcessing,
+                    enabled = !isProcessing,
+                    onContinueClick = {
+                        onIntent(CheckoutContract.CheckoutIntent.ContinueToPaymentClicked)
+                    },
+                )
+            }
         },
     ) { innerPadding ->
         when (val cartState = uiState.cartState) {
@@ -98,21 +117,37 @@ internal fun CheckoutScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
-                    item {
-                        Text(
-                            text = "Delivery address",
-                            style = MaterialTheme.typography.titleLarge,
+                    item(key = "checkout-delivery-address") {
+                        CheckoutAddressContent(
+                            addressesState = uiState.addressesState,
+                            selectedAddressId = uiState.selectedAddressId,
+                            onAddressSelected = { address ->
+                                onIntent(CheckoutContract.CheckoutIntent.SelectAddress(address))
+                            },
+                            onAddAddressClick = {
+                                onIntent(CheckoutContract.CheckoutIntent.AddAddressClicked)
+                            },
+                            onRetry = {
+                                onIntent(CheckoutContract.CheckoutIntent.GetAddresses)
+                            },
                         )
                     }
 
-                    item {
-                        Text(
-                            text = "Contact details",
-                            style = MaterialTheme.typography.titleLarge,
+                    item(key = "checkout-contact-details") {
+                        CheckoutContactDetailsSection(
+                            recipientName = uiState.recipientName,
+                            phoneNumber = uiState.phoneNumber,
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            onRecipientNameChange = { value ->
+                                onIntent(CheckoutContract.CheckoutIntent.RecipientNameChanged(value))
+                            },
+                            onPhoneNumberChange = { value ->
+                                onIntent(CheckoutContract.CheckoutIntent.PhoneNumberChanged(value))
+                            },
                         )
                     }
 
-                    item {
+                    item(key = "checkout-order-summary") {
                         CheckoutOrderSummaryCard(
                             itemCount = cart.totalItemCount,
                             subtotal = cart.cartTotal,
@@ -126,10 +161,7 @@ internal fun CheckoutScreen(
 
             else -> Unit
         }
-
-
     }
-
 }
 
 
@@ -138,6 +170,7 @@ internal fun CheckoutScreen(
     showBackground = true,
     widthDp = 360,
     heightDp = 800,
+    showSystemUi = true,
 )
 @Composable
 private fun CheckoutScreenPreview() {

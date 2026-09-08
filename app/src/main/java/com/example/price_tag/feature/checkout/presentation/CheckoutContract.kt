@@ -15,6 +15,11 @@ class CheckoutContract {
         data class CreateAddress(val newAddress: NewAddress) : CheckoutIntent
         data class CreateOrder(val createOrderParams: CreateOrderParams) : CheckoutIntent
         data class InitializePayment(val orderNumber: String) : CheckoutIntent
+        data object ContinueToPaymentClicked : CheckoutIntent
+        data class SelectAddress(val address: Address) : CheckoutIntent
+        data object AddAddressClicked : CheckoutIntent
+        data class RecipientNameChanged(val recipientName: String) : CheckoutIntent
+        data class PhoneNumberChanged(val phoneNumber: String) : CheckoutIntent
     }
 
     data class CheckoutState(
@@ -26,6 +31,10 @@ class CheckoutContract {
         val paymentIntentDetailsState: ResourceState<PaymentIntentDetails>? = ResourceState.Initial,
         val shippingFee: Double? = null,
         val currencyCode: String = "AUD",
+        val selectedAddressId: Long? = null,
+        val isAddressFormVisible: Boolean = false,
+        val recipientName: String = "",
+        val phoneNumber: String = "",
     )
 
     sealed interface CheckoutEffect {
