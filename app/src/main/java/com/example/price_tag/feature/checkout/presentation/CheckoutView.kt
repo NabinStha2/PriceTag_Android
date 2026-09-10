@@ -131,6 +131,7 @@ internal fun CheckoutScreen(
                             onRetry = {
                                 onIntent(CheckoutContract.CheckoutIntent.GetAddresses)
                             },
+                            selectedAddressError = uiState.selectedAddressError,
                         )
                     }
 
@@ -145,6 +146,7 @@ internal fun CheckoutScreen(
                             onPhoneNumberChange = { value ->
                                 onIntent(CheckoutContract.CheckoutIntent.PhoneNumberChanged(value))
                             },
+                            contactDetailsErrors = uiState.contactDetailsErrors,
                         )
                     }
 
@@ -178,6 +180,7 @@ internal fun CheckoutScreen(
                 onIntent(CheckoutContract.CheckoutIntent.SubmitAddressForm)
             },
             errorMessage = (uiState.createAddressState as? ResourceState.Error)?.error,
+            errors = uiState.addressFormErrors,
         )
     }
 }

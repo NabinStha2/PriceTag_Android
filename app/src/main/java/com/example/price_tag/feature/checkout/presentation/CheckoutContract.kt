@@ -6,7 +6,9 @@ import com.example.price_tag.feature.checkout.domain.model.CreateOrderParams
 import com.example.price_tag.feature.checkout.domain.model.CreatedOrder
 import com.example.price_tag.feature.checkout.domain.model.NewAddress
 import com.example.price_tag.feature.checkout.domain.model.PaymentIntentDetails
+import com.example.price_tag.feature.checkout.presentation.model.AddressFormErrors
 import com.example.price_tag.feature.checkout.presentation.model.AddressFormState
+import com.example.price_tag.feature.checkout.presentation.model.ContactDetailsErrors
 import com.example.utilites.ResourceState
 
 class CheckoutContract {
@@ -35,11 +37,15 @@ class CheckoutContract {
         val paymentIntentDetailsState: ResourceState<PaymentIntentDetails>? = ResourceState.Initial,
         val shippingFee: Double? = null,
         val currencyCode: String = "AUD",
-        val selectedAddressId: Long? = null,
         val isAddressFormVisible: Boolean = false,
+        val addressForm: AddressFormState = AddressFormState(),
+        val addressFormErrors: AddressFormErrors = AddressFormErrors(),
         val recipientName: String = "",
         val phoneNumber: String = "",
-        val addressForm: AddressFormState = AddressFormState(),
+        val contactDetailsErrors: ContactDetailsErrors = ContactDetailsErrors(),
+        val selectedAddressId: Long? = null,
+        val selectedAddressError: String? = null,
+        val hasSubmittedAddressForm: Boolean = false,
     )
 
     sealed interface CheckoutEffect {

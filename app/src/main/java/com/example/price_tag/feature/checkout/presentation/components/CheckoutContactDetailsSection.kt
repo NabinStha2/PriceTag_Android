@@ -13,6 +13,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import com.example.price_tag.feature.checkout.presentation.model.ContactDetailsErrors
 
 @Composable
 fun CheckoutContactDetailsSection(
@@ -21,6 +22,7 @@ fun CheckoutContactDetailsSection(
     onRecipientNameChange: (String) -> Unit,
     onPhoneNumberChange: (String) -> Unit,
     modifier: Modifier = Modifier,
+    contactDetailsErrors: ContactDetailsErrors = ContactDetailsErrors(),
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -43,6 +45,10 @@ fun CheckoutContactDetailsSection(
                 keyboardType = KeyboardType.Text,
                 imeAction = ImeAction.Next,
             ),
+            isError = contactDetailsErrors.recipientName != null,
+            supportingText = contactDetailsErrors.recipientName?.let { message ->
+                { Text(text = message) }
+            },
             modifier = Modifier.fillMaxWidth(),
         )
 
@@ -57,6 +63,10 @@ fun CheckoutContactDetailsSection(
                 keyboardType = KeyboardType.Phone,
                 imeAction = ImeAction.Done,
             ),
+            isError = contactDetailsErrors.phoneNumber != null,
+            supportingText = contactDetailsErrors.phoneNumber?.let { message ->
+                { Text(text = message) }
+            },
             modifier = Modifier.fillMaxWidth(),
         )
     }

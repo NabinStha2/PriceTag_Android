@@ -7,9 +7,12 @@ import com.example.price_tag.feature.checkout.domain.model.Address
 import com.example.price_tag.feature.checkout.domain.model.NewAddress
 import com.example.price_tag.feature.checkout.domain.usecase.CreateAddressUseCase
 import com.example.price_tag.feature.checkout.domain.usecase.GetAddressesUseCase
-import com.example.price_tag.feature.checkout.presentation.mapper.isValid
 import com.example.price_tag.feature.checkout.presentation.mapper.toNewAddress
+import com.example.price_tag.feature.checkout.presentation.model.AddressFormErrors
 import com.example.price_tag.feature.checkout.presentation.model.AddressFormState
+import com.example.price_tag.feature.checkout.presentation.model.ContactDetailsErrors
+import com.example.price_tag.feature.checkout.presentation.validation.validate
+import com.example.price_tag.feature.checkout.presentation.validation.validateCheckoutContactDetails
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -58,18 +61,36 @@ class CheckoutViewModel @Inject constructor(
             }
 
             is CheckoutContract.CheckoutIntent.RecipientNameChanged -> {
-                _state.update { currentState -> currentState.copy(recipientName = intent.recipientName) }
+                _state.update { currentState ->
+                    currentState.copy(
+                        recipientName = intent.recipientName,
+                        contactDetailsErrors = currentState.contactDetailsErrors.copy(recipientName = null),
+                    )
+                }
             }
 
             is CheckoutContract.CheckoutIntent.PhoneNumberChanged -> {
-                _state.update { currentState -> currentState.copy(phoneNumber = intent.phoneNumber) }
+                _state.update { currentState ->
+                    currentState.copy(
+                        phoneNumber = intent.phoneNumber,
+                        contactDetailsErrors = currentState.contactDetailsErrors.copy(phoneNumber = null),
+                    )
+                }
             }
 
             is CheckoutContract.CheckoutIntent.AddressFormChanged -> {
+                if (createAddressJob?.isActive == true) {
+                    return
+                }
                 _state.update { currentState ->
                     currentState.copy(
                         addressForm = intent.addressForm,
                         createAddressState = ResourceState.Initial,
+                        addressFormErrors = if (currentState.hasSubmittedAddressForm) {
+                            intent.addressForm.validate()
+                        } else {
+                            AddressFormErrors()
+                        },
                     )
                 }
             }
@@ -79,7 +100,9 @@ class CheckoutViewModel @Inject constructor(
                     currentState.copy(
                         isAddressFormVisible = false,
                         addressForm = AddressFormState(),
+                        addressFormErrors = AddressFormErrors(),
                         createAddressState = ResourceState.Initial,
+                        hasSubmittedAddressForm = false,
                     )
                 }
             }
@@ -87,6 +110,11 @@ class CheckoutViewModel @Inject constructor(
             is CheckoutContract.CheckoutIntent.SubmitAddressForm -> {
                 submitAddressForm()
             }
+
+            is CheckoutContract.CheckoutIntent.ContinueToPaymentClicked -> {
+                validateCheckout()
+            }
+
 
             else -> Unit
         }
@@ -129,7 +157,10 @@ class CheckoutViewModel @Inject constructor(
         _state.update { currentState ->
             val addressesState: ResourceState<List<Address>> = currentState.addressesState
             if (addressesState is ResourceState.Success && addressesState.data.any { it.id == addressId }) {
-                currentState.copy(selectedAddressId = addressId)
+                currentState.copy(
+                    selectedAddressId = addressId,
+                    selectedAddressError = null,
+                )
             } else {
                 currentState
             }
@@ -174,14 +205,36 @@ class CheckoutViewModel @Inject constructor(
     }
 
     private fun submitAddressForm() {
+        if (createAddressJob?.isActive == true) {
+            return
+        }
+
         val addressForm: AddressFormState = _state.value.addressForm
-        if (!_state.value.addressForm.isValid()) {
+        val errors: AddressFormErrors = addressForm.validate()
+
+        _state.update {
+            it.copy(
+                addressFormErrors = errors,
+                hasSubmittedAddressForm = true,
+            )
+        }
+
+        if (!errors.isValid) {
+            _state.update { currentState ->
+                currentState.copy(
+                    createAddressState = ResourceState.Initial,
+                )
+            }
             return
         }
 
         val newAddress: NewAddress = addressForm.toNewAddress()
-        if (createAddressJob?.isActive == true) {
-            return
+
+        _state.update {
+            it.copy(
+                addressFormErrors = AddressFormErrors(),
+                createAddressState = ResourceState.Loading,
+            )
         }
 
         createAddressJob = viewModelScope.launch {
@@ -200,14 +253,48 @@ class CheckoutViewModel @Inject constructor(
                                                     ?: currentState.selectedAddressId,
                                 isAddressFormVisible = false,
                                 addressForm = AddressFormState(),
+                                addressFormErrors = AddressFormErrors(),
+                                hasSubmittedAddressForm = false,
                             )
                         }
 
-                        else -> currentState.copy(createAddressState = response)
+                        else -> currentState.copy(
+                            createAddressState = response,
+                        )
                     }
                 }
             }
         }
+    }
+
+    private fun validateCheckout(): Boolean {
+        val currentState = _state.value
+
+        val contactErrors: ContactDetailsErrors = validateCheckoutContactDetails(
+            recipientName = currentState.recipientName,
+            phoneNumber = currentState.phoneNumber,
+        )
+
+        val addressesState: ResourceState<List<Address>> = currentState.addressesState
+        val hasSelectedAddress: Boolean =
+            addressesState is ResourceState.Success && addressesState.data.any {
+                it.id == currentState.selectedAddressId
+            }
+
+        val addressError: String? = if (hasSelectedAddress) {
+            null
+        } else {
+            "Select a delivery address"
+        }
+
+        _state.update {
+            it.copy(
+                contactDetailsErrors = contactErrors,
+                selectedAddressError = addressError,
+            )
+        }
+
+        return contactErrors.isValid && hasSelectedAddress
     }
 
 

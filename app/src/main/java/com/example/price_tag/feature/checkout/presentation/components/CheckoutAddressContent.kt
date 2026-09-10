@@ -22,6 +22,7 @@ fun CheckoutAddressContent(
     onAddAddressClick: () -> Unit,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
+    selectedAddressError: String? = null,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -76,6 +77,14 @@ fun CheckoutAddressContent(
                     onAddAddressClick = onAddAddressClick,
                 )
             }
+        }
+
+        selectedAddressError?.let { message ->
+            Text(
+                text = message,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+            )
         }
     }
 }

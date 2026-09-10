@@ -19,6 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
+import com.example.price_tag.feature.checkout.presentation.model.AddressFormErrors
 import com.example.price_tag.feature.checkout.presentation.model.AddressFormState
 
 
@@ -31,7 +32,8 @@ fun CheckoutAddressFormSheet(
     onDismiss: () -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier,
-    errorMessage: String?,
+    errorMessage: String?, // this errorMessage if from the API or network failures
+    errors: AddressFormErrors,
 ) {
     ModalBottomSheet(
         modifier = modifier,
@@ -54,7 +56,6 @@ fun CheckoutAddressFormSheet(
                     style = MaterialTheme.typography.headlineSmall,
                 )
             }
-
             if (errorMessage != null) {
                 item {
                     Text(
@@ -70,6 +71,8 @@ fun CheckoutAddressFormSheet(
                     value = form.label,
                     label = "Label (for example, Home)",
                     onValueChange = { onFormChange(form.copy(label = it)) },
+                    errorMessage = errors.label,
+                    enabled = !isSaving,
                 )
             }
 
@@ -80,6 +83,8 @@ fun CheckoutAddressFormSheet(
                     onValueChange = {
                         onFormChange(form.copy(unitNumber = it))
                     },
+                    errorMessage = errors.unitNumber,
+                    enabled = !isSaving,
                 )
             }
 
@@ -90,6 +95,8 @@ fun CheckoutAddressFormSheet(
                     onValueChange = {
                         onFormChange(form.copy(streetNumber = it))
                     },
+                    errorMessage = errors.streetNumber,
+                    enabled = !isSaving,
                 )
             }
 
@@ -98,6 +105,8 @@ fun CheckoutAddressFormSheet(
                     value = form.street,
                     label = "Street *",
                     onValueChange = { onFormChange(form.copy(street = it)) },
+                    errorMessage = errors.street,
+                    enabled = !isSaving,
                 )
             }
 
@@ -106,6 +115,8 @@ fun CheckoutAddressFormSheet(
                     value = form.city,
                     label = "City *",
                     onValueChange = { onFormChange(form.copy(city = it)) },
+                    errorMessage = errors.city,
+                    enabled = !isSaving,
                 )
             }
 
@@ -114,6 +125,8 @@ fun CheckoutAddressFormSheet(
                     value = form.state,
                     label = "State *",
                     onValueChange = { onFormChange(form.copy(state = it)) },
+                    errorMessage = errors.state,
+                    enabled = !isSaving,
                 )
             }
 
@@ -122,6 +135,8 @@ fun CheckoutAddressFormSheet(
                     value = form.country,
                     label = "Country *",
                     onValueChange = { onFormChange(form.copy(country = it)) },
+                    errorMessage = errors.country,
+                    enabled = !isSaving,
                 )
             }
 
@@ -132,6 +147,8 @@ fun CheckoutAddressFormSheet(
                     onValueChange = {
                         onFormChange(form.copy(postalCode = it))
                     },
+                    errorMessage = errors.postalCode,
+                    enabled = !isSaving,
                 )
             }
 
@@ -141,6 +158,7 @@ fun CheckoutAddressFormSheet(
                     onCheckedChange = {
                         onFormChange(form.copy(isDefault = it))
                     },
+                    enabled = !isSaving,
                 )
             }
 
@@ -171,8 +189,11 @@ private fun AddressTextField(
     value: String,
     label: String,
     onValueChange: (String) -> Unit,
+    errorMessage: String?,
+    enabled: Boolean,
 ) {
     OutlinedTextField(
+        enabled = enabled,
         modifier = Modifier.fillMaxWidth(),
         value = value,
         onValueChange = onValueChange,
@@ -181,5 +202,16 @@ private fun AddressTextField(
         keyboardOptions = KeyboardOptions(
             capitalization = KeyboardCapitalization.Words,
         ),
+        isError = errorMessage.isNullOrBlank()
+            .not(),
+        supportingText = errorMessage?.let { message ->
+            {
+                Text(
+                    message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        },
     )
 }
