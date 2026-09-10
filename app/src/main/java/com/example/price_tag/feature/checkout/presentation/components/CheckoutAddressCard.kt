@@ -27,6 +27,7 @@ fun CheckoutAddressCard(
     isSelected: Boolean,
     onSelect: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Card(
         modifier = modifier
@@ -35,6 +36,7 @@ fun CheckoutAddressCard(
                 selected = isSelected,
                 role = Role.RadioButton,
                 onClick = onSelect,
+                enabled = enabled,
             ),
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(
@@ -61,6 +63,7 @@ fun CheckoutAddressCard(
             RadioButton(
                 selected = isSelected,
                 onClick = null,
+                enabled = enabled,
             )
 
             Column(

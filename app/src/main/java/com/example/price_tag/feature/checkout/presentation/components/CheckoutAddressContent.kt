@@ -23,6 +23,7 @@ fun CheckoutAddressContent(
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
     selectedAddressError: String? = null,
+    enabled: Boolean = true,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -75,6 +76,7 @@ fun CheckoutAddressContent(
                     selectedAddressId = selectedAddressId,
                     onAddressSelected = onAddressSelected,
                     onAddAddressClick = onAddAddressClick,
+                    enabled = enabled,
                 )
             }
         }

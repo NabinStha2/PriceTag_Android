@@ -23,6 +23,7 @@ fun CheckoutContactDetailsSection(
     onPhoneNumberChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     contactDetailsErrors: ContactDetailsErrors = ContactDetailsErrors(),
+    enabled: Boolean = true,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),

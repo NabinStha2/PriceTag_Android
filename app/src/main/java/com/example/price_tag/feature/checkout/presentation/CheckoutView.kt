@@ -31,6 +31,7 @@ import com.example.price_tag.feature.checkout.presentation.components.CheckoutAd
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutContactDetailsSection
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutErrorState
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutLoadingState
+import com.example.price_tag.feature.checkout.presentation.components.CheckoutOrderStatus
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutOrderSummaryCard
 import com.example.utilites.ResourceState
 
@@ -62,6 +63,9 @@ internal fun CheckoutScreen(
     modifier: Modifier = Modifier,
     onIntent: (CheckoutContract.CheckoutIntent) -> Unit,
 ) {
+    val canEditOrderDetails: Boolean =
+        uiState.createOrderState !is ResourceState.Loading && uiState.createOrderState !is ResourceState.Success
+
     Scaffold(
         modifier = modifier
             .fillMaxSize()
@@ -86,12 +90,17 @@ internal fun CheckoutScreen(
             if (uiState.cartState is ResourceState.Success) {
                 val isProcessing =
                     uiState.createOrderState is ResourceState.Loading || uiState.paymentIntentDetailsState is ResourceState.Loading
+                val paymentErrorMessage =
+                    (uiState.paymentIntentDetailsState as? ResourceState.Error)?.error
+
                 CheckoutActionBar(
                     isLoading = isProcessing,
-                    enabled = !isProcessing,
+                    enabled = !isProcessing && uiState.paymentIntentDetailsState !is ResourceState.Success,
                     onContinueClick = {
                         onIntent(CheckoutContract.CheckoutIntent.ContinueToPaymentClicked)
                     },
+                    errorMessage = paymentErrorMessage,
+                    buttonText = if (paymentErrorMessage != null) "Retry payment setup" else "Continue to payment",
                 )
             }
         },
@@ -118,6 +127,12 @@ internal fun CheckoutScreen(
                     contentPadding = PaddingValues(16.dp),
                     verticalArrangement = Arrangement.spacedBy(24.dp),
                 ) {
+                    if (uiState.createOrderState is ResourceState.Error || uiState.createOrderState is ResourceState.Success) {
+                        item(key = "checkout-order-status") {
+                            CheckoutOrderStatus(orderState = uiState.createOrderState)
+                        }
+                    }
+
                     item(key = "checkout-delivery-address") {
                         CheckoutAddressContent(
                             addressesState = uiState.addressesState,
@@ -132,6 +147,7 @@ internal fun CheckoutScreen(
                                 onIntent(CheckoutContract.CheckoutIntent.GetAddresses)
                             },
                             selectedAddressError = uiState.selectedAddressError,
+                            enabled = canEditOrderDetails,
                         )
                     }
 
@@ -147,6 +163,7 @@ internal fun CheckoutScreen(
                                 onIntent(CheckoutContract.CheckoutIntent.PhoneNumberChanged(value))
                             },
                             contactDetailsErrors = uiState.contactDetailsErrors,
+                            enabled = canEditOrderDetails,
                         )
                     }
 

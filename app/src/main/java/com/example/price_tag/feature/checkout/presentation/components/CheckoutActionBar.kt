@@ -25,6 +25,8 @@ fun CheckoutActionBar(
     enabled: Boolean,
     isLoading: Boolean,
     onContinueClick: () -> Unit,
+    errorMessage: String? = null,
+    buttonText: String = "Continue to payment",
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
@@ -39,6 +41,15 @@ fun CheckoutActionBar(
                     vertical = 12.dp,
                 ),
         ) {
+            errorMessage?.let { message ->
+                Text(
+                    text = message,
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                )
+            }
+
             Button(
                 enabled = enabled && !isLoading,
                 onClick = onContinueClick,
@@ -59,7 +70,7 @@ fun CheckoutActionBar(
                     text = if (isLoading) {
                         "Preparing payment…"
                     } else {
-                        "Continue to payment"
+                        buttonText
                     },
                 )
             }

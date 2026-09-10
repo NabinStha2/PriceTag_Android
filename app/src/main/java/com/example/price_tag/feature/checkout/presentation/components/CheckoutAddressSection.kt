@@ -24,6 +24,7 @@ fun CheckoutAddressSection(
     onAddressSelected: (Address) -> Unit,
     onAddAddressClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -53,6 +54,7 @@ fun CheckoutAddressSection(
                             onSelect = {
                                 onAddressSelected(address)
                             },
+                            enabled = enabled,
                         )
                     }
                 }

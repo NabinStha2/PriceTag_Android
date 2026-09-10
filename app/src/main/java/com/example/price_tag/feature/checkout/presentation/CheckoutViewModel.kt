@@ -2,11 +2,16 @@ package com.example.price_tag.feature.checkout.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.price_tag.feature.cart.domain.model.Cart
 import com.example.price_tag.feature.cart.domain.usecase.GetAllCartItemsUseCase
 import com.example.price_tag.feature.checkout.domain.model.Address
+import com.example.price_tag.feature.checkout.domain.model.CreateOrderParams
+import com.example.price_tag.feature.checkout.domain.model.CreatedOrder
 import com.example.price_tag.feature.checkout.domain.model.NewAddress
 import com.example.price_tag.feature.checkout.domain.usecase.CreateAddressUseCase
+import com.example.price_tag.feature.checkout.domain.usecase.CreateOrderUseCase
 import com.example.price_tag.feature.checkout.domain.usecase.GetAddressesUseCase
+import com.example.price_tag.feature.checkout.domain.usecase.InitializePaymentUseCase
 import com.example.price_tag.feature.checkout.presentation.mapper.toNewAddress
 import com.example.price_tag.feature.checkout.presentation.model.AddressFormErrors
 import com.example.price_tag.feature.checkout.presentation.model.AddressFormState
@@ -30,6 +35,8 @@ class CheckoutViewModel @Inject constructor(
     private val getAllCartItemsUseCase: GetAllCartItemsUseCase,
     private val getAllAddressesUseCase: GetAddressesUseCase,
     private val createAddressUseCase: CreateAddressUseCase,
+    private val createOrderUseCase: CreateOrderUseCase,
+    private val paymentInitializePaymentUseCase: InitializePaymentUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(CheckoutContract.CheckoutState())
     val state: StateFlow<CheckoutContract.CheckoutState> = _state.asStateFlow()
@@ -37,8 +44,21 @@ class CheckoutViewModel @Inject constructor(
     private var cartJob: Job? = null
     private var addressJob: Job? = null
     private var createAddressJob: Job? = null
+    private var createOrderJob: Job? = null
+    private var initializePaymentJob: Job? = null
 
     fun onIntent(intent: CheckoutContract.CheckoutIntent) {
+        val changesOrderDetails = when (intent) {
+            is CheckoutContract.CheckoutIntent.RecipientNameChanged, is CheckoutContract.CheckoutIntent.PhoneNumberChanged, is CheckoutContract.CheckoutIntent.SelectAddress, CheckoutContract.CheckoutIntent.AddAddressClicked, is CheckoutContract.CheckoutIntent.AddressFormChanged, CheckoutContract.CheckoutIntent.SubmitAddressForm -> true
+
+            else -> false
+        }
+
+        if (areOrderDetailsLocked() && changesOrderDetails) {
+            return
+        }
+
+
         when (intent) {
             is CheckoutContract.CheckoutIntent.LoadCheckout -> {
                 loadCheckout(intent.cartId)
@@ -48,34 +68,16 @@ class CheckoutViewModel @Inject constructor(
                 }
             }
 
+            is CheckoutContract.CheckoutIntent.GetAddresses -> {
+                loadAddresses()
+            }
+
             is CheckoutContract.CheckoutIntent.SelectAddress -> {
                 selectAddress(addressId = intent.address.id)
             }
 
             is CheckoutContract.CheckoutIntent.AddAddressClicked -> {
                 addAddressClicked()
-            }
-
-            is CheckoutContract.CheckoutIntent.GetAddresses -> {
-                loadAddresses()
-            }
-
-            is CheckoutContract.CheckoutIntent.RecipientNameChanged -> {
-                _state.update { currentState ->
-                    currentState.copy(
-                        recipientName = intent.recipientName,
-                        contactDetailsErrors = currentState.contactDetailsErrors.copy(recipientName = null),
-                    )
-                }
-            }
-
-            is CheckoutContract.CheckoutIntent.PhoneNumberChanged -> {
-                _state.update { currentState ->
-                    currentState.copy(
-                        phoneNumber = intent.phoneNumber,
-                        contactDetailsErrors = currentState.contactDetailsErrors.copy(phoneNumber = null),
-                    )
-                }
             }
 
             is CheckoutContract.CheckoutIntent.AddressFormChanged -> {
@@ -111,15 +113,117 @@ class CheckoutViewModel @Inject constructor(
                 submitAddressForm()
             }
 
-            is CheckoutContract.CheckoutIntent.ContinueToPaymentClicked -> {
-                validateCheckout()
+            is CheckoutContract.CheckoutIntent.RecipientNameChanged -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        recipientName = intent.recipientName,
+                        contactDetailsErrors = currentState.contactDetailsErrors.copy(recipientName = null),
+                    )
+                }
             }
 
+            is CheckoutContract.CheckoutIntent.PhoneNumberChanged -> {
+                _state.update { currentState ->
+                    currentState.copy(
+                        phoneNumber = intent.phoneNumber,
+                        contactDetailsErrors = currentState.contactDetailsErrors.copy(phoneNumber = null),
+                    )
+                }
+            }
+
+            is CheckoutContract.CheckoutIntent.ContinueToPaymentClicked -> {
+                placeOrder()
+            }
 
             else -> Unit
         }
     }
 
+    private fun areOrderDetailsLocked(): Boolean {
+        val orderState = _state.value.createOrderState
+
+        return orderState is ResourceState.Loading || orderState is ResourceState.Success
+    }
+
+    private fun initializePayment(orderNumber: String) {
+        if (initializePaymentJob?.isActive == true) {
+            return
+        }
+
+        if (_state.value.paymentIntentDetailsState is ResourceState.Success) {
+            return
+        }
+
+        initializePaymentJob = viewModelScope.launch {
+            paymentInitializePaymentUseCase(orderNumber).collectLatest { response ->
+                _state.update { currentState ->
+                    when (response) {
+                        is ResourceState.Loading -> {
+                            currentState.copy(paymentIntentDetailsState = ResourceState.Loading)
+                        }
+
+                        is ResourceState.Success -> {
+                            currentState.copy(paymentIntentDetailsState = response)
+                        }
+
+                        else -> currentState.copy(paymentIntentDetailsState = response)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun placeOrder() {
+        if (createOrderJob?.isActive == true) return
+
+        val currentState: CheckoutContract.CheckoutState = _state.value
+
+        val existingOrder: ResourceState<CreatedOrder> = currentState.createOrderState
+        if (existingOrder is ResourceState.Success) {
+            initializePayment(existingOrder.data.orderNumber)
+            return
+        }
+
+        if (createAddressJob?.isActive == true) return
+
+        val cartState: ResourceState<Cart> = currentState.cartState
+        if (cartState !is ResourceState.Success) return
+        if (cartState.data.items.isEmpty()) {
+            _state.update {
+                it.copy(createOrderState = ResourceState.Error("Your cart is empty"))
+            }
+            return
+        }
+
+        if (!validateCheckout()) return
+
+        val validatedState = _state.value
+        val addressId = validatedState.selectedAddressId ?: return
+
+        val createOrderParams: CreateOrderParams = CreateOrderParams(
+            addressId = addressId,
+            recipientName = currentState.recipientName.trim(),
+            phoneNumber = currentState.phoneNumber.trim(),
+        )
+
+        _state.update {
+            it.copy(createOrderState = ResourceState.Loading)
+        }
+
+        createOrderJob = viewModelScope.launch {
+            createOrderUseCase(createOrderParams).collectLatest { response ->
+                _state.update { currentState ->
+                    currentState.copy(createOrderState = response)
+                }
+
+                if (response is ResourceState.Success) {
+                    initializePayment(response.data.orderNumber)
+
+                }
+
+            }
+        }
+    }
 
     private fun loadCheckout(cartId: Long) {
         if (cartId <= 0L) {
@@ -166,7 +270,6 @@ class CheckoutViewModel @Inject constructor(
             }
         }
     }
-
 
     private fun addAddressClicked() {
         _state.update { currentState -> currentState.copy(isAddressFormVisible = true) }
@@ -296,6 +399,4 @@ class CheckoutViewModel @Inject constructor(
 
         return contactErrors.isValid && hasSelectedAddress
     }
-
-
 }
