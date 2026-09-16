@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application) //    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.compose.compiler)
@@ -5,6 +7,23 @@ plugins {
     alias(libs.plugins.hilt)
     alias(libs.plugins.jetbrains.kotlin.serialization)
 }
+
+val localConfig = Properties().apply {
+    val configFile = rootProject.file("local.properties")
+    if (configFile.exists()) {
+        configFile.inputStream()
+            .use { load(it) }
+    }
+}
+
+val stripePublishableKey = localConfig.getProperty("STRIPE_PUBLISHABLE_KEY",
+                                                   "")
+    .trim()
+
+require(stripePublishableKey.startsWith("pk_")) {
+    "Set STRIPE_PUBLISHABLE_KEY in local.properties"
+}
+
 
 android {
     namespace = "com.example.price_tag"
@@ -22,6 +41,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField(
+            "String",
+            "STRIPE_PUBLISHABLE_KEY",
+            "\"$stripePublishableKey\"",
+        )
     }
 
     buildTypes {
@@ -39,6 +64,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -125,4 +151,7 @@ dependencies {
 
     // ---------------- Module ----------------
     implementation(project(":utilites"))
+
+    // ---------------- Stripe ----------------
+    implementation(libs.stripe.android)
 }

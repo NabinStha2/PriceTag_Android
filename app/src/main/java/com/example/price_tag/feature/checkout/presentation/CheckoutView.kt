@@ -18,6 +18,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,8 @@ import com.example.price_tag.feature.checkout.presentation.components.CheckoutLo
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutOrderStatus
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutOrderSummaryCard
 import com.example.utilites.ResourceState
+import com.stripe.android.paymentsheet.PaymentSheet
+import com.stripe.android.paymentsheet.PaymentSheetResult
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,11 +46,26 @@ fun CheckoutView(
     checkoutViewModel: CheckoutViewModel = hiltViewModel(),
 ) {
     val uiState by checkoutViewModel.state.collectAsStateWithLifecycle()
+    
+    val paymentSheet = remember(checkoutViewModel) {
+        PaymentSheet.Builder { result ->
+            val intent = when (result) {
+                is PaymentSheetResult.Completed -> CheckoutContract.CheckoutIntent.PaymentSheetCompleted
+
+                is PaymentSheetResult.Canceled -> CheckoutContract.CheckoutIntent.PaymentSheetCanceled
+
+                is PaymentSheetResult.Failed -> CheckoutContract.CheckoutIntent.PaymentSheetFailed(
+                    message = "Payment could not be completed. Please try again.",
+                )
+            }
+
+            checkoutViewModel.onIntent(intent)
+        }
+    }.build()
 
     LaunchedEffect(key1 = cartId) {
         checkoutViewModel.onIntent(CheckoutContract.CheckoutIntent.LoadCheckout(cartId))
     }
-
     CheckoutScreen(
         uiState = uiState,
         onBackClick = onBackClick,

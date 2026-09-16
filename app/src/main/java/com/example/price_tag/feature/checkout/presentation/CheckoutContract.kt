@@ -23,7 +23,9 @@ class CheckoutContract {
         data class RecipientNameChanged(val recipientName: String) : CheckoutIntent
         data class PhoneNumberChanged(val phoneNumber: String) : CheckoutIntent
         data object ContinueToPaymentClicked : CheckoutIntent
-        data class InitializePayment(val orderNumber: String) : CheckoutIntent
+        data object PaymentSheetCompleted : CheckoutIntent
+        data object PaymentSheetCanceled : CheckoutIntent
+        data class PaymentSheetFailed(val message: String) : CheckoutIntent
     }
 
     data class CheckoutState(
@@ -44,6 +46,8 @@ class CheckoutContract {
         val hasSubmittedAddressForm: Boolean = false,
         val createOrderState: ResourceState<CreatedOrder> = ResourceState.Initial,
         val paymentIntentDetailsState: ResourceState<PaymentIntentDetails> = ResourceState.Initial,
+        val isAwaitingPaymentConfirmation: Boolean = false,
+        val paymentResultMessage: String? = null,
     )
 
     sealed interface CheckoutEffect {

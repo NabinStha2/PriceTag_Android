@@ -5,7 +5,9 @@ data class ContactDetailsErrors(
     val phoneNumber: String? = null,
 ) {
     val isValid: Boolean
-        get() = listOf(recipientName,
-                       phoneNumber).all { it == null }
+        get() = listOf(
+            recipientName,
+            phoneNumber,
+        ).all { it == null }
 
 }

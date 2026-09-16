@@ -21,10 +21,12 @@ import com.example.price_tag.feature.checkout.presentation.validation.validateCh
 import com.example.utilites.ResourceState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -40,6 +42,9 @@ class CheckoutViewModel @Inject constructor(
 ) : ViewModel() {
     private val _state = MutableStateFlow(CheckoutContract.CheckoutState())
     val state: StateFlow<CheckoutContract.CheckoutState> = _state.asStateFlow()
+
+    private val _effects = Channel<CheckoutContract.CheckoutEffect>(Channel.BUFFERED)
+    val effect = _effects.receiveAsFlow()
 
     private var cartJob: Job? = null
     private var addressJob: Job? = null
@@ -135,7 +140,32 @@ class CheckoutViewModel @Inject constructor(
                 placeOrder()
             }
 
-            else -> Unit
+            CheckoutContract.CheckoutIntent.PaymentSheetCompleted -> {
+                _state.update {
+                    it.copy(
+                        isAwaitingPaymentConfirmation = true,
+                        paymentResultMessage = "Payment submitted. Checking order status…",
+                    )
+                }
+            }
+
+            CheckoutContract.CheckoutIntent.PaymentSheetCanceled -> {
+                _state.update {
+                    it.copy(
+                        isAwaitingPaymentConfirmation = false,
+                        paymentResultMessage = "Payment cancelled. You can try again.",
+                    )
+                }
+            }
+
+            is CheckoutContract.CheckoutIntent.PaymentSheetFailed -> {
+                _state.update {
+                    it.copy(
+                        isAwaitingPaymentConfirmation = false,
+                        paymentResultMessage = intent.message,
+                    )
+                }
+            }
         }
     }
 
@@ -157,17 +187,15 @@ class CheckoutViewModel @Inject constructor(
         initializePaymentJob = viewModelScope.launch {
             paymentInitializePaymentUseCase(orderNumber).collectLatest { response ->
                 _state.update { currentState ->
-                    when (response) {
-                        is ResourceState.Loading -> {
-                            currentState.copy(paymentIntentDetailsState = ResourceState.Loading)
-                        }
+                    currentState.copy(paymentIntentDetailsState = response)
+                }
 
-                        is ResourceState.Success -> {
-                            currentState.copy(paymentIntentDetailsState = response)
-                        }
-
-                        else -> currentState.copy(paymentIntentDetailsState = response)
+                when (response) {
+                    is ResourceState.Success -> {
+                        _effects.send(CheckoutContract.CheckoutEffect.PresentPaymentSheet(response.data.clientSecret))
                     }
+
+                    else -> Unit
                 }
             }
         }
