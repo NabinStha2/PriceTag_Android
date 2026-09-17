@@ -48,6 +48,7 @@ class CheckoutContract {
         val paymentIntentDetailsState: ResourceState<PaymentIntentDetails> = ResourceState.Initial,
         val isAwaitingPaymentConfirmation: Boolean = false,
         val paymentResultMessage: String? = null,
+        val isPaymentSheetOpen: Boolean = false,
     )
 
     sealed interface CheckoutEffect {

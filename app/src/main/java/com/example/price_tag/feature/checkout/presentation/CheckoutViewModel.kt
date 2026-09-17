@@ -145,6 +145,7 @@ class CheckoutViewModel @Inject constructor(
                     it.copy(
                         isAwaitingPaymentConfirmation = true,
                         paymentResultMessage = "Payment submitted. Checking order status…",
+                        isPaymentSheetOpen = false,
                     )
                 }
             }
@@ -154,6 +155,7 @@ class CheckoutViewModel @Inject constructor(
                     it.copy(
                         isAwaitingPaymentConfirmation = false,
                         paymentResultMessage = "Payment cancelled. You can try again.",
+                        isPaymentSheetOpen = false,
                     )
                 }
             }
@@ -163,9 +165,29 @@ class CheckoutViewModel @Inject constructor(
                     it.copy(
                         isAwaitingPaymentConfirmation = false,
                         paymentResultMessage = intent.message,
+                        isPaymentSheetOpen = false,
                     )
                 }
             }
+        }
+    }
+
+    private fun presentPaymentSheet(clientSecret: String) {
+        val currentState = _state.value
+
+        if (currentState.isPaymentSheetOpen || currentState.isAwaitingPaymentConfirmation) {
+            return
+        }
+
+        _state.update {
+            it.copy(
+                isPaymentSheetOpen = true,
+                paymentResultMessage = null,
+            )
+        }
+
+        viewModelScope.launch {
+            _effects.send(CheckoutContract.CheckoutEffect.PresentPaymentSheet(clientSecret))
         }
     }
 
@@ -180,8 +202,16 @@ class CheckoutViewModel @Inject constructor(
             return
         }
 
-        if (_state.value.paymentIntentDetailsState is ResourceState.Success) {
+        val currentState = _state.value
+        if (currentState.isPaymentSheetOpen || currentState.isAwaitingPaymentConfirmation) {
             return
+        }
+
+        _state.update {
+            it.copy(
+                paymentIntentDetailsState = ResourceState.Loading,
+                paymentResultMessage = null,
+            )
         }
 
         initializePaymentJob = viewModelScope.launch {
@@ -192,7 +222,7 @@ class CheckoutViewModel @Inject constructor(
 
                 when (response) {
                     is ResourceState.Success -> {
-                        _effects.send(CheckoutContract.CheckoutEffect.PresentPaymentSheet(response.data.clientSecret))
+                        presentPaymentSheet(response.data.clientSecret)
                     }
 
                     else -> Unit
@@ -206,6 +236,11 @@ class CheckoutViewModel @Inject constructor(
 
         val currentState: CheckoutContract.CheckoutState = _state.value
 
+
+        if (currentState.isPaymentSheetOpen || currentState.isAwaitingPaymentConfirmation) {
+            return
+        }
+
         val existingOrder: ResourceState<CreatedOrder> = currentState.createOrderState
         if (existingOrder is ResourceState.Success) {
             initializePayment(existingOrder.data.orderNumber)
@@ -216,6 +251,15 @@ class CheckoutViewModel @Inject constructor(
 
         val cartState: ResourceState<Cart> = currentState.cartState
         if (cartState !is ResourceState.Success) return
+        if (cartState.data.status == "CHECKOUT") {
+            _state.update {
+                it.copy(
+                    createOrderState = ResourceState.Error("An existing checkout must be resumed before continuing."),
+                )
+            }
+            return
+        }
+
         if (cartState.data.items.isEmpty()) {
             _state.update {
                 it.copy(createOrderState = ResourceState.Error("Your cart is empty"))
@@ -246,7 +290,6 @@ class CheckoutViewModel @Inject constructor(
 
                 if (response is ResourceState.Success) {
                     initializePayment(response.data.orderNumber)
-
                 }
 
             }

@@ -13,6 +13,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -23,7 +25,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.price_tag.core.theme.PriceTagTheme
 import com.example.price_tag.feature.cart.domain.model.Cart
 import com.example.price_tag.feature.checkout.presentation.components.CheckoutActionBar
@@ -46,7 +51,10 @@ fun CheckoutView(
     checkoutViewModel: CheckoutViewModel = hiltViewModel(),
 ) {
     val uiState by checkoutViewModel.state.collectAsStateWithLifecycle()
-    
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val snackbarHostState = remember { SnackbarHostState() }
+
+
     val paymentSheet = remember(checkoutViewModel) {
         PaymentSheet.Builder { result ->
             val intent = when (result) {
@@ -66,10 +74,38 @@ fun CheckoutView(
     LaunchedEffect(key1 = cartId) {
         checkoutViewModel.onIntent(CheckoutContract.CheckoutIntent.LoadCheckout(cartId))
     }
+
+    LaunchedEffect(checkoutViewModel,
+                   lifecycleOwner,
+                   paymentSheet) {
+        lifecycleOwner.lifecycle.repeatOnLifecycle(
+            Lifecycle.State.STARTED,
+        ) {
+            checkoutViewModel.effect.collect { effect ->
+                when (effect) {
+                    is CheckoutContract.CheckoutEffect.PresentPaymentSheet -> {
+                        paymentSheet.presentWithPaymentIntent(
+                            effect.clientSecret,
+                            PaymentSheet.Configuration.Builder(
+                                merchantDisplayName = "PriceTag",
+                            )
+                                .build(),
+                        )
+                    }
+
+                    is CheckoutContract.CheckoutEffect.ShowSnackBar -> {
+                        snackbarHostState.showSnackbar(effect.message)
+                    }
+                }
+            }
+        }
+    }
+
     CheckoutScreen(
         uiState = uiState,
         onBackClick = onBackClick,
         onIntent = { checkoutViewModel.onIntent(intent = it) },
+        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -80,6 +116,7 @@ internal fun CheckoutScreen(
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier,
     onIntent: (CheckoutContract.CheckoutIntent) -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val canEditOrderDetails: Boolean =
         uiState.createOrderState !is ResourceState.Loading && uiState.createOrderState !is ResourceState.Success
@@ -89,6 +126,7 @@ internal fun CheckoutScreen(
             .fillMaxSize()
             .imePadding(),
         containerColor = MaterialTheme.colorScheme.background,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -113,12 +151,17 @@ internal fun CheckoutScreen(
 
                 CheckoutActionBar(
                     isLoading = isProcessing,
-                    enabled = !isProcessing && uiState.paymentIntentDetailsState !is ResourceState.Success,
+                    enabled = !isProcessing && !uiState.isPaymentSheetOpen && !uiState.isAwaitingPaymentConfirmation,
                     onContinueClick = {
                         onIntent(CheckoutContract.CheckoutIntent.ContinueToPaymentClicked)
                     },
                     errorMessage = paymentErrorMessage,
-                    buttonText = if (paymentErrorMessage != null) "Retry payment setup" else "Continue to payment",
+                    buttonText = when {
+                        uiState.isAwaitingPaymentConfirmation -> "Checking payment…"
+                        paymentErrorMessage != null -> "Retry payment setup"
+                        uiState.paymentIntentDetailsState is ResourceState.Success -> "Continue payment"
+                        else -> "Continue to payment"
+                    },
                 )
             }
         },
